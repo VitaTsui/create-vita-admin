@@ -1,0 +1,187 @@
+.ChatModal {
+  height: 80vh;
+
+  :global(.ant-modal-body) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+.chatBox {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: stretch;
+  justify-content: flex-start;
+  row-gap: 10px;
+
+  width: 100%;
+  min-height: 0;
+
+  .contextHeader {
+    flex-shrink: 0;
+
+    width: 100%;
+    padding: 0 10px 10px;
+
+    border-bottom: 1px solid var(--cf-border-weak);
+  }
+
+  .contextTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    width: 100%;
+
+    margin-bottom: 0;
+  }
+
+  .contextToggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+
+    font-size: 12px;
+    color: #5e6772;
+
+    cursor: pointer;
+
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+
+    &:hover {
+      color: #111827;
+      background: #f3f4f6;
+    }
+  }
+
+  .contextListTitle {
+    flex: 0 1 auto;
+    max-width: 100%;
+
+    margin-bottom: 0;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1f2937;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .contextSelectedCount {
+    font-weight: 400;
+    color: #6b7280;
+  }
+
+  .contextSelected {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .selectedRowsTableWrap {
+    width: 100%;
+    height: 220px;
+
+    padding: 8px 10px;
+
+    border: 1px solid var(--cf-border-weak);
+    border-radius: 6px;
+
+    background: #fafafa;
+  }
+
+  .contextTable {
+    width: 100%;
+  }
+
+  .contextTableEmpty {
+    padding: 16px;
+
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .chatList {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+
+    margin: 12px 0 40px;
+
+    .chatListContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      width: 100%;
+      max-width: 100%;
+      height: max-content;
+
+      padding: 0 10px;
+      margin: 0 auto;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      width: 10px;
+
+      background-color: #0000001a;
+
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      width: 10px;
+
+      background-color: transparent;
+
+      border-radius: 10px;
+    }
+  }
+
+  .chatInput {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 100%;
+    margin-top: auto;
+    padding: 0 10px;
+    position: relative;
+  }
+
+  > p {
+    display: flex;
+    flex-shrink: 0;
+    align-items: flex-start;
+    justify-content: center;
+
+    margin-bottom: 10px !important;
+
+    font-size: 12px;
+    line-height: 14px;
+    color: #5e6772;
+
+    opacity: 0.7;
+  }
+}

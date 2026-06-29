@@ -1,0 +1,62 @@
+.Cont {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  .items {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
+
+    border: 1px solid var(--cf-border);
+
+    .item {
+      display: flex;
+
+      border-bottom: 1px solid var(--cf-border);
+
+      .fieldName,
+      .fieldDesc,
+      .oldValue,
+      .newValue {
+        display: flex;
+        align-items: center;
+
+        padding: 6px 12px;
+
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .fieldDesc,
+      .fieldName {
+        width: 15%;
+      }
+
+      .oldValue,
+      .newValue {
+        width: 35%;
+      }
+
+      .fieldDesc,
+      .fieldName,
+      .oldValue {
+        border-right: 1px solid var(--cf-border);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.header {
+        font-weight: bold;
+
+        background-color: var(--cf-subtle);
+      }
+    }
+  }
+}

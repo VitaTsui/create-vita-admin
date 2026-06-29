@@ -1,0 +1,35 @@
+{
+  "name": "create-vita-admin",
+  "version": "0.0.1",
+  "description": "脚手架：一键创建基于 @hsu-react/ui 的 React + MobX + webpack 中后台管理项目",
+  "bin": {
+    "create-vita-admin": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "keywords": [
+    "create",
+    "scaffold",
+    "starter",
+    "template",
+    "admin",
+    "vita-admin",
+    "hsu-react",
+    "@hsu-react/ui",
+    "react",
+    "mobx",
+    "antd"
+  ],
+  "author": "vita.hsu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VitaTsui/vita-admin-starter.git"
+  },
+  "homepage": "https://github.com/VitaTsui/vita-admin-starter"
+}

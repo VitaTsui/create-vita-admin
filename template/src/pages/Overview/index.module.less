@@ -1,0 +1,283 @@
+// 去掉 Panel.Default 内容区(content)的背景/描边/内边距，露出内容区灰画布，
+// 恢复「灰底浮卡片」的仪表盘层次；仅保留可滚动能力。
+// 外边距仍由 Panel.Default 外层容器(wrapper)提供。
+.overviewContent {
+  min-height: 0;
+  padding: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+
+  overflow: auto;
+}
+
+// 仅内部纵向布局与卡片间距
+.overview {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+
+  width: 100%;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+
+  padding: 28px 32px;
+
+  color: #fff;
+
+  background: linear-gradient(135deg, #1fa1b4 0%, #15788a 100%);
+  border-radius: 8px;
+  box-shadow: none;
+
+  .hello {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .sub {
+    margin-top: 6px;
+
+    font-size: 14px;
+    opacity: 0.85;
+  }
+}
+
+.stats {
+  display: grid;
+  // auto-fit：卡片拉伸铺满整行；窄屏自动换行
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
+
+  padding: 20px;
+
+  background: var(--cf-surface);
+
+  // CF 风格：描边白卡片，hover 仅描边变色
+  border-radius: 8px;
+  border: 1px solid var(--cf-border);
+  cursor: pointer;
+
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+
+  &:hover {
+    border-color: var(--primary-color);
+
+    box-shadow: 0 1px 4px rgb(19 194 194 / 12%);
+  }
+
+  .statIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 52px;
+    height: 52px;
+
+    font-size: 26px;
+
+    border-radius: 12px;
+  }
+
+  .statInfo {
+    display: flex;
+    flex-direction: column;
+
+    .statValue {
+      color: var(--cf-text);
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .statLabel {
+      margin-top: 2px;
+
+      color: var(--cf-text-2);
+      font-size: 14px;
+    }
+  }
+}
+
+// 使用量卡片：非可点击，hover 不强调
+.statCard.flat {
+  cursor: default;
+
+  &:hover {
+    border-color: var(--cf-border);
+    box-shadow: none;
+  }
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart {
+  width: 100%;
+  height: 280px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+
+  background: var(--cf-surface);
+
+  // CF 风格：描边白卡片
+  border-radius: 8px;
+  border: 1px solid var(--cf-border);
+
+  .panelTitle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+
+    color: var(--cf-text);
+    font-size: 16px;
+    font-weight: 600;
+
+    .more {
+      color: var(--primary-color);
+      font-size: 13px;
+      font-weight: 400;
+
+      cursor: pointer;
+    }
+  }
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+
+  @media (max-width: 1400px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 8px;
+
+  padding: 18px 8px;
+
+  background: var(--cf-subtle);
+
+  border: 1px solid var(--cf-border-weak);
+  border-radius: 8px;
+  cursor: pointer;
+
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+
+  &:hover {
+    background: rgb(19 194 194 / 8%);
+    border-color: rgb(19 194 194 / 35%);
+  }
+
+  .shortcutIcon {
+    color: var(--primary-color);
+    font-size: 24px;
+  }
+
+  .shortcutLabel {
+    color: var(--cf-text);
+    font-size: 13px;
+  }
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  padding: 32px 0;
+
+  color: var(--cf-text-3);
+  font-size: 14px;
+  text-align: center;
+}
+
+.recentItem {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+
+  padding: 12px 4px;
+
+  border-bottom: 1px solid var(--cf-border-weak);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .recentIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    color: var(--primary-color);
+    font-size: 18px;
+
+    background: rgb(19 194 194 / 10%);
+    border-radius: 8px;
+  }
+
+  .recentMain {
+    flex: 1;
+    min-width: 0;
+
+    .recentName {
+      color: var(--cf-text);
+      font-size: 14px;
+      font-weight: 500;
+
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .recentDesc {
+      margin-top: 2px;
+
+      color: var(--cf-text-2);
+      font-size: 12px;
+    }
+  }
+
+  .recentTime {
+    color: var(--cf-text-3);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
