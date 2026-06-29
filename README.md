@@ -40,7 +40,24 @@ yarn start    # 启动开发服务器（默认 3003，portfinder 自动顺延）
 ## 与模板仓库的关系
 
 模板取自 [vita-admin-starter](https://github.com/VitaTsui/vita-admin-starter)。
-脚手架内嵌该模板的快照；模板更新后会发布 `create-vita-admin` 的新版本。
+脚手架内嵌该模板的快照；模板更新后发布 `create-vita-admin` 的新版本。
+
+### 维护（同步模板 + 发布新版本）
+
+`vita-admin-starter` 有更新后，在本仓库执行：
+
+```bash
+yarn sync                          # 从 ../vita-admin-starter 同步模板 + 项目级 skills
+#（也可指定路径：bash scripts/sync-template.sh /path/to/vita-admin-starter）
+
+npm version patch                  # 升补丁版本
+npm publish --otp=<6位验证码>       # 发布（无构建步骤，上传很快）
+git push --follow-tags             # 推送代码与版本标签
+```
+
+`yarn sync` 做的事：rsync 源码到 `template/`（排除 node_modules/dist/.git 等）、
+把 `.gitignore` 重命名为 `_gitignore`（规避 npm 对点 gitignore 的特殊处理）、
+并同步 `.claude/skills/` 项目级规范。
 
 ## License
 

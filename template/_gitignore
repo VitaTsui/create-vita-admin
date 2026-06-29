@@ -16,7 +16,9 @@ dist-ssr
 playwright
 .cursor
 .codex
-.claude
+# 忽略 .claude 本地配置，但保留项目级 skills（页面/接口/选项/菜单规范）
+.claude/*
+!.claude/skills/
 tmp
 
 # Editor directories and files

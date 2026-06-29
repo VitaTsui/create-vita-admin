@@ -5,6 +5,9 @@
   "bin": {
     "create-vita-admin": "index.js"
   },
+  "scripts": {
+    "sync": "bash scripts/sync-template.sh"
+  },
   "files": [
     "index.js",
     "template"
