@@ -48,7 +48,8 @@ const config = {
         }
         return "static/css/[name].[hash:8].chunk.css";
       },
-      chunkFilename: "static/css/[name].[hash:8].chunk.css",
+      // 异步 chunk 无 name，用 [id] 兜底（避免 name 渲染成字面量 undefined）
+      chunkFilename: "static/css/[id].[hash:8].chunk.css",
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -78,7 +79,8 @@ const config = {
             const packageName = module.context.match(
               /[\\/]node_modules[\\/](.*?)([\\/]|$)/
             )?.[1];
-            return `${packageName?.replace("@", "")}`;
+            // 匹配不到包名时返回 undefined，交给 webpack 用 chunk id 命名（避免出现字面量 "undefined"）
+            return packageName ? packageName.replace("@", "") : undefined;
           },
           minSize: 20 * 1024,
           maxSize: 200 * 1024,
