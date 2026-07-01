@@ -10,23 +10,65 @@
   &::after {
     box-sizing: border-box;
   }
+}
 
-  scrollbar-width: auto;
-  scrollbar-color: auto;
+// ===== 现代化滚动条：圆角滑块 + 上下 / 左右 单箭头按钮，hover 加深 =====
+// 中性灰配色，明暗主题下都清晰可见
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(90, 90, 90, 0.7);
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(64, 64, 64, 0.85);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:active {
+  background: rgba(90, 90, 90, 0.9);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
 
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-    border-radius: 1em;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 1em;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 1em;
-  }
+// 箭头按钮：仅两端单箭头，隐藏双箭头端
+::-webkit-scrollbar-button {
+  background-color: rgba(0, 0, 0, 0.06);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+}
+::-webkit-scrollbar-button:hover {
+  background-color: rgba(0, 0, 0, 0.16);
+}
+::-webkit-scrollbar-button:vertical:single-button:decrement {
+  height: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 7.5 L6 4 L9 7.5' fill='none' stroke='%23606060' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:vertical:single-button:increment {
+  height: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 L6 8 L9 4.5' fill='none' stroke='%23606060' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:single-button:decrement {
+  width: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M7.5 3 L4 6 L7.5 9' fill='none' stroke='%23606060' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:single-button:increment {
+  width: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M4.5 3 L8 6 L4.5 9' fill='none' stroke='%23606060' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:double-button {
+  display: none;
 }
 
 html,
