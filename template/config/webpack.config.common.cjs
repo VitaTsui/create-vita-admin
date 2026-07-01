@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -79,7 +80,8 @@ const config = {
       },
       {
         test: /\.scss$/,
-        exclude: /node_modules/,
+        // 放行 @hsu-react/ui 的 es 产物 scss（组件库发布未编译的 .module.scss，需本项目编译），排除其余 node_modules
+        exclude: /node_modules\/(?!@hsu-react\/ui\/)/,
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -118,57 +120,19 @@ const config = {
           },
         ],
       },
-      {
-        // 第三方依赖（@hsu-react/ui、x-data-spreadsheet 等）仍以 .less 发布，
-        // 无法重命名，故仅对 node_modules 内的 .less 保留 less-loader 处理。
-        test: /\.less$/,
-        include: /node_modules/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              modules: {
-                auto: true,
-                localIdentName: "[local]--[hash:base64:5]",
-                getLocalIdent: (_, __, localName) => {
-                  for (const key in PASS_CLS) {
-                    if (PASS_CLS[key] === "LK" && localName.startsWith(key)) {
-                      return localName;
-                    } else if (PASS_CLS[key] === "EQ" && localName === key) {
-                      return localName;
-                    }
-                  }
-
-                  return undefined;
-                },
-              },
-            },
-          },
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [require("autoprefixer")],
-              },
-            },
-          },
-          {
-            loader: "less-loader",
-            options: {
-              lessOptions: {
-                javascriptEnabled: true,
-              },
-            },
-          },
-        ],
-      },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       //模板路径，注意需要和index.html路径对应
       template: path.resolve(__dirname, "../public/index.html"),
+    }),
+    // x-data-spreadsheet 的 src/index.js 会 `import './index.less'`，但其样式已由
+    // @hsu-react/ui 引入的 dist/xspreadsheet.css 提供，这里忽略这条重复的 less 引入，
+    // 从而无需 less/less-loader。
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/index\.less$/,
+      contextRegExp: /x-data-spreadsheet/,
     }),
   ],
   resolve: {
