@@ -1,6 +1,6 @@
 {
   "name": "create-vita-admin",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "脚手架：一键创建基于 @hsu-react/ui 的 React + MobX + webpack 中后台管理项目",
   "bin": {
     "create-vita-admin": "index.js"
