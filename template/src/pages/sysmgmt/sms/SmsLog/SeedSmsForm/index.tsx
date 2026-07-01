@@ -3,7 +3,7 @@ import React from "react";
 import { FormItemProps, Form } from "@hsu-react/ui";
 import SeedSmsFormStore from "./SeedSmsFormStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { Options } from "@/stores/OptionsStore";
 import { PhoneRule } from "@hsu-react/ui/es/components/FormItem/rules";
 

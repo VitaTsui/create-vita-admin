@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import ApiLogFormStore from "./ApiLogFormStore";
 import { Form, FormItemProps } from "@hsu-react/ui";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface ApiLogFormProps {
   open?: boolean;

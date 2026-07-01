@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
 import { RouteType } from "@/router/router.config";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { cloneDeep } from "lodash";
 import classNames from "classnames";
 import { formatRoutes } from "./_utils/formatRoutes";

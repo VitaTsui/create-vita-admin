@@ -9,7 +9,7 @@ import MenuFormStore from "./MenuFormStore";
 import MenuStore from "../MenuStore";
 import { Options } from "@/stores/OptionsStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface MenuFormProps {
   open?: boolean;

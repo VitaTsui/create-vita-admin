@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@hsu-react/ui";
 import SmsLogStore from "./SmsLogStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import SmsLogForm from "./SmsLogForm";
 import OptionsStore, { Options } from "@/stores/OptionsStore";
 import { SendOutlined, RedoOutlined } from "@ant-design/icons";

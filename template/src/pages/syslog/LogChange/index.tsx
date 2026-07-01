@@ -5,7 +5,7 @@ import { DownOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@hsu-react/ui";
 import LogChangeStore from "./LogChangeStore";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import LogChangeForm from "./LogChangeForm";
 import { LogChangeData } from "@/services/apis/syslog/logChange";
 

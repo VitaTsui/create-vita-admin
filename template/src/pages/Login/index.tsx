@@ -10,7 +10,7 @@ import { FormItem } from "@hsu-react/ui";
 import LoginStore from "./LoginStore";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { useDebounceEffect } from "ahooks";
 import { useNavigate } from "react-router-dom";
 

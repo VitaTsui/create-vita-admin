@@ -93,7 +93,7 @@ function main() {
         path: panelPath,
       },
       {
-        fileName: "index.module.less",
+        fileName: "index.module.scss",
         content: `.${PanelName} {\n}`,
         path: panelPath,
       },
@@ -166,7 +166,7 @@ function main() {
         path: formPanelPath,
       },
       {
-        fileName: "index.module.less",
+        fileName: "index.module.scss",
         content: `.${PanelName}Form {\n}`,
         path: formPanelPath,
       },

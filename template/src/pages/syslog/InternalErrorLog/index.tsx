@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@hsu-react/ui";
 import InternalErrorLogStore from "./InternalErrorLogStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import InternalErrorLogForm from "./InternalErrorLogForm";
 import CleanInternalErrorLogForm from "./CleanInternalErrorLogForm";
 import ChatModal from "../_components/ChatModal";

@@ -1,4 +1,4 @@
-import "./App.less";
+import "./App.scss";
 
 import { Avatar, Button, Layout, Popover, Segmented, Space } from "antd";
 import {

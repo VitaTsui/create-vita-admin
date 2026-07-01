@@ -8,7 +8,7 @@ import RouterService from "@/router/RouterService";
 
 import MenuStore from "./MenuStore";
 import MenuForm from "./MenuForm";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const Menu: React.FC = observer(() => {
   const {

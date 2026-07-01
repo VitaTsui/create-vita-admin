@@ -8,7 +8,7 @@ import RouterService from "@/router/RouterService";
 import RoleStore from "./RoleStore";
 import RoleForm from "./RoleForm";
 import MenuAssign from "./MenuAssign";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const Role: React.FC = observer(() => {
   const {

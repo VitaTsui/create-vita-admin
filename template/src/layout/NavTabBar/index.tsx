@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import { RouteType } from "@/router/router.config";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { useAliveController } from "react-activation";
 import useReload from "@/hooks/useReload";
 import { formatNavTabBar } from "./_utils/formatNavTabBar";

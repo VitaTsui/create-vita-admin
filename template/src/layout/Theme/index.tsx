@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { ConfigProvider, theme as antdTheme } from "antd";
 import { observer } from "mobx-react-lite";
 import classNames from "classnames";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import ThemeStore from "./ThemeStore";
 
 interface ThemeProps {

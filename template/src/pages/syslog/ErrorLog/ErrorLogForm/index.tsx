@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import ErrorLogFormStore from "./ErrorLogFormStore";
 import { Form, FormItemProps } from "@hsu-react/ui";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface ErrorLogFormProps {
   open?: boolean;

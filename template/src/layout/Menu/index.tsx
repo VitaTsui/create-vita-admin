@@ -6,7 +6,7 @@ import { ItemType } from "antd/es/menu/interface";
 import { RouteType } from "@/router/router.config";
 import { cloneDeep } from "lodash";
 import classNames from "classnames";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { formatMenu } from "./_utils/formatMenu";
 import { setActiveIcon } from "./_utils/setActiveIcon";
 import { useMenuPath } from "./_hooks/useMenuPath";

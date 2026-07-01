@@ -8,7 +8,7 @@ import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@
 import DeptStore from "./DeptStore";
 import DeptForm from "./DeptForm";
 import DingtalkSyncModal from "./_components/DingtalkSyncModal";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const Dept: React.FC = observer(() => {
   const {

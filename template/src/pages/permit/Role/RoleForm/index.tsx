@@ -4,7 +4,7 @@ import { Form, FormItemProps } from "@hsu-react/ui";
 import RoleFormStore from "./RoleFormStore";
 import { RolePermissionsData } from "@/services/apis/permit/Role/role";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface RoleFormProps {
   open?: boolean;

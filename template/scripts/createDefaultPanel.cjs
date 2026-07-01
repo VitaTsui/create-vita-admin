@@ -65,7 +65,7 @@ function main() {
         path: panelPath,
       },
       {
-        fileName: "index.module.less",
+        fileName: "index.module.scss",
         content: `.${PanelName} {\n}\n\n.${PanelName}Content {\n}`,
         path: panelPath,
       },

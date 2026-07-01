@@ -6,7 +6,7 @@ import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@
 
 import ParamStore from "./ParamStore";
 import ParamForm from "./ParamForm";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const Param: React.FC = observer(() => {
   const {

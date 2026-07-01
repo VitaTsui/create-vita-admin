@@ -9,7 +9,7 @@ import {
   closeOtherTabs,
   closeAllTabs,
 } from "../../_utils/tabActions";
-import styles from "../../index.module.less";
+import styles from "../../index.module.scss";
 
 interface TabContextMenuProps {
   item: TabType;

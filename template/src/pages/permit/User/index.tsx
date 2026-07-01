@@ -8,7 +8,7 @@ import OptionsStore from "@/stores/OptionsStore";
 import UserStore from "./UserStore";
 import UserForm from "./UserForm";
 import ResetPasswordForm from "./ResetPasswordForm";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const User: React.FC = observer(() => {
   const {

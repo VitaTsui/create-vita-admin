@@ -3,7 +3,7 @@ import React from "react";
 import { FormItemProps, Form } from "@hsu-react/ui";
 import CleanOprLogFormStore from "./CleanOprLogFormStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface CleanOprLogFormProps {
   open?: boolean;

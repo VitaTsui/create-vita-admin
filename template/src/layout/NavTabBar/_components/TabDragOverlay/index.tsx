@@ -2,7 +2,7 @@ import React from "react";
 import { DragOverlay } from "@dnd-kit/core";
 import { TabType } from "../..";
 import TabLabel from "../TabLabel";
-import styles from "../../index.module.less";
+import styles from "../../index.module.scss";
 
 interface TabDragOverlayProps {
   activeId: string | null;

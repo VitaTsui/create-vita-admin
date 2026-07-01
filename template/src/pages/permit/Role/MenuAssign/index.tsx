@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { Tree, Checkbox, CheckedKeys, TreeData, Modal, Icon, TextEllipsis } from "@hsu-react/ui";
 import MenuAssignStore from "./MenuAssignStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface MenuAssignProps {
   open?: boolean;

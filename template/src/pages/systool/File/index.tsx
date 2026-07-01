@@ -7,7 +7,7 @@ import OptionsStore, { Options } from "@/stores/OptionsStore";
 
 import FileStore from "./FileStore";
 import FileForm from "./FileForm";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const File: React.FC = observer(() => {
   const {

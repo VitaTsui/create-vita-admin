@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel } from "@hsu-react/ui";
 import <NAME>Store from "./<NAME>Store";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import <NAME>Form from "./<NAME>Form";
 import { PlusOutlined } from "@ant-design/icons";
 import { Operate } from "@hsu-react/ui";

@@ -4,7 +4,7 @@ import DeptFormStore from "./DeptFormStore";
 import DeptStore from "../DeptStore";
 import { Form, FormItemProps } from "@hsu-react/ui";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface DeptFormProps {
   open?: boolean;

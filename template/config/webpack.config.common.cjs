@@ -78,7 +78,51 @@ const config = {
         ],
       },
       {
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: "[local]--[hash:base64:5]",
+                getLocalIdent: (_, __, localName) => {
+                  for (const key in PASS_CLS) {
+                    if (PASS_CLS[key] === "LK" && localName.startsWith(key)) {
+                      return localName;
+                    } else if (PASS_CLS[key] === "EQ" && localName === key) {
+                      return localName;
+                    }
+                  }
+
+                  return undefined;
+                },
+              },
+            },
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [require("autoprefixer")],
+              },
+            },
+          },
+          {
+            loader: "sass-loader",
+            options: {
+              additionalData: `@use "@/styles/variables.global.scss";`,
+            },
+          },
+        ],
+      },
+      {
+        // 第三方依赖（@hsu-react/ui、x-data-spreadsheet 等）仍以 .less 发布，
+        // 无法重命名，故仅对 node_modules 内的 .less 保留 less-loader 处理。
         test: /\.less$/,
+        include: /node_modules/,
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -115,7 +159,6 @@ const config = {
               lessOptions: {
                 javascriptEnabled: true,
               },
-              additionalData: `@import "@/styles/variables.global.less";`,
             },
           },
         ],
@@ -138,7 +181,7 @@ const config = {
       ".cts",
       ".cjs",
       ".mjs",
-      ".less",
+      ".scss",
     ],
     alias: {
       "@": path.resolve(__dirname, "../src"),

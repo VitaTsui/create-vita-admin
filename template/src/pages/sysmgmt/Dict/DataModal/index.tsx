@@ -5,7 +5,7 @@ import DataModalStore from "./DataModalStore";
 import DictForm from "../DictForm";
 import { PlusOutlined } from "@ant-design/icons";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 export interface DataModalProps {
   id?: number | string;

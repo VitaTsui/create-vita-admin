@@ -3,7 +3,7 @@ import { Password } from "@hsu-react/ui/es/components/FormItem/rules";
 import PwdChangeStore from "./PwdChangeStore";
 import React from "react";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { Form as AntdForm } from "antd";
 
 interface PwdChangeProps {

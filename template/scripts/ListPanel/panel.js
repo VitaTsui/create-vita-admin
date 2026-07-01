@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel } from "@hsu-react/ui";
 import <NAME>Store from "./<NAME>Store";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const <NAME>: React.FC = observer(() => {
   const {

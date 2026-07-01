@@ -98,7 +98,7 @@ function main() {
         path: panelPath,
       },
       {
-        fileName: "index.module.less",
+        fileName: "index.module.scss",
         content: unForm ? `.${PanelName} {\n}` : `.${PanelName}Form {\n}`,
         path: panelPath,
       },

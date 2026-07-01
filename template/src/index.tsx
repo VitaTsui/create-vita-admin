@@ -1,7 +1,7 @@
 import "./install-object-has-own-polyfill";
 
-import "./index.less";
-import "./styles/antd-overload.less";
+import "./index.scss";
+import "./styles/antd-overload.scss";
 
 import { BrowserRouter } from "react-router-dom";
 import Internationalization from "./layout/I18n";

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate, Switch } from "@hsu-react/ui";
 import SmsConfigStore from "./SmsConfigStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import SmsConfigForm from "./SmsConfigForm";
 import { PlusOutlined } from "@ant-design/icons";
 import OptionsStore, { Options } from "@/stores/OptionsStore";

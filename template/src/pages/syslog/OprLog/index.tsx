@@ -5,7 +5,7 @@ import { getDateRange } from "hsu-utils";
 
 import { ColumnsType, FormItemProps, Panel, Operate, ChakraButtonProps } from "@hsu-react/ui";
 import OprLogStore from "./OprLogStore";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import OprLogForm from "./OprLogForm";
 import CleanOprLogForm from "./CleanOprLogForm";
 import ChatModal from "../_components/ChatModal";

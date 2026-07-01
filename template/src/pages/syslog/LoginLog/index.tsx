@@ -11,7 +11,7 @@ import LoginLogForm from "./LoginLogForm";
 import CleanLoginLogForm from "./CleanLoginLogForm";
 import ChatModal from "../_components/ChatModal";
 import ChatModalStore from "../_components/ChatModal/ChatModalStore";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { DeleteOutlined, RobotOutlined } from "@ant-design/icons";
 import { message } from "antd";
 

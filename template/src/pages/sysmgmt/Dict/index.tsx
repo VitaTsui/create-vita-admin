@@ -7,7 +7,7 @@ import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@
 import DictStore from "./DictStore";
 import DictForm from "./DictForm";
 import DataModal from "./DataModal";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 const Dict: React.FC = observer(() => {
   const {

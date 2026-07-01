@@ -10,7 +10,7 @@ import { Form as AntdForm } from "antd";
 import { Form, FormItemProps } from "@hsu-react/ui";
 import UserFormStore from "./UserFormStore";
 import { observer } from "mobx-react-lite";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 
 interface UserFormProps {
   open?: boolean;

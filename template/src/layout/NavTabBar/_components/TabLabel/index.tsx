@@ -2,7 +2,7 @@ import React from "react";
 import { Popover } from "antd";
 import { TabType } from "../..";
 import TabContextMenu from "../TabContextMenu";
-import styles from "../../index.module.less";
+import styles from "../../index.module.scss";
 import classNames from "classnames";
 
 interface TabLabelProps {

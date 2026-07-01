@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import styles from "./index.module.less";
+import styles from "./index.module.scss";
 import { Chat, Modal, ModalProps, Table, ColumnsType } from "@hsu-react/ui";
 import { observer } from "mobx-react-lite";
 import ChatModalStore from "./ChatModalStore";
