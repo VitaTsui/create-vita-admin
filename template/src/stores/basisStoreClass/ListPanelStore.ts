@@ -179,6 +179,12 @@ export default class ListPanelStore<
   @observable
   protected accessor _dataSource: Array<D> = [];
   public getDataSource = () => {
+    // 每次请求前先置空列表数据，避免展示上一次的旧数据
+    this._dataSource = [];
+
+    this._getDataSource();
+  };
+  protected _getDataSource = () => {
     // 由子类实现具体的数据获取逻辑
   };
 

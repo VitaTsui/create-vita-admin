@@ -26,7 +26,7 @@ class LoginLogStore extends ListPanelStore<LoginLogSearchData, LoginLogData> {
   /**
    * 获取列表
    */
-  public getDataSource = () => {
+  protected _getDataSource = () => {
     this.getTotal();
 
     getLoginLogList({ query: this._query.value })

@@ -27,7 +27,7 @@ class ApiLogStore extends ListPanelStore<ApiLogSearchData, ApiLogData> {
   /**
    * 获取列表
    */
-  public getDataSource = () => {
+  protected _getDataSource = () => {
     this.getTotal();
 
     getApiLogList({ query: this._query.value })

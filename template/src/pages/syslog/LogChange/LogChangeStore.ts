@@ -25,7 +25,7 @@ class LogChangeStore extends ListPanelStore<LogChangeSearchData, LogChangeData> 
   /**
    * 获取列表
    */
-  public getDataSource = () => {
+  protected _getDataSource = () => {
     this.getTotal();
 
     getLogChangeList({ query: this._query.value })

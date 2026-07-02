@@ -23,7 +23,7 @@ class FileStore extends ListPanelStore<FileSearchData, FileData> {
   /**
    * 获取列表
    */
-  public getDataSource = () => {
+  protected _getDataSource = () => {
     getFileList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

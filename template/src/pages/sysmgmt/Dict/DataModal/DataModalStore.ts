@@ -25,7 +25,7 @@ class DataModalStore extends ListPanelStore<DictSearchData, DictData> {
   /**
    * 获取列表
    */
-  public getDataSource = () => {
+  protected _getDataSource = () => {
     if (!this._id) return;
 
     this._isLoading = true;
