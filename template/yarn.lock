@@ -1892,17 +1892,17 @@
   dependencies:
     hsu-utils "^0.0.48"
 
-"@hsu-react/single-router@^0.0.24":
-  version "0.0.24"
-  resolved "https://registry.npmjs.org/@hsu-react/single-router/-/single-router-0.0.24.tgz"
-  integrity sha512-05tPFCY6iPuwlSRtlLJEX22NbVIIg69lRzW8Zxj8aPWl0zfhCiGXLlUZBQdwBB4BsW0Jkoxm0boGfzd3XUPNLA==
+"@hsu-react/single-router@0.0.26":
+  version "0.0.26"
+  resolved "https://registry.npmjs.org/@hsu-react/single-router/-/single-router-0.0.26.tgz#6d8ba9f541961bee3b3b906402711838ca896348"
+  integrity sha512-QyP3vYhA1LCtmSpMtwpEp4TcXUFetaBCqhs2UzWexnkmc65gYkMIcfRnVbYwHyX+OecRG7JTqWEk2TJYNYXAsA==
   dependencies:
     hsu-utils "^0.0.9"
 
-"@hsu-react/ui@0.0.7":
-  version "0.0.7"
-  resolved "https://registry.npmjs.org/@hsu-react/ui/-/ui-0.0.7.tgz#9b6b604b2530db9031a20eb02121b4a1e0daafc7"
-  integrity sha512-A8iJn/1aoGDcR1skY/2UOSVbKp2We9bRU9YU9yBZAbUmn0AQVq+i9snh0aQ9Fq2NM0quqAMaEAyg8wMTcX9rew==
+"@hsu-react/ui@0.0.8":
+  version "0.0.8"
+  resolved "https://registry.npmjs.org/@hsu-react/ui/-/ui-0.0.8.tgz#057da9b4d7f8b9f0c24a35ac97c648f318b61397"
+  integrity sha512-rHCv1tNaqmivQxdNSLfQ5UisJeV55N9+/Wn47wbcABmJl0JwXhAAk5O8xhEEafmB5oUephDzFMjlUbZXca9Y4Q==
   dependencies:
     "@ant-design/x" "^2.0.1"
     "@antv/g" "^6.1.21"
@@ -1922,7 +1922,7 @@
     "@emotion/cache" "^11.14.0"
     "@emotion/react" "^11.14.0"
     "@emotion/styled" "^11.14.1"
-    "@hsu-react/single-router" "^0.0.24"
+    "@hsu-react/single-router" "0.0.26"
     "@iconify/json" "^2.2.385"
     "@iconify/react" "^5.0.1"
     "@uiw/codemirror-theme-vscode" "^4.25.1"
