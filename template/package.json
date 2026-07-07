@@ -33,7 +33,7 @@
     "@emotion/styled": "^11.14.1",
     "@hsu-canvas/renderer": "^0.0.12",
     "@hsu-react/single-router": "0.0.26",
-    "@hsu-react/ui": "0.0.8",
+    "@hsu-react/ui": "0.0.9",
     "@iconify/json": "^2.2.385",
     "@iconify/react": "^5.0.1",
     "@microsoft/fetch-event-source": "^2.0.1",
