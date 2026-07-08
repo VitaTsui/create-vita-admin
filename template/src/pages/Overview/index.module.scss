@@ -10,6 +10,13 @@
 
   // 仅纵向滚动：竖滚动条出现后图表宽度短暂超出容器 14px，横向一律裁掉
   overflow: hidden auto;
+
+  // 隐藏滚动条（保留滚动能力）
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // 仅内部纵向布局与卡片间距
