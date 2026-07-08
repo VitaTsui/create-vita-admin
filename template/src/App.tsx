@@ -60,18 +60,18 @@ const App: React.FC = observer(() => {
   const { checkPermission } = usePermissions();
 
   useEffect(() => {
-    const onResize = () => {
-      // 窗口宽度小于1440px，自动设置 collapsed 为 true (收起菜单)
-      const isSmallScreen = window.innerWidth <= 1440;
-      setCollapsed(isSmallScreen);
+    // 窗口宽度 <=1440 收起菜单、>1440 展开；只在跨越断点时自动切换，
+    // 断点内的 resize 不覆盖用户手动展开/收起的选择
+    const mql = window.matchMedia("(max-width: 1440px)");
+    const onBreakpointChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setCollapsed(e.matches);
     };
 
-    window.addEventListener("resize", onResize);
-    // 初始化时执行一次
-    onResize();
+    onBreakpointChange(mql);
+    mql.addEventListener("change", onBreakpointChange);
 
     return () => {
-      window.removeEventListener("resize", onResize);
+      mql.removeEventListener("change", onBreakpointChange);
     };
   }, []);
 

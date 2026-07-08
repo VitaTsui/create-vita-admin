@@ -80,6 +80,15 @@ body,
   overflow: hidden;
 }
 
+// 极窄窗口布局保护：窗口小于最小支持宽度时不向内挤碎布局，改为横向滚动
+body {
+  overflow-x: auto;
+}
+
+#root {
+  min-width: 960px;
+}
+
 [class^="ka-"] {
   width: 100%;
   height: 100%;
@@ -117,39 +126,3 @@ ol {
   src: url("./assets/fonts/DINAlternateBold.ttf") format("opentype");
 }
 
-@media screen and (max-width: 1920px) {
-  html,
-  body {
-    font-size: 18px !important;
-  }
-}
-@media screen and (max-width: 1680px) {
-  html,
-  body {
-    font-size: 16px !important;
-  }
-}
-@media screen and (max-width: 1460px) {
-  html,
-  body {
-    font-size: 14px !important;
-  }
-}
-@media screen and (max-width: 1366px) {
-  html,
-  body {
-    font-size: 14px !important;
-  }
-}
-@media screen and (max-width: 1080px) {
-  html,
-  body {
-    font-size: 10px !important;
-  }
-}
-@media screen and (max-width: 960px) {
-  html,
-  body {
-    font-size: 8px !important;
-  }
-}

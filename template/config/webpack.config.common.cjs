@@ -1,5 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -22,6 +21,13 @@ const config = {
         // 关闭 webpack5 的 fullySpecified 强校验，允许其无扩展名解析。
         test: /\.m?js$/,
         resolve: { fullySpecified: false },
+      },
+      {
+        // x-data-spreadsheet 的 src/index.js 会 `import './index.less'`，但其样式已由
+        // @hsu-react/ui 引入的 dist/xspreadsheet.css 提供；把该 less 当作字符串模块
+        // （无人消费其导出，编译与运行时均安全），从而无需 less/less-loader
+        test: /node_modules[\\/]x-data-spreadsheet[\\/]src[\\/]index\.less$/,
+        type: "asset/source",
       },
       {
         test: /\.(png|jpe?g|gif|webp|svg)$/i,
@@ -126,13 +132,6 @@ const config = {
     new HtmlWebpackPlugin({
       //模板路径，注意需要和index.html路径对应
       template: path.resolve(__dirname, "../public/index.html"),
-    }),
-    // x-data-spreadsheet 的 src/index.js 会 `import './index.less'`，但其样式已由
-    // @hsu-react/ui 引入的 dist/xspreadsheet.css 提供，这里忽略这条重复的 less 引入，
-    // 从而无需 less/less-loader。
-    new webpack.IgnorePlugin({
-      resourceRegExp: /^\.\/index\.less$/,
-      contextRegExp: /x-data-spreadsheet/,
     }),
   ],
   resolve: {
