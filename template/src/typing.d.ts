@@ -138,7 +138,3 @@ declare const Config: {
   smallTitle: string;
   description: string;
 };
-
-declare interface Window {
-  minCrtTm: string;
-}

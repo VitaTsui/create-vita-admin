@@ -70,6 +70,27 @@ src/pages/<category>/<ModuleName>/
 - **LESS 类命名**：`styles.ApiBlacklistManagement`（外层）、`styles.content`、`styles.formItemGroupTitle`（内层 camelCase）。
 - **props 类型**：`<ModuleName>FormProps`，放在组件文件顶部，不单独抽文件。
 
+## 组件选用：@hsu-react/ui 优先（硬性规则）
+
+页面里用到的 UI 组件**一律优先从 `@hsu-react/ui` 导入**，antd 只兜底 hsu-ui 没有的能力——不要凭习惯从 antd 拿：
+
+- **hsu-ui 已覆盖，必须用 hsu-ui 版**：`Button`、`Icon`、`Table`、`FormItem`、`Form`（含 `Form.Modal`）、`Panel`、`Search`、`Operate`、`Switch`、`Select`、`Input`、`Checkbox`、`DatePicker`、`Tree`、`Tags`、`Modal`、`Descriptions`、`TextEllipsis`、`Copy`、`Upload`、`TabBar`、`Slider`、`FlexFill`、`Chart`、`Markdown`、`CodeMirror`、`Editor`、`FilePreview`、`Spreadsheet`、`ChainGraph`、`Chat`、`SecondConf`、`FileCol`。
+- **antd 兜底（hsu-ui 无对应）**：`message`、`notification`、`Popover`、`Tooltip`、`Divider`、`Segmented`、`Spin`、`Empty`、`Row/Col` 栅格、`Space` 等。
+- 拿不准某组件 hsu-ui 有没有：先查 `node_modules/@hsu-react/ui/es/index.d.ts` 的导出（或文档站 <https://vitatsui.github.io/hsu-ui>），再决定 import 来源。
+
+反例：
+
+```tsx
+// ❌ hsu-ui 已有同名组件却从 antd 导入 —— 观感与行为都会偏离项目规范
+import { Table, Modal, Switch, Button } from "antd";
+```
+
+```tsx
+// ✅ 同名组件一律走 hsu-ui，antd 只补缺
+import { Table, Modal, Switch, Button } from "@hsu-react/ui";
+import { message, Tooltip } from "antd";
+```
+
 ## 列表页 `index.tsx` 模板
 
 ```tsx
