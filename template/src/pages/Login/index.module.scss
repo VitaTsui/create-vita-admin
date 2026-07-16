@@ -196,6 +196,9 @@
 
   &:hover {
     opacity: 0.94;
+    // antd primary 按钮 hover 用 background 简写覆盖（清空渐变露出透明底闪白），
+    // 这里锁住渐变；!important 用于压过 antd 含 :not 链的高特异性 hover 规则
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
   }
 }
 
