@@ -1102,7 +1102,8 @@ import dayjs from "dayjs";
 
 ## 开关/状态列快捷写法
 
-表格中"是否启用/禁用"列不要额外弹窗，直接调用 `FormStore` 的 `editFormData`：
+表格中"是否启用/禁用"列不要额外弹窗，直接调用 `FormStore` 的 `editFormData`；
+**成功回调用列表 store 的单行刷新，不要整表 `getDataSource()` 重拉**（整表重拉会置空列表 + loading、丢滚动位置，连续切换多行时反复闪烁）：
 
 ```tsx
 {
@@ -1118,7 +1119,7 @@ import dayjs from "dayjs";
         editFormData(
           record.id,
           { ...record, status: +checked },
-          () => getDataSource()
+          () => refreshRow(record.id)
         );
       }}
       key={`${record.id}-${record.status}`}
@@ -1126,6 +1127,23 @@ import dayjs from "dayjs";
   ),
   hasPermi: ["<module>:<sub>:upd"],
 }
+```
+
+列表 store 侧公开 `refreshRow`，封装基类的 `_refreshRowData`（按主键经列表接口重拉该行并就地合并；内部自带乱序返回防护，未查到该行时自动回退整表刷新）：
+
+```ts
+public refreshRow = (id: number | string) => {
+  this._refreshRowData(id, getXxxList);
+};
+```
+
+反例：
+
+```tsx
+// ❌ 开关成功后整表重拉 —— 列表置空 + loading，滚动位置丢失，连续切换多行时反复闪烁
+onChange={(checked) => {
+  editFormData(record.id, { ...record, status: +checked }, () => getDataSource());
+}}
 ```
 
 ## 导入顺序（项目风格）
