@@ -45,7 +45,6 @@ const LogChange: React.FC = observer(() => {
       name: "releTm",
       label: "发布时间",
       componentProps: {
-        minDate: dayjs(new Date(window.minCrtTm)),
         maxDate: dayjs(new Date()),
       },
     },

@@ -48,7 +48,6 @@ const ApiLog: React.FC = observer(() => {
     const crtTm = getDateRange({
       amount: 1,
       type: "past",
-      minDate: window.minCrtTm,
     });
 
     initSearchData({
@@ -72,10 +71,8 @@ const ApiLog: React.FC = observer(() => {
       initialValue: getDateRange({
         amount: 1,
         type: "past",
-        minDate: window.minCrtTm,
       }),
       componentProps: {
-        minDate: dayjs(new Date(window.minCrtTm)),
         maxDate: dayjs(new Date()),
         allowClear: false,
       },

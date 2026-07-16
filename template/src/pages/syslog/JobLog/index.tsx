@@ -52,7 +52,6 @@ const JobLog: React.FC = observer(() => {
     const crtTm = getDateRange({
       amount: 1,
       type: "past",
-      minDate: window.minCrtTm,
     });
 
     initSearchData({
@@ -91,10 +90,8 @@ const JobLog: React.FC = observer(() => {
       initialValue: getDateRange({
         amount: 1,
         type: "past",
-        minDate: window.minCrtTm,
       }),
       componentProps: {
-        minDate: dayjs(new Date(window.minCrtTm)),
         maxDate: dayjs(new Date()),
         allowClear: false,
       },
@@ -104,7 +101,6 @@ const JobLog: React.FC = observer(() => {
       name: "execStartTm",
       label: "业务开始时间",
       componentProps: {
-        minDate: dayjs(new Date(window.minCrtTm)),
         maxDate: dayjs(new Date()),
       },
     },
@@ -113,7 +109,6 @@ const JobLog: React.FC = observer(() => {
       name: "execEndTm",
       label: "业务结束时间",
       componentProps: {
-        minDate: dayjs(new Date(window.minCrtTm)),
         maxDate: dayjs(new Date()),
       },
     },
