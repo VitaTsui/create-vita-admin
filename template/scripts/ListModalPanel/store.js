@@ -22,7 +22,7 @@ class <NAME>Store extends ListPanelStore<<NAME>SearchData, <NAME>Data> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     get<NAME>List({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

@@ -24,7 +24,7 @@ class OprLogStore extends ListPanelStore<OprLogSearchData, OprLogData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     this.getTotal();
 
     getOprLogList({ query: this._query.value })

@@ -27,7 +27,7 @@ class JobLogStore extends ListPanelStore<JobLogSearchData, JobLogData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     this.getTotal();
 
     getJobLogList({ query: this._query.value })

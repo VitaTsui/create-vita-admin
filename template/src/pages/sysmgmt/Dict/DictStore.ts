@@ -25,7 +25,7 @@ class DictStore extends ListPanelStore<DictSearchData, DictData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getDictList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

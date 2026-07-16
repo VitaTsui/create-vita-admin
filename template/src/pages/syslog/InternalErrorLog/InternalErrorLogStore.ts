@@ -27,7 +27,7 @@ class InternalErrorLogStore extends ListPanelStore<
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     this.getTotal();
 
     getInternalErrorLogList({ query: this._query.value })

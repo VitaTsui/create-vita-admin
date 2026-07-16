@@ -26,7 +26,7 @@ class ErrorLogStore extends ListPanelStore<ErrorLogSearchData, ErrorLogData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     this.getTotal();
 
     getErrorLogList({ query: this._query.value })

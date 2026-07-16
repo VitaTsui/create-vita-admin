@@ -29,7 +29,7 @@ class RolePermissionsStore extends ListPanelStore<
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getRolePermissionsList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

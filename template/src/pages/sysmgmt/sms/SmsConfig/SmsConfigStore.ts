@@ -28,7 +28,7 @@ class SmsConfigStore extends ListPanelStore<
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getSmsConfigList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

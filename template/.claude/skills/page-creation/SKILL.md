@@ -11,7 +11,7 @@ description: Use this skill when creating, modifying, reviewing, auditing, or sc
 
 创建页面前必须确认以下基础设施（若缺失，此 skill 不适用）：
 
-- `src/stores/basisStoreClass/ListPanelStore.ts` —— 列表页基类，暴露 `searchData`/`page`/`dataSource`/`total`/`isLoading`/`order` 等 observable，以及 `setSearchData`/`initSearchData`/`changePage`/`onOrderChange`/`getDataSource`/`delData`/`resetStore` 等方法。其中 `getDataSource` 是基类提供的公开包装：每次请求前自动置空列表数据，再转发给子类覆写的 `protected _getDataSource`。
+- `src/stores/basisStoreClass/ListPanelStore.ts` —— 列表页基类，暴露 `searchData`/`page`/`dataSource`/`total`/`isLoading`/`order` 等 observable，以及 `setSearchData`/`initSearchData`/`changePage`/`onOrderChange`/`getDataSource`/`delData`/`resetStore` 等方法。基类在排序/翻页/查询路径会先置空列表再调 `getDataSource`（避免展示旧数据）；另有 `getTotal`（条数独立请求，仅查询触发）与 `_patchRow`/`_refreshRowData`（按主键行级更新，不触发整表刷新）。
 - `src/stores/basisStoreClass/FormModalStore.ts` —— 表单弹窗基类，暴露 `formData`、`getFormData`、`addFormData`、`editFormData`、`resetFormData`、`_message`。
 - 配对好的服务层：`src/services/apis/<category>/<module>.ts`（必须镜像页面路径，详见 api-creation skill）。
 - 组件套件（多数在 `src/components/` 下）：`Panel.List` / `Panel.Default`、`Form.Modal`、`FormItem`（含 `FormItemProps`）、`Table`（含 `ColumnsType`）、`Operate`、`Button`（含 `ChakraButtonProps`）、`Switch`。
@@ -233,7 +233,7 @@ class XxxStore extends ListPanelStore<XxxSearchData, XxxData> {
     makeObservable(this);
   }
 
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getXxxList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {
@@ -269,7 +269,7 @@ export default new XxxStore();
 
 要点：
 - **导出单例**：`export default new XxxStore();`，页面直接 `import XxxStore from "./XxxStore"` 拿到同一个实例。
-- 列表获取**必须**覆写 `protected _getDataSource`（不要自己另开 `public getDataSource`）——基类公开的 `getDataSource` 会在每次请求前置空 `_dataSource` 再调用 `_getDataSource`，防止旧数据闪现；刷新调用（`delData` 成功后、页面 `onOk`）仍走公开的 `this.getDataSource()`。
+- 列表获取覆写 `public getDataSource`；排序/翻页/查询路径由基类先置空列表再调用（防旧数据闪现），`delData` 成功后的刷新不置空（无闪烁）。状态开关等单行变更优先用 `_refreshRowData(id, 列表接口)` 行级刷新（内部防乱序、未查到自动回退整表），不要整表重拉。
 - `_isLoading = false` 必须在 `.then` 和 `.catch` 两条路径都设置，避免卡 loading。
 - 成功分支只在 `res.code === 0` 下处理数据；失败分支统一走 `this._message(res)`。
 - **`_modeType` 始终声明**（即便是 `{}`）——脚手架和现有模块都显式挂了 `protected accessor _modeType = {};`，子类保持一致，便于后面按需加模式而不改签名。
@@ -880,7 +880,7 @@ class XxxStore extends ListPanelStore<XxxSearchData, XxxData> {
     makeObservable(this);
   }
 
-  // _getDataSource / delData 同普通列表页
+  // getDataSource / delData 同普通列表页
 }
 ```
 

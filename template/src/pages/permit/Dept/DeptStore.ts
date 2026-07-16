@@ -32,7 +32,7 @@ class DeptStore extends ListPanelStore<DeptSearchData, DeptData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getDeptList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

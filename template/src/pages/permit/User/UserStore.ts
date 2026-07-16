@@ -33,7 +33,7 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getUserList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

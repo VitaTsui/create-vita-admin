@@ -25,7 +25,7 @@ class SmsLogStore extends ListPanelStore<SmsLogSearchData, SmsLogData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     getSmsLogList({ query: this._query.value })
       .then((res) => {
         if (res.code === 0) {

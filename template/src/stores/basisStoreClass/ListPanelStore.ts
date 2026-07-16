@@ -7,6 +7,7 @@ import Query, {
   RuleNameType,
 } from "@/services/Query";
 import FormModalStore from "./FormModalStore";
+import { ListRes } from "@/services/ResType";
 import { ResType } from "@/services/Axios";
 import { message, notification } from "antd";
 import wsCache, { CACHE_KEY } from "@/utils/wsCache";
@@ -65,6 +66,8 @@ export default class ListPanelStore<
     this._query.toOArr(this._order ? [this._order] : []);
 
     this._isLoading = true;
+    // 请求前置空旧列表，避免新数据返回前展示过期行
+    this._dataSource = [];
 
     this.getDataSource();
   };
@@ -100,6 +103,9 @@ export default class ListPanelStore<
       this._ruleName,
       this._logicType
     );
+
+    // 条数仅在查询时获取，翻页/排序不重复请求
+    this.getTotal();
 
     this.changePage({ num: 1 });
   };
@@ -144,6 +150,8 @@ export default class ListPanelStore<
     }
 
     this._isLoading = true;
+    // 请求前置空旧列表，避免新数据返回前展示过期行
+    this._dataSource = [];
 
     this._page = { ...this._page, ...page };
 
@@ -172,6 +180,17 @@ export default class ListPanelStore<
   }
   @observable
   protected accessor _total: number = 0;
+
+  /**
+   * 条数加载中
+   * 独立条数请求（getTotal）进行时为 true，由有独立条数请求的子类维护
+   */
+  @computed
+  get totalLoading() {
+    return this._totalLoading;
+  }
+  @observable
+  protected accessor _totalLoading: boolean = false;
   @computed
   get dataSource(): Array<D> {
     return this._dataSource;
@@ -179,13 +198,75 @@ export default class ListPanelStore<
   @observable
   protected accessor _dataSource: Array<D> = [];
   public getDataSource = () => {
-    // 每次请求前先置空列表数据，避免展示上一次的旧数据
-    this._dataSource = [];
-
-    this._getDataSource();
-  };
-  protected _getDataSource = () => {
     // 由子类实现具体的数据获取逻辑
+  };
+
+  /**
+   * 局部更新单行数据（按主键就地合并），不触发整表刷新
+   * @param id 主键值
+   * @param row 要合并的字段
+   * @param key 主键字段名，默认 "id"
+   */
+  protected _patchRow = (
+    id: number | string,
+    row: Partial<D>,
+    key: string = "id"
+  ) => {
+    const index = this._dataSource.findIndex(
+      (item) => String((item as Record<string, unknown>)[key]) === String(id)
+    );
+
+    if (index > -1) {
+      this._dataSource[index] = { ...this._dataSource[index], ...row };
+    }
+  };
+
+  // 单行刷新请求序号，用于丢弃乱序返回的过期响应
+  private accessor _rowRefreshSeq: Map<string, number> = new Map();
+
+  /**
+   * 按主键重新拉取单行数据并就地合并，不触发整表刷新
+   * 走列表接口保证行结构与列表一致；未查到该行时回退整表刷新
+   * @param id 主键
+   * @param fetchList 列表接口（与 getDataSource 用同一个）
+   * @param key 主键字段名，默认 "id"
+   */
+  protected _refreshRowData = (
+    id: number | string,
+    fetchList: (params: { query: string }) => Promise<ResType<ListRes<D>>>,
+    key: string = "id"
+  ) => {
+    const seq = (this._rowRefreshSeq.get(String(id)) ?? 0) + 1;
+    this._rowRefreshSeq.set(String(id), seq);
+
+    const query = new Query();
+    query.toEqual(key, id);
+    query.toP(1, 1, 1);
+
+    fetchList({ query: query.value })
+      .then((res) => {
+        if (this._rowRefreshSeq.get(String(id)) !== seq) {
+          return;
+        }
+
+        const row = res.code === 0 ? res.data.list?.[0] : undefined;
+
+        if (row) {
+          this._patchRow(id, row, key);
+        } else {
+          this.getDataSource();
+        }
+      })
+      .catch(() => {});
+  };
+
+  /**
+   * 获取条数
+   * 仅在查询（setSearchData）时调用，翻页/排序不触发
+   * 由有独立条数请求的子类实现；无独立条数请求的列表无需重写
+   */
+  public getTotal = () => {
+    // 由子类实现具体的条数获取逻辑
   };
 
   /**
@@ -236,7 +317,9 @@ export default class ListPanelStore<
     };
     this._dataSource = [];
     this._total = 0;
+    this._totalLoading = false;
     this._isLoading = true;
+    this._rowRefreshSeq.clear();
     this._query.clear();
 
     this.resetFormData();

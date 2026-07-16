@@ -36,7 +36,7 @@ class MenuStore extends ListPanelStore<MenuSearchData, MenuData> {
   /**
    * 获取列表
    */
-  protected _getDataSource = () => {
+  public getDataSource = () => {
     this._query.toR("type", "1,2", "IN");
 
     getMenuList({ query: this._query.value }).then((res) => {
