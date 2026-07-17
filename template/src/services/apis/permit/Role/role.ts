@@ -27,29 +27,29 @@ interface IRolePermissionsData {
 }
 export type RolePermissionsData = Partial<IRolePermissionsData>;
 
-// 列表
+// List
 export const getRolePermissionsList = async (params: RolePermissionsSearch) => {
   return await get<ListRes<RolePermissionsData>>("/sys/role/page", {
     params,
   });
 };
 
-// 详情
+// Detail
 export const getRolePermissions = async (id: number | string) => {
   return await get<RolePermissionsData>("/sys/role/info/" + id);
 };
 
-// 新增
+// Create
 export const createRolePermissions = async (data: RolePermissionsData) => {
   return await post("/sys/role/add", data);
 };
 
-// 修改
+// Update
 export const editRolePermissions = async (data: RolePermissionsData) => {
   return await post("/sys/role/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteRolePermissions = async (id: number | string) => {
   return await get("/sys/role/del", { params: { ids: id } });
 };
@@ -80,7 +80,7 @@ export interface PermRtRscoTreeNodeRes {
   list: MenuListData[];
 }
 
-// 获取角色关联菜单
+// Get the menus associated with a role
 export const getPermRtRscoTreeNode = async (params: PermRtRscoTreeNode) => {
   return await get<PermRtRscoTreeNodeRes>("/sys/rsco/listPermRtRscoTreeNode", {
     params,
@@ -93,7 +93,7 @@ interface RoleRtRscoData {
 }
 export type RoleRtRsco = Partial<RoleRtRscoData>;
 
-// 修改角色关联菜单
+// Update the menus associated with a role
 export const updateRoleRtRsco = async (data: RoleRtRsco) => {
   return await post("/sys/role/updRoleRsco", data);
 };

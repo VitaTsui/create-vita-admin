@@ -30,7 +30,7 @@ class DeptStore extends ListPanelStore<DeptSearchData, DeptData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getDeptList({ query: this._query.value })
@@ -55,7 +55,7 @@ class DeptStore extends ListPanelStore<DeptSearchData, DeptData> {
         this._isLoading = false;
       });
   };
-  // 格式化部门列表
+  // Format the dept list
   private _formatTree = (list: Required<DeptData>[]) => {
     const node: TreeData[] = [];
 
@@ -76,7 +76,7 @@ class DeptStore extends ListPanelStore<DeptSearchData, DeptData> {
 
     return node;
   };
-  // 获取展开Id
+  // Get expanded ids
   private _getExpandedIds = (list: Required<DeptData>[]) => {
     const ids: string[] = [];
 
@@ -91,7 +91,7 @@ class DeptStore extends ListPanelStore<DeptSearchData, DeptData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

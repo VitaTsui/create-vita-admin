@@ -1,7 +1,7 @@
 .NavTabBar {
   padding: 6px 8px 0px;
 
-  // 现代化：保留白色条带，激活页签为水青浅底胶囊
+  // Modern look: keep the white strip; the active tab is a light teal pill
   background: var(--cf-surface);
 
   border-bottom: 1px solid var(--cf-border);
@@ -14,7 +14,7 @@
       border-bottom: none;
     }
 
-    // 卡片式页签无需底部墨条
+    // Card-style tabs do not need the bottom ink bar
     .ant-tabs-ink-bar {
       display: none;
     }

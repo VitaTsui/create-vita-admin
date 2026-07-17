@@ -8,13 +8,13 @@ const {
 } = require("./utils.cjs");
 
 /**
- * 创建表单面板
- * 用法: node createFormPanel.cjs --panel <panelName> [--parent <parent>] [--api <apiName>] [--apiUrl <apiUrl>] [--apiCrt] [--unForm]
- * 示例: node createFormPanel.cjs --panel userForm --parent dataMonitoring --api user --apiUrl /api/user --apiCrt
+ * Create a form panel
+ * Usage: node createFormPanel.cjs --panel <panelName> [--parent <parent>] [--api <apiName>] [--apiUrl <apiUrl>] [--apiCrt] [--unForm]
+ * Example: node createFormPanel.cjs --panel userForm --parent dataMonitoring --api user --apiUrl /api/user --apiCrt
  */
 function main() {
   try {
-    // 解析命令行参数
+    // Parse the command line arguments
     let panelIdx = process.argv.indexOf("--panel");
     panelIdx = panelIdx === -1 ? 1 : panelIdx;
     const panelName = process.argv[panelIdx + 1];
@@ -39,7 +39,7 @@ function main() {
     const apiCrt = process.argv.includes("--apiCrt");
     const unForm = process.argv.includes("--unForm");
 
-    // 确定面板路径
+    // Determine the panel path
     let panelPath = path.resolve(
       __dirname,
       "../src/pages",
@@ -59,12 +59,12 @@ function main() {
     console.log(`创建 API 文件: ${apiCrt ? "是" : "否"}`);
     console.log(`独立表单: ${unForm ? "是" : "否"}\n`);
 
-    // 读取模板
+    // Read the templates
     const panelTemplate = path.resolve(__dirname, "./FormPanel/panel.js");
     const storeTemplate = path.resolve(__dirname, "./FormPanel/store.js");
     const apiTemplate = path.resolve(__dirname, "./FormPanel/api.js");
 
-    // 处理面板模板（根据 unForm 标志决定替换模式）
+    // Process the panel template (the unForm flag decides the replacement mode)
     const panelReplacements = unForm
       ? { "<NAME>Form": PanelName, "<NAME>": PanelName }
       : { "<NAME>": PanelName };
@@ -85,7 +85,7 @@ function main() {
       "<API_DEL_PATH>": apiUrl ? `${apiUrl}/del` : "",
     });
 
-    // 创建文件
+    // Create the files
     const files = [
       {
         fileName: "index.tsx",
@@ -108,7 +108,7 @@ function main() {
       writeFile(path.join(file.path, file.fileName), file.content);
     });
 
-    // 可选：创建 API 文件
+    // Optional: create the API file
     if (apiCrt) {
       writeFile(path.join(apiPath, `${apiName}.ts`), Api);
     }

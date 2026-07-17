@@ -9,7 +9,7 @@
   background: linear-gradient(135deg, #eef3ff 0%, #f7f9ff 100%);
 }
 
-// 左侧品牌展示区
+// Left brand showcase area
 .brand {
   position: relative;
   flex: 1.1;
@@ -21,7 +21,7 @@
 
   background: linear-gradient(150deg, #1d4ed8 0%, #2563eb 45%, #4f46e5 100%);
 
-  // 柔光装饰
+  // Soft-glow decoration
   &::before,
   &::after {
     content: "";
@@ -97,7 +97,7 @@
   }
 }
 
-// 右侧表单区
+// Right form area
 .panel {
   flex: 1;
 
@@ -196,8 +196,8 @@
 
   &:hover {
     opacity: 0.94;
-    // antd primary 按钮 hover 用 background 简写覆盖（清空渐变露出透明底闪白），
-    // 这里锁住渐变；!important 用于压过 antd 含 :not 链的高特异性 hover 规则
+    // antd primary button hover overrides with the background shorthand (clearing the gradient exposes the transparent base and flashes white);
+    // lock the gradient here; !important overrides antd's high-specificity hover rules with :not chains
     background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
   }
 }
@@ -258,7 +258,7 @@
   }
 }
 
-// 窄屏：隐藏品牌区，仅留表单
+// Narrow screens: hide the brand area, keep only the form
 @media (max-width: 860px) {
   .brand {
     display: none;

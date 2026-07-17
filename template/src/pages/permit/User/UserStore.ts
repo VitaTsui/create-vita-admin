@@ -31,7 +31,7 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getUserList({ query: this._query.value })
@@ -54,7 +54,7 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {
@@ -68,7 +68,7 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   };
 
   /**
-   * 修改状态
+   * Update status
    * @param id
    * @param status
    */
@@ -83,7 +83,7 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   };
 
   /**
-   * 重置密码
+   * Reset password
    * @param id
    */
   public resetUserPwd = (

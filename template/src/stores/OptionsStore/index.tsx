@@ -1,31 +1,31 @@
 import { makeAutoObservable } from "mobx";
 import { SelectOption } from "@hsu-react/ui";
 
-// 导入各个功能模块的方法类
+// Import the method classes of each feature module
 import PermitMethods from "./methods/permit";
 import SysmgmtMethods from "./methods/sysmgmt";
 import SyslogMethods from "./methods/syslog";
 
 /**
- * @param MENU_CAT 菜单分类
- * @param MENU_TYPE 菜单类型
- * @param ROLE 角色
- * @param ROLE_TYPE 角色类型
- * @param USER 用户
- * @param MASK_STATUS 是否脱敏
- * @param FILE_CONFIG_STATUS 文件配置状态
- * @param FILE_CONFIG_TYPE 文件配置类型
- * @param FILE_CONFIG_ACTIVE 文件配置环境
- * @param SMS_CONFIG_ACTIVE 短信配置环境
- * @param SMS_CONFIG_TYPE 短信配置类型
- * @param SMS_CONFIG_STATUS 短信配置状态
- * @param SMS_TEMPLATE_TYPE 短信模板类型
- * @param SMS_LOG_STATUS 短信日志状态
- * @param SMS_CONFIG_LIST 短信配置列表
- * @param SMS_TEMPLATE_LIST 短信模板列表
- * @param LOGIN_LOG_STATUS 登录日志状态
- * @param JOB_LOG_STATUS 任务日志状态
- * @param LARGE_MODEL_API_KEY_LIST 大模型API_KEY列表（占位，模板内未接入真实大模型，需自行扩展）
+ * @param MENU_CAT menu category
+ * @param MENU_TYPE menu type
+ * @param ROLE role
+ * @param ROLE_TYPE role type
+ * @param USER user
+ * @param MASK_STATUS whether data is masked
+ * @param FILE_CONFIG_STATUS file config status
+ * @param FILE_CONFIG_TYPE file config type
+ * @param FILE_CONFIG_ACTIVE file config environment
+ * @param SMS_CONFIG_ACTIVE SMS config environment
+ * @param SMS_CONFIG_TYPE SMS config type
+ * @param SMS_CONFIG_STATUS SMS config status
+ * @param SMS_TEMPLATE_TYPE SMS template type
+ * @param SMS_LOG_STATUS SMS log status
+ * @param SMS_CONFIG_LIST SMS config list
+ * @param SMS_TEMPLATE_LIST SMS template list
+ * @param LOGIN_LOG_STATUS login log status
+ * @param JOB_LOG_STATUS job log status
+ * @param LARGE_MODEL_API_KEY_LIST LLM API_KEY list (placeholder; the template has no real LLM wired in, extend it yourself)
  */
 export type OptionsType =
   | "MENU_CAT"
@@ -61,7 +61,7 @@ class CommonOptions {
     makeAutoObservable(this);
   }
 
-  // 系统管理相关方法 - 委托给 SysmgmtMethods
+  // System management methods - delegated to SysmgmtMethods
   public getMenuCat = () => this.sysmgmtMethods.getMenuCat();
   public getMenuType = () => this.sysmgmtMethods.getMenuType();
   public getFileConfigStatus = () => this.sysmgmtMethods.getFileConfigStatus();
@@ -75,17 +75,17 @@ class CommonOptions {
   public getSmsConfigList = () => this.sysmgmtMethods.getSmsConfigList();
   public getSmsTemplateList = () => this.sysmgmtMethods.getSmsTemplateList();
 
-  // 权限相关方法 - 委托给 PermitMethods
+  // Permission methods - delegated to PermitMethods
   public getRole = () => this.permitMethods.getRole();
   public getRoleType = () => this.permitMethods.getRoleType();
   public getUser = () => this.permitMethods.getUser();
   public getMaskStatus = () => this.permitMethods.getMaskStatus();
 
-  // 系统日志相关方法 - 委托给 SyslogMethods
+  // System log methods - delegated to SyslogMethods
   public getLoginLogStatus = () => this.syslogMethods.getLoginLogStatus();
   public getJobLogStatus = () => this.syslogMethods.getJobLogStatus();
 
-  // 大模型 API_KEY 列表（占位实现：模板未接入真实大模型，syslog 下 ChatModal 引用此项时不会发起请求）
+  // LLM API_KEY list (placeholder implementation: the template has no real LLM wired in; when ChatModal under syslog references this item, no request is made)
   public getLargeModelApiKeyList = () => undefined;
 
   public options = (optionsType: OptionsType): SelectOption[] => {

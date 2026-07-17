@@ -26,7 +26,7 @@ interface TabContextMenuProps {
 }
 
 /**
- * 标签页右键菜单组件
+ * Tab context menu component
  */
 const TabContextMenu: React.FC<TabContextMenuProps> = ({
   item,
@@ -41,7 +41,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   setOpen,
   navigate,
 }) => {
-  // 判断当前标签页是否为固定标签页
+  // Determine whether the current tab is affixed
   const isAffixed = affixRouter.includes(item.key) || item.affix;
 
   return (
@@ -65,7 +65,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
             const newOpenKeys = closeTab(openKeys, index, drop, affixRouter);
             setOpenkeys(newOpenKeys);
             setOpen("");
-            // 关闭标签页后，选中前一个标签页，如果没有前一个则选中第一个
+            // After closing the tab, select the previous one; fall back to the first one
             const targetIndex = index > 0 ? index - 1 : 0;
             navigate(newOpenKeys[targetIndex]?.key || basePath);
           }}
@@ -138,7 +138,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
             const newOpenKeys = closeAllTabs(openKeys, drop, affixRouter);
             setOpenkeys(newOpenKeys);
             setOpen("");
-            // 如果有保留的固定标签页，导航到第一个固定标签页
+            // If any affixed tabs remain, navigate to the first one
             if (newOpenKeys.length > 0) {
               navigate(newOpenKeys[0].key);
             } else {

@@ -17,28 +17,28 @@ interface CacheData {
 }
 
 interface UseDataViewCacheOptions {
-  /** 缓存 key 前缀，默认为 'dataViewSearch' */
+  /** Cache key prefix, defaults to 'dataViewSearch' */
   cacheKeyPrefix?: string;
-  /** 初始搜索项 */
+  /** Initial search items */
   initialSearchItems: FormItemProps[];
-  /** 初始列配置 */
+  /** Initial column configuration */
   initialColumns: ColumnsType;
-  /** 是否启用缓存，默认为 true */
+  /** Whether caching is enabled, defaults to true */
   enabled?: boolean;
 }
 
 interface UseDataViewCacheReturn {
-  /** 搜索项（带缓存状态） */
+  /** Search items (with cached state) */
   searchItems: FormItemProps[];
-  /** 列配置（带缓存状态） */
+  /** Column configuration (with cached state) */
   columns: ColumnsType;
-  /** 设置搜索项 */
+  /** Set the search items */
   setSearchItems: (items: FormItemProps[]) => void;
-  /** 设置列配置 */
+  /** Set the column configuration */
   setColumns: (columns: ColumnsType) => void;
-  /** 处理搜索项过滤变化 */
+  /** Handle search item filter changes */
   handleSearchFilterChange: (items: FormItemProps[]) => void;
-  /** 处理列选择变化 */
+  /** Handle column selection changes */
   handleColumnSelectionChange: (
     selectedDataIndexes: string[],
     dataSource: Array<{
@@ -52,8 +52,8 @@ interface UseDataViewCacheReturn {
 }
 
 /**
- * 数据视图缓存 Hook
- * 用于管理列表显示项和查询勾选项的缓存
+ * Data view cache hook
+ * Manages the cache of list display columns and search item selections
  */
 export default function useDataViewCache(
   options: UseDataViewCacheOptions
@@ -72,7 +72,7 @@ export default function useDataViewCache(
   const [columns, setColumnsState] = useState<ColumnsType>([]);
   const prevColumnsRef = useRef<string>("");
 
-  // 从缓存恢复状态
+  // Restore state from cache
   useEffect(() => {
     if (!enabled) {
       setSearchItemsState(initialSearchItems);
@@ -82,7 +82,7 @@ export default function useDataViewCache(
 
     const cachedData: CacheData | null = wsCache.get(cacheKey);
 
-    // 恢复搜索项
+    // Restore search items
     if (cachedData?.searchItemsVisible) {
       const restoredSearchItems = initialSearchItems?.map((item) => {
         const cachedItem = cachedData.searchItemsVisible?.find(
@@ -98,7 +98,7 @@ export default function useDataViewCache(
       setSearchItemsState(initialSearchItems);
     }
 
-    // 恢复列配置
+    // Restore column configuration
     if (cachedData?.columnsConfig) {
       const restoredColumns = initialColumns?.map((col) => {
         const cachedCol = cachedData.columnsConfig?.find(
@@ -118,7 +118,7 @@ export default function useDataViewCache(
         }
         return col;
       });
-      // 按 sort 排序
+      // Sort by sort
       restoredColumns.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
       setColumnsState(restoredColumns);
     } else {
@@ -126,7 +126,7 @@ export default function useDataViewCache(
     }
   }, [cacheKey, enabled, initialSearchItems, initialColumns]);
 
-  // 设置搜索项（带缓存保存）
+  // Set search items (persisting to cache)
   const setSearchItems = useCallback(
     (items: FormItemProps[]) => {
       setSearchItemsState(items);
@@ -145,13 +145,13 @@ export default function useDataViewCache(
     [cacheKey, enabled]
   );
 
-  // 设置列配置（带缓存保存）
+  // Set column configuration (persisting to cache)
   const setColumns = useCallback(
     (newColumns: ColumnsType) => {
       setColumnsState(newColumns);
       if (enabled && newColumns.length > 0) {
         const columnsConfig: ColumnCacheData[] = newColumns
-          .filter((col) => col.dataIndex) // 过滤掉没有 dataIndex 的列
+          .filter((col) => col.dataIndex) // Filter out columns without a dataIndex
           ?.map((col) => ({
             dataIndex: col.dataIndex!,
             hidden: col.hidden || false,
@@ -162,7 +162,7 @@ export default function useDataViewCache(
           }));
         const currentColumnsKey = JSON.stringify(columnsConfig);
 
-        // 只有当配置真正改变时才更新缓存
+        // Only update the cache when the configuration actually changed
         if (currentColumnsKey !== prevColumnsRef.current) {
           const cachedData: CacheData = wsCache.get(cacheKey) || {};
           wsCache.set(cacheKey, {
@@ -176,7 +176,7 @@ export default function useDataViewCache(
     [cacheKey, enabled]
   );
 
-  // 处理搜索项过滤变化
+  // Handle search item filter changes
   const handleSearchFilterChange = useCallback(
     (items: FormItemProps[]) => {
       setSearchItems(items);
@@ -184,7 +184,7 @@ export default function useDataViewCache(
     [setSearchItems]
   );
 
-  // 处理列选择变化
+  // Handle column selection changes
   const handleColumnSelectionChange = useCallback(
     (
       _selectedDataIndexes: string[],
@@ -211,7 +211,7 @@ export default function useDataViewCache(
         columnsConfig,
       });
 
-      // 同步更新 columns 状态和缓存引用
+      // Sync the columns state and the cache reference
       setColumnsState((prevColumns) => {
         const updatedColumns = prevColumns?.map((col) => {
           const dataSourceItem = dataSource.find(
@@ -238,10 +238,10 @@ export default function useDataViewCache(
           return col;
         });
 
-        // 按 sort 排序
+        // Sort by sort
         updatedColumns.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
 
-        // 更新缓存引用
+        // Update the cache reference
         const currentColumnsKey = JSON.stringify(columnsConfig);
         prevColumnsRef.current = currentColumnsKey;
 
@@ -251,11 +251,11 @@ export default function useDataViewCache(
     [cacheKey, enabled]
   );
 
-  // 当 columns 变化时自动保存到缓存
+  // Automatically save to cache whenever columns change
   useEffect(() => {
     if (enabled && columns.length > 0) {
       const columnsConfig: ColumnCacheData[] = columns
-        .filter((col) => col.dataIndex) // 过滤掉没有 dataIndex 的列
+        .filter((col) => col.dataIndex) // Filter out columns without a dataIndex
         ?.map((col) => ({
           dataIndex: col.dataIndex!,
           hidden: col.hidden || false,
@@ -266,7 +266,7 @@ export default function useDataViewCache(
         }));
       const currentColumnsKey = JSON.stringify(columnsConfig);
 
-      // 只有当配置真正改变时才更新缓存
+      // Only update the cache when the configuration actually changed
       if (currentColumnsKey !== prevColumnsRef.current) {
         const cachedData: CacheData = wsCache.get(cacheKey) || {};
         wsCache.set(cacheKey, {

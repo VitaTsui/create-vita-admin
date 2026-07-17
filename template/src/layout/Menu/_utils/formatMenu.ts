@@ -3,11 +3,11 @@ import { RouteType } from "@/router/router.config";
 import { MenuType } from "..";
 
 /**
- * 格式化路由为菜单项
- * @param routes 路由配置
- * @param all 是否包含所有路由（包括不在菜单中显示的）
- * @param parent 父菜单项
- * @returns 菜单项数组
+ * Format routes into menu items
+ * @param routes Route config
+ * @param all Whether to include all routes (including those not shown in the menu)
+ * @param parent Parent menu item
+ * @returns Menu item array
  */
 export const formatMenu = (
   routes: RouteType[],

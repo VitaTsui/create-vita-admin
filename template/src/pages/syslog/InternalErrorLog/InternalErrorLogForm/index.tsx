@@ -11,7 +11,7 @@ interface InternalErrorLogFormProps {
   id?: string | number;
   onCancel?: () => void;
   onOk?: () => void;
-  mode?: "edit" | "detail"; // 新增模式：edit 编辑模式，detail 详情模式
+  mode?: "edit" | "detail"; // Added mode: edit for edit mode, detail for detail mode
 }
 
 const InternalErrorLogForm: React.FC<InternalErrorLogFormProps> = observer(
@@ -26,7 +26,7 @@ const InternalErrorLogForm: React.FC<InternalErrorLogFormProps> = observer(
       }
     }, [getFormData, id, open]);
 
-    // 详情模式的表单字段
+    // Form fields for detail mode
     const detailFormItems: FormItemProps[] = [
       {
         type: "TEXT",
@@ -57,7 +57,7 @@ const InternalErrorLogForm: React.FC<InternalErrorLogFormProps> = observer(
       },
     ];
 
-    // 编辑模式的表单字段（保持原有逻辑，可根据实际需求添加）
+    // Form fields for edit mode (keeps the original logic; extend as actually needed)
     const editFormItems: FormItemProps[] = [];
 
     const formItems: FormItemProps[] =

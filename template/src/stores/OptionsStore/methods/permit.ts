@@ -3,23 +3,23 @@ import { SelectOption } from "@hsu-react/ui";
 import { makeAutoObservable } from "mobx";
 
 /**
- * 权限相关的选项方法
+ * Permission-related option methods
  */
 export default class PermitMethods {
-  // 角色
+  // Role
   private _role: SelectOption[] = [];
-  // 角色类型
+  // Role type
   private _roleType: SelectOption[] = [];
-  // 用户
+  // User
   private _user: SelectOption[] = [];
-  // 是否脱敏
+  // Whether data is masked
   private _maskStatus: SelectOption[] = [];
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  // 角色
+  // Role
   public getRole = () => {
     getRoleList().then((res) => {
       if (res.code === 0) {
@@ -32,7 +32,7 @@ export default class PermitMethods {
     });
   };
 
-  // 角色类型
+  // Role type
   public getRoleType = () => {
     getEnum("SysUserEn$Type").then((res) => {
       if (res.code === 0) {
@@ -45,7 +45,7 @@ export default class PermitMethods {
     });
   };
 
-  // 用户
+  // User
   public getUser = () => {
     getUserList().then((res) => {
       if (res.code === 0) {
@@ -58,7 +58,7 @@ export default class PermitMethods {
     });
   };
 
-  // 是否脱敏
+  // Whether data is masked
   public getMaskStatus = () => {
     getEnum("SysRoleDataLevelScopeEn$MaskStatus").then((res) => {
       if (res.code === 0) {

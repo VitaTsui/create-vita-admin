@@ -18,11 +18,11 @@
     padding: 0px;
     overflow: hidden;
 
-    // CF 风格：以细描边替代投影（随外观切换）
+    // CF style: thin border instead of drop shadow (switches with appearance)
     border-bottom: 1px solid var(--cf-border);
     box-shadow: none;
 
-    // 深色/主题色导航：白字 + 适配深底的描边
+    // Dark/theme-colored nav: white text + border adapted to dark background
     &.dark,
     &.theme {
       color: #fff;
@@ -38,7 +38,7 @@
       }
     }
 
-    // 仅深色导航用中性黑渐变
+    // Neutral black gradient for dark nav only
     &.dark {
       background: linear-gradient(
         90deg,
@@ -167,7 +167,7 @@
     min-height: 0px;
 
     .ant-layout-sider {
-      // CF 风格：细描边分隔，不用投影
+      // CF style: thin border separator, no drop shadow
       border-right: 1px solid var(--cf-border);
       box-shadow: none;
     }
@@ -180,7 +180,7 @@
       min-width: 0px;
       height: 100%;
 
-      // CF 风格：冷调浅灰画布，衬托描边白卡片（随外观切换）
+      // CF style: cool light-gray canvas that sets off bordered white cards (switches with appearance)
       background: var(--cf-canvas);
 
       .content-body {
@@ -191,7 +191,7 @@
     }
   }
 
-  // 深色导航：侧边中性黑渐变
+  // Dark nav: neutral black gradient on the sidebar
   &.dark .body .ant-layout-sider {
     background: linear-gradient(
       180deg,
@@ -202,28 +202,28 @@
     border-right-color: rgb(255 255 255 / 8%);
   }
 
-  // 亮色导航：白底深字
+  // Light nav: white background with dark text
   &.light {
     .header .title {
-      color: rgb(0 0 0 / 88%);
+      color: var(--cf-text);
     }
 
     .header-right {
       .app-version {
-        color: rgb(0 0 0 / 45%);
+        color: var(--cf-text-2);
 
         &:hover {
-          background-color: rgb(0 0 0 / 4%);
-          color: rgb(0 0 0 / 88%);
+          background-color: var(--cf-row-hover);
+          color: var(--cf-text);
         }
       }
 
       .user {
-        color: rgb(0 0 0 / 75%);
+        color: var(--cf-text);
 
         &:hover {
-          background-color: rgb(0 0 0 / 6%);
-          color: rgb(0 0 0 / 88%);
+          background-color: var(--cf-row-hover);
+          color: var(--cf-text);
         }
       }
     }

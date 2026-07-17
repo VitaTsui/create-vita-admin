@@ -3,19 +3,19 @@ import { getEnum } from "@/services/apis/enum";
 import { makeAutoObservable } from "mobx";
 
 /**
- * 系统日志相关的选项方法
+ * System-log-related option methods
  */
 export default class SyslogMethods {
-  // 登录日志状态
+  // Login log status
   private _loginLogStatus: SelectOption[] = [];
-  // 任务日志状态
+  // Job log status
   private _jobLogStatus: SelectOption[] = [];
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  // 登录日志状态
+  // Login log status
   public getLoginLogStatus = () => {
     getEnum("SysLogLoginEn$Status").then((res) => {
       if (res.code === 0) {
@@ -28,7 +28,7 @@ export default class SyslogMethods {
     });
   };
 
-  // 任务日志状态
+  // Job log status
   public getJobLogStatus = () => {
     getEnum("SysJobLogEn$Status").then((res) => {
       if (res.code === 0) {

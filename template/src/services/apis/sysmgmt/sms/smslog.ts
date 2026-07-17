@@ -13,34 +13,34 @@ interface ISmsLogData {
 }
 export type SmsLogData = Partial<ISmsLogData>;
 
-// 列表
+// List
 export const getSmsLogList = async (params: SmsLogSearch) => {
   return await get<ListRes<SmsLogData>>("/sys/smsLog/page", { params });
 };
 
-// 详情
+// Detail
 export const getSmsLog = async (id: number | string) => {
   return await get<SmsLogData>("/sys/smsLog/info/" + id);
 };
 
-// 新增
+// Create
 export const createSmsLog = async (data: SmsLogData) => {
   return await post("/sys/smsLog/add", data);
 };
 
-// 修改
+// Update
 export const editSmsLog = async (data: SmsLogData) => {
   return await post("/sys/smsLog/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteSmsLog = async (id: number | string) => {
   return await get("/sys/smsLog/del", { params: { ids: id } });
 };
 
 export interface SendSmsData {}
 
-// 发送短信
+// Send SMS
 export const sendSms = async (data: SendSmsData) => {
   return await post("/sys/sms/send", data);
 };

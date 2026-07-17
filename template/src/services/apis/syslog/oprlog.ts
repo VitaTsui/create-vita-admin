@@ -16,17 +16,17 @@ interface IOprLogData {
 }
 export type OprLogData = Partial<IOprLogData>;
 
-// 列表
+// List
 export const getOprLogList = async (params: OprLogSearch) => {
   return await get<ListRes<OprLogData>>("/sys/oprLog/page", { params });
 };
 
-// 详情
+// Detail
 export const getOprLog = async (id: number | string) => {
   return await get<OprLogData>("/sys/oprLog/info/" + id);
 };
 
-// 清理日志
+// Clean logs
 export interface CleanLogParams {
   logType: string;
   retentionPeriod: string;

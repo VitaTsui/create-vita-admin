@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { ConfigProvider, theme as antdTheme } from "antd";
+import { lightTokens, darkTokens } from "@hsu-react/ui";
 import { observer } from "mobx-react-lite";
 import classNames from "classnames";
 import styles from "./index.module.scss";
@@ -9,44 +10,18 @@ interface ThemeProps {
   children?: React.ReactNode;
 }
 
-// CF 调色板：以 CSS 变量下发，亮/暗两套，内容区样式统一引用
-const PALETTE = {
-  light: {
-    canvas: "#f6f7f9", // 页面画布
-    surface: "#ffffff", // 卡片/面板底
-    subtle: "#fafbfc", // 表头/次级底
-    border: "#e6e8eb", // 描边
-    borderWeak: "#eceef1", // 更轻描边
-    headerBg: "#ffffff", // 顶栏底
-    text: "rgba(0, 0, 0, 0.88)",
-    text2: "rgba(0, 0, 0, 0.45)",
-    text3: "rgba(0, 0, 0, 0.35)",
-    rowHover: "#f6f7f9",
-  },
-  dark: {
-    canvas: "#131314",
-    surface: "#1c1c1e",
-    subtle: "#232325",
-    border: "rgba(255, 255, 255, 0.12)",
-    borderWeak: "rgba(255, 255, 255, 0.08)",
-    headerBg: "#1c1c1e",
-    text: "rgba(255, 255, 255, 0.85)",
-    text2: "rgba(255, 255, 255, 0.45)",
-    text3: "rgba(255, 255, 255, 0.35)",
-    rowHover: "rgba(255, 255, 255, 0.04)",
-  },
-};
-
 const Theme: React.FC<ThemeProps> = observer((props) => {
   const { children } = props;
   const { isDark, primaryColor } = ThemeStore;
 
-  const p = isDark ? PALETTE.dark : PALETTE.light;
+  // The single source of truth for design tokens is @hsu-react/ui (the CSS variable version comes from es/styles/tokens.scss,
+  // auto-switching with html[data-theme]; the TS constants here are only consumed by the antd themeConfig)
+  const p = isDark ? darkTokens : lightTokens;
 
-  // 暗色下把水青调暗去刺眼（亮色保持品牌色）
+  // In dark mode, dim the teal to reduce glare (light mode keeps the brand color)
   const accent = isDark ? "#1C9C9C" : primaryColor;
 
-  // 主色 hex -> rgba，用于菜单高亮
+  // Primary color hex -> rgba, used for menu highlighting
   const hexToRgba = (hex: string, alpha: number) => {
     const m = hex.replace("#", "");
     if (m.length < 6) return hex;
@@ -56,29 +31,31 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
-  // 暗色导航：中性黑（渐变两端 + 中间色作为 token 兜底）
+  // Dark nav: neutral black (gradient endpoints + middle tone as token fallback)
   const DARK_TOP = "#1F1F1F";
   const DARK_BOTTOM = "#141414";
 
   const headerBg = p.headerBg;
   const siderBg = p.surface;
 
-  // CF 调色板挂到 <html>，保证 body 级 Portal（Modal/Drawer/下拉）也能解析这些变量
+  // Appearance switch: set html[data-theme]; the token CSS variables (tokens.scss) switch as a whole set accordingly;
+  // only the primary color is still applied at runtime (users can change it in appearance settings).
+  // Older versions set each --cf-* inline on html; clear them here to avoid leftovers overriding stylesheet values.
   useEffect(() => {
     const root = document.documentElement;
-    const vars: Record<string, string> = {
-      "--primary-color": accent,
-      "--cf-canvas": p.canvas,
-      "--cf-surface": p.surface,
-      "--cf-subtle": p.subtle,
-      "--cf-border": p.border,
-      "--cf-border-weak": p.borderWeak,
-      "--cf-text": p.text,
-      "--cf-text-2": p.text2,
-      "--cf-text-3": p.text3,
-    };
-    Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
-  }, [accent, p]);
+    root.dataset.theme = isDark ? "dark" : "light";
+    root.style.setProperty("--primary-color", accent);
+    [
+      "--cf-canvas",
+      "--cf-surface",
+      "--cf-subtle",
+      "--cf-border",
+      "--cf-border-weak",
+      "--cf-text",
+      "--cf-text-2",
+      "--cf-text-3",
+    ].forEach((k) => root.style.removeProperty(k));
+  }, [accent, isDark]);
 
   const themeConfig = useMemo(
     () => ({
@@ -87,11 +64,11 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
         : antdTheme.defaultAlgorithm,
       token: {
         colorPrimary: accent,
-        // Cloudflare 观感：以描边替代阴影、统一中等圆角
+        // Cloudflare look: borders instead of shadows, unified medium border radius
         borderRadius: 8,
         borderRadiusLG: 8,
         borderRadiusSM: 6,
-        // 冷调浅灰画布 + 轻描边（随外观切换）
+        // Cool light-gray canvas + light borders (switches with appearance)
         colorBgLayout: p.canvas,
         colorBorder: p.border,
         colorBorderSecondary: p.borderWeak,
@@ -101,7 +78,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
           headerBg,
           siderBg,
         },
-        // CF 风格：方正紧凑的控件
+        // Squared-off, compact controls
         Button: {
           controlHeight: 34,
           borderRadius: 6,
@@ -111,7 +88,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
         },
         Input: { borderRadius: 6 },
         Select: { borderRadius: 6 },
-        // CF 风格：浅头、细分割线、行 hover
+        // Light table header, thin dividers, row hover
         Table: {
           headerBg: p.subtle,
           headerColor: p.text2,
@@ -125,7 +102,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
           borderRadiusLG: 8,
         },
         Menu: {
-          // 透明底以透出导航渐变；选中态为圆角胶囊
+          // Transparent background to reveal the nav gradient; selected state is a rounded pill
           darkItemBg: "transparent",
           darkSubMenuItemBg: "transparent",
           darkPopupBg: p.surface,
@@ -134,7 +111,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
           darkItemHoverBg: "rgba(255, 255, 255, 0.14)",
           darkItemSelectedBg: hexToRgba(accent, 0.16),
           darkItemSelectedColor: accent,
-          // 亮色模式（CF 侧边栏）：紧凑行 + 浅水色高亮，左侧高亮条由 CSS 叠加
+          // Light-mode sidebar: compact rows + light aqua highlight; the left highlight bar is overlaid via CSS
           itemSelectedBg: hexToRgba(accent, 0.12),
           itemSelectedColor: accent,
           itemActiveBg: hexToRgba(accent, 0.12),
@@ -162,7 +139,7 @@ const Theme: React.FC<ThemeProps> = observer((props) => {
             "--primary-color": accent,
             "--nav-dark-top": DARK_TOP,
             "--nav-dark-bottom": DARK_BOTTOM,
-            // CF 调色板（内容区样式统一引用）
+            // Built-in palette (uniformly referenced by content-area styles)
             "--cf-canvas": p.canvas,
             "--cf-surface": p.surface,
             "--cf-subtle": p.subtle,

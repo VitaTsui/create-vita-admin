@@ -167,7 +167,7 @@ const UserForm: React.FC<UserFormProps> = observer((props) => {
   };
 
   const handleValuesChange = (changedValues: Record<string, unknown>) => {
-    // 仅当确认密码字段有值时，当密码字段变更时，触发确认密码字段的验证
+    // Only when the confirm-password field has a value: re-validate it when the password field changes
     if (
       "password" in changedValues &&
       form &&

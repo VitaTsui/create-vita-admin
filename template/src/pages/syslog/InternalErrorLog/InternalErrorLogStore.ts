@@ -25,7 +25,7 @@ class InternalErrorLogStore extends ListPanelStore<
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this.getTotal();
@@ -60,8 +60,8 @@ class InternalErrorLogStore extends ListPanelStore<
   };
 
   /**
-   * 删除
-   * @param id 记录ID
+   * Delete
+   * @param id Record ID
    */
   public delData = (id: number | string) => {
     deleteInternalErrorLog(id).then((res) => {

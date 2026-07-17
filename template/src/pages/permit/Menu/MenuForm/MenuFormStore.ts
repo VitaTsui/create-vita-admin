@@ -18,7 +18,7 @@ class MenuFormStore extends FormModalStore<MenuData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (id: number | string) => {
@@ -32,7 +32,7 @@ class MenuFormStore extends FormModalStore<MenuData> {
   };
 
   /**
-   * 新增
+   * Create
    * @param data
    * @param fn
    */
@@ -84,7 +84,7 @@ class MenuFormStore extends FormModalStore<MenuData> {
   };
 
   /**
-   * 编辑
+   * Edit
    * @param id
    * @param data
    * @param fn

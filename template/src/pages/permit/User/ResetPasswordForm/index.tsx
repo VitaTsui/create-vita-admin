@@ -66,7 +66,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
       formItems={formItems}
       externalForm={form}
       onValuesChange={(changedValues) => {
-        // 仅当确认密码字段有值时，当新密码字段变更时，触发确认密码字段的验证
+        // Only when the confirm-password field has a value: re-validate it when the new-password field changes
         if (
           "password" in changedValues &&
           form &&

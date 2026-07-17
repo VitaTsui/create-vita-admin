@@ -21,7 +21,7 @@ class FileStore extends ListPanelStore<FileSearchData, FileData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getFileList({ query: this._query.value })
@@ -44,7 +44,7 @@ class FileStore extends ListPanelStore<FileSearchData, FileData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

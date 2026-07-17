@@ -9,9 +9,9 @@ const {
 } = require("./utils.cjs");
 
 /**
- * 创建 Modal 列表面板（带表单）
- * 用法: node createListModalPanel.cjs <panelName> [parent] [apiUrl] [parentIdProp] [modalTitle]
- * 示例: node createListModalPanel.cjs userAbnormalPolicy ApiExceptionStrategyManagement /vm/monitApiExcepStratUser excepStratId "用户异常策略管理"
+ * Create a Modal list panel (with a form)
+ * Usage: node createListModalPanel.cjs <panelName> [parent] [apiUrl] [parentIdProp] [modalTitle]
+ * Example: node createListModalPanel.cjs userAbnormalPolicy ApiExceptionStrategyManagement /vm/monitApiExcepStratUser excepStratId "用户异常策略管理"
  */
 function main() {
   try {
@@ -43,7 +43,7 @@ function main() {
     console.log(`父级ID属性: ${parentIdProp}`);
     console.log(`Modal 标题: ${modalTitle}\n`);
 
-    // ========== 创建 Modal 列表部分 ==========
+    // ========== Create the Modal list part ==========
     const modalPanelTemplate = path.resolve(
       __dirname,
       "./ListModalPanel/panel.js"
@@ -80,7 +80,7 @@ function main() {
       "<API_DEL_PATH>": apiUrl ? `${apiUrl}/del` : "",
     });
 
-    // 创建 Modal 列表文件
+    // Create the Modal list files
     const modalFiles = [
       {
         fileName: "index.tsx",
@@ -108,7 +108,7 @@ function main() {
       writeFile(path.join(file.path, file.fileName), file.content);
     });
 
-    // ========== 创建表单部分 ==========
+    // ========== Create the form part ==========
     const formPanelPath = path.resolve(
       __dirname,
       "../src/pages",
@@ -129,23 +129,23 @@ function main() {
       "<API_PATH>": apiPathValue,
     });
 
-    // 修改 FormPanel 以支持父级ID属性
+    // Modify FormPanel to support the parent ID property
     let finalFormPanel = FormPanel;
 
-    // 在接口中添加父级ID属性
+    // Add the parent ID property to the interface
     finalFormPanel = finalFormPanel.replace(
       /(onOk\?: \(\) => void;)/,
       `$1
   ${parentIdProp}?: number | string;`
     );
 
-    // 在 props 解构中添加父级ID
+    // Add the parent ID to the props destructuring
     finalFormPanel = finalFormPanel.replace(
       /const \{ open, title, id, onCancel, onOk \} = props;/,
       `const { open, title, id, onCancel, onOk, ${parentIdProp} } = props;`
     );
 
-    // 在 handleOk 中添加父级ID赋值（在函数开始处）
+    // Add the parent ID assignment in handleOk (at the start of the function)
     finalFormPanel = finalFormPanel.replace(
       /(const handleOk = \(data: Record<string, unknown>\) => \{)/,
       `$1
@@ -153,7 +153,7 @@ function main() {
 `
     );
 
-    // 创建表单文件
+    // Create the form files
     const formFiles = [
       {
         fileName: "index.tsx",

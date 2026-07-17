@@ -17,44 +17,44 @@ interface IDeptData {
   children: IDeptData[];
   cd: string;
   rmks: string;
-  /** 外部部门 ID（钉钉） */
+  /** External department ID (DingTalk) */
   outId: string;
-  /** 来源：0 自建，1 钉钉 */
+  /** Source: 0 self-created, 1 DingTalk */
   source: number;
 }
 export type DeptData = Partial<IDeptData>;
 
-// 列表
+// List
 export const getDeptList = async (params: DeptSearch) => {
   return await get<ListRes<DeptData>>("/sys/org/listTreeNode", { params });
 };
 
-// 详情
+// Detail
 export const getDept = async (id: number | string) => {
   return await get<DeptData>("/sys/org/info/" + id);
 };
 
-// 新增
+// Create
 export const createDept = async (data: DeptData) => {
   return await post("/sys/org/add", data);
 };
 
-// 修改
+// Update
 export const editDept = async (data: DeptData) => {
   return await post("/sys/org/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteDept = async (id: number | string) => {
   return await get("/sys/org/del", { params: { ids: id } });
 };
 
-// 钉钉部门树（供同步弹窗勾选）
+// DingTalk department tree (for selection in the sync modal)
 export const getDingtalkOrgTree = async () => {
   return await get<DeptData[]>("/sys/org/dingtalk/tree");
 };
 
-// 同步/导入钉钉部门（空数组表示全量）
+// Sync/import DingTalk departments (an empty array means all)
 export const importDingtalkOrg = async (deptIds: (string | number)[]) => {
   return await post<number>("/sys/org/dingtalk/import", deptIds);
 };

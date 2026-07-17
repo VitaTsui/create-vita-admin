@@ -16,7 +16,7 @@ class DictFormStore extends FormModalStore<DictData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (id: number | string) => {
@@ -30,7 +30,7 @@ class DictFormStore extends FormModalStore<DictData> {
   };
 
   /**
-   * 新增
+   * Create
    * @param data
    * @param fn
    */
@@ -45,7 +45,7 @@ class DictFormStore extends FormModalStore<DictData> {
   };
 
   /**
-   * 编辑
+   * Edit
    * @param id
    * @param data
    * @param fn

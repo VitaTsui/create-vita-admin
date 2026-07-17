@@ -8,9 +8,9 @@ const {
 } = require("./utils.cjs");
 
 /**
- * 创建默认面板
- * 用法: node createDefaultPanel.cjs <panelName> [parent] [apiName]
- * 示例: node createDefaultPanel.cjs dashboard dataMonitoring dashboard
+ * Create a default panel
+ * Usage: node createDefaultPanel.cjs <panelName> [parent] [apiName]
+ * Example: node createDefaultPanel.cjs dashboard dataMonitoring dashboard
  */
 function main() {
   try {
@@ -35,7 +35,7 @@ function main() {
     console.log(`面板路径: ${panelPath}`);
     console.log(`API 路径: ${apiPathValue}\n`);
 
-    // 读取并处理模板
+    // Read and process the templates
     const panelTemplate = path.resolve(__dirname, "./DefaultPanel/panel.js");
     const storeTemplate = path.resolve(__dirname, "./DefaultPanel/store.js");
     const apiTemplate = path.resolve(__dirname, "./DefaultPanel/api.js");
@@ -52,7 +52,7 @@ function main() {
       "<NAME>": PanelName,
     });
 
-    // 创建文件
+    // Create the files
     const files = [
       {
         fileName: "index.tsx",

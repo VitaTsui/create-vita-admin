@@ -1,6 +1,6 @@
-// 去掉 Panel.Default 内容区(content)的背景/描边/内边距，露出内容区灰画布，
-// 恢复「灰底浮卡片」的仪表盘层次；仅保留可滚动能力。
-// 外边距仍由 Panel.Default 外层容器(wrapper)提供。
+// Remove the background/border/padding of the Panel.Default content area to expose the gray canvas,
+// restoring the "gray base, floating cards" dashboard hierarchy; keep only scrollability.
+// The outer margin is still provided by the Panel.Default outer container (wrapper).
 .overviewContent {
   min-height: 0;
   padding: 0 !important;
@@ -8,10 +8,10 @@
   background: transparent !important;
   border: none !important;
 
-  // 仅纵向滚动：竖滚动条出现后图表宽度短暂超出容器 14px，横向一律裁掉
+  // Vertical scrolling only: after the vertical scrollbar appears, chart width briefly exceeds the container by 14px, so always clip horizontally
   overflow: hidden auto;
 
-  // 隐藏滚动条（保留滚动能力）
+  // Hide the scrollbar (keep scrollability)
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -19,7 +19,7 @@
   }
 }
 
-// 仅内部纵向布局与卡片间距
+// Only internal vertical layout and card spacing
 .overview {
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
 
 .stats {
   display: grid;
-  // auto-fit：卡片拉伸铺满整行；窄屏自动换行
+  // auto-fit: cards stretch to fill the row; wrap automatically on narrow screens
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
 }
@@ -69,7 +69,7 @@
 
   background: var(--cf-surface);
 
-  // CF 风格：描边白卡片，hover 仅描边变色
+  // CF style: outlined white card; only the border color changes on hover
   border-radius: 8px;
   border: 1px solid var(--cf-border);
   cursor: pointer;
@@ -117,7 +117,7 @@
   }
 }
 
-// 使用量卡片：非可点击，hover 不强调
+// Usage card: non-clickable, no hover emphasis
 .statCard.flat {
   cursor: default;
 
@@ -150,7 +150,7 @@
 
   background: var(--cf-surface);
 
-  // CF 风格：描边白卡片
+  // CF style: outlined white card
   border-radius: 8px;
   border: 1px solid var(--cf-border);
 

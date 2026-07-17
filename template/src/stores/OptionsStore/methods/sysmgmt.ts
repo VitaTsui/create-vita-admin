@@ -7,39 +7,39 @@ import { SelectOption } from "@hsu-react/ui";
 import { makeAutoObservable } from "mobx";
 
 /**
- * 系统管理相关的选项方法
+ * System-management-related option methods
  */
 export default class SysmgmtMethods {
-  // 菜单分类
+  // Menu category
   private _menuCat: SelectOption[] = [];
-  // 菜单类型
+  // Menu type
   private _menuType: SelectOption[] = [];
-  // 文件配置状态
+  // File config status
   private _fileConfigStatus: SelectOption[] = [];
-  // 文件配置类型
+  // File config type
   private _fileConfigType: SelectOption[] = [];
-  // 文件配置环境
+  // File config environment
   private _fileConfigActive: SelectOption[] = [];
-  // 短信配置环境
+  // SMS config environment
   private _smsConfigActive: SelectOption[] = [];
-  // 短信配置类型
+  // SMS config type
   private _smsConfigType: SelectOption[] = [];
-  // 短信配置状态
+  // SMS config status
   private _smsConfigStatus: SelectOption[] = [];
-  // 短信模板类型
+  // SMS template type
   private _smsTemplateType: SelectOption[] = [];
-  // 短信日志状态
+  // SMS log status
   private _smsLogStatus: SelectOption[] = [];
-  // 短信配置列表
+  // SMS config list
   private _smsConfigList: SelectOption[] = [];
-  // 短信模板列表
+  // SMS template list
   private _smsTemplateList: SelectOption[] = [];
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  // 菜单分类
+  // Menu category
   public getMenuCat = () => {
     getEnum("SysRscoEn$Cat").then((res) => {
       if (res.code === 0) {
@@ -52,7 +52,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 菜单类型
+  // Menu type
   public getMenuType = () => {
     getEnum("SysRscoEn$Type").then((res) => {
       if (res.code === 0) {
@@ -65,7 +65,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 文件配置状态
+  // File config status
   public getFileConfigStatus = () => {
     getEnum("SysFileConfEn$Status").then((res) => {
       if (res.code === 0) {
@@ -78,7 +78,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 文件配置类型
+  // File config type
   public getFileConfigType = () => {
     getEnum("SysFileConfEn$Type").then((res) => {
       if (res.code === 0) {
@@ -91,7 +91,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 文件配置环境
+  // File config environment
   public getFileConfigActive = () => {
     getEnum("SysFileConfEn$Active").then((res) => {
       if (res.code === 0) {
@@ -104,7 +104,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信配置环境
+  // SMS config environment
   public getSmsConfigActive = () => {
     getEnum("SysSmsConfEn$Active").then((res) => {
       if (res.code === 0) {
@@ -117,7 +117,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信配置类型
+  // SMS config type
   public getSmsConfigType = () => {
     getEnum("SysSmsConfEn$Type").then((res) => {
       if (res.code === 0) {
@@ -130,7 +130,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信配置状态
+  // SMS config status
   public getSmsConfigStatus = () => {
     getEnum("SysSmsConfEn$Status").then((res) => {
       if (res.code === 0) {
@@ -143,7 +143,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信模板类型
+  // SMS template type
   public getSmsTemplateType = () => {
     getEnum("SysSmsTemplateEn$Type").then((res) => {
       if (res.code === 0) {
@@ -156,7 +156,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信日志状态
+  // SMS log status
   public getSmsLogStatus = () => {
     getEnum("SysSmsLogEn$Status").then((res) => {
       if (res.code === 0) {
@@ -169,7 +169,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信配置列表
+  // SMS config list
   public getSmsConfigList = () => {
     getSmsConfigList().then((res) => {
       if (res.code === 0) {
@@ -183,7 +183,7 @@ export default class SysmgmtMethods {
     });
   };
 
-  // 短信模板列表
+  // SMS template list
   public getSmsTemplateList = () => {
     getSmsTemplateList().then((res) => {
       if (res.code === 0) {

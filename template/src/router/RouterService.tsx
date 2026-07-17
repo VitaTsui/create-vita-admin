@@ -13,7 +13,7 @@ import { getAccessToken } from "@/utils/auth";
 import { lazy } from "react";
 import { array_is_includes } from "hsu-utils";
 
-// 菜单路径映射：旧路径 -> 新路径
+// Menu path mapping: old path -> new path
 const MENU_PATH_MAPPING: Readonly<Record<string, string>> = {
   "sys/dept/index": "permit/dept/index",
   "sys/menu/index": "permit/menu/index",
@@ -29,14 +29,14 @@ const MENU_PATH_MAPPING: Readonly<Record<string, string>> = {
   "sys/fileConf/index": "systool/File/index",
 };
 
-// 路径前缀映射：旧前缀 -> 新前缀
+// Path prefix mapping: old prefix -> new prefix
 const PATH_PREFIX_MAPPING: Readonly<Record<string, string>> = {
   "/sys": "/platform",
   "/log": "/syslog",
 };
 
 /**
- * 递归包装路由，为每个路由添加 RouterContainer 容器组件
+ * Recursively wrap routes, adding the RouterContainer wrapper component to each route
  */
 function wrapRoutes(routes: RouteType[]): RouteType[] {
   return routes?.map((route) => {
@@ -53,15 +53,15 @@ function wrapRoutes(routes: RouteType[]): RouteType[] {
 }
 
 /**
- * 使用 webpack 的 require.context 动态导入所有页面组件
- * 这是 webpack 特有的功能，用于批量导入模块
+ * Dynamically import all page components with webpack's require.context
+ * This is a webpack-specific feature for importing modules in bulk
  */
 const pages = require.context("../pages/", true, /\.tsx$/);
 
 /**
- * 将所有页面组件转换为懒加载组件映射表
- * @param r - webpack require.context 对象
- * @returns 组件路径到懒加载组件的映射
+ * Convert all page components into a lazy-loaded component map
+ * @param r - webpack require.context object
+ * @returns Map from component paths to lazy-loaded components
  */
 function importAll(r: __WebpackModuleApi.RequireContext) {
   const modules: Record<
@@ -77,8 +77,8 @@ function importAll(r: __WebpackModuleApi.RequireContext) {
         .replace(/\.tsx$/, "")
         .replace(/^\.\//, "");
 
-      // lazy() 需要一个返回 Promise 的函数
-      // webpack 的 require.context 返回的模块需要包装成 Promise
+      // lazy() requires a function that returns a Promise
+      // Modules returned by webpack's require.context need to be wrapped in a Promise
       modules[normalizedKey] = lazy(() => Promise.resolve(r(key)));
     });
 
@@ -100,14 +100,14 @@ class RouterStore {
 
   private _menuList: MenuList[] = [];
 
-  // 防抖函数需要持久化，避免每次 autorun 时创建新实例
+  // Debounced functions must be persisted to avoid creating new instances on every autorun
   private _debouncedGetMenuList: ReturnType<typeof debounce>;
   private _debouncedGetPermissions: ReturnType<typeof debounce>;
 
   constructor() {
     makeAutoObservable(this);
 
-    // 在构造函数中初始化防抖函数
+    // Initialize the debounced functions in the constructor
     this._debouncedGetMenuList = debounce(this.getMenuList.bind(this), 300);
     this._debouncedGetPermissions = debounce(
       this.getPermissions.bind(this),
@@ -162,7 +162,7 @@ class RouterStore {
   };
 
   /**
-   * 规范化路径：处理 index 路径、添加斜杠前缀、应用路径映射等
+   * Normalize a path: handle index paths, add the leading slash, apply path mappings, etc.
    */
   private _normalizePath = (
     path: string,
@@ -171,18 +171,18 @@ class RouterStore {
   ): string => {
     let normalizedPath = path;
 
-    // 处理 index 路径
+    // Handle index paths
     if (normalizedPath === "index" && parentPath) {
       normalizedPath = parentPath;
     }
 
-    // 确保路径以 / 开头
+    // Ensure the path starts with /
     if (!normalizedPath.startsWith("/")) {
       normalizedPath = `/${normalizedPath}`;
     }
 
-    // 后管页面统一挂到 /admin 前缀下（AI 问答页独占根路径）。
-    // 父子层级都会在此补齐，保证 _normalizePath 的父子合并逻辑不受影响。
+    // Admin pages are all mounted under the /admin prefix (the AI Q&A page owns the root path).
+    // Both parent and child levels get the prefix here, keeping _normalizePath's parent-child merge logic unaffected.
     if (
       normalizedPath !== ADMIN_BASE &&
       !normalizedPath.startsWith(`${ADMIN_BASE}/`)
@@ -190,7 +190,7 @@ class RouterStore {
       normalizedPath = `${ADMIN_BASE}${normalizedPath}`;
     }
 
-    // 应用路径前缀映射（仅在根级路由时）
+    // Apply the path prefix mapping (only for root-level routes)
     if (applyMapping && !parentPath) {
       for (const [oldPrefix, newPrefix] of Object.entries(
         PATH_PREFIX_MAPPING
@@ -202,7 +202,7 @@ class RouterStore {
       }
     }
 
-    // 合并父路径
+    // Merge the parent path
     if (parentPath) {
       const parentParts = parentPath.split("/");
       const currentParts = normalizedPath.split("/");
@@ -216,7 +216,7 @@ class RouterStore {
   };
 
   /**
-   * 规范化组件 URL
+   * Normalize a component URL
    */
   private _normalizeComponentUrl = (url: string): string => {
     const cleanUrl = url.startsWith("/")
@@ -226,13 +226,13 @@ class RouterStore {
   };
 
   /**
-   * 根据 URL 设置路由的 element 属性
+   * Set the route's element property based on the URL
    */
   private _setRouteElement = (_router: RouteType, url: string): void => {
     const normalizedUrl = this._normalizeComponentUrl(url);
     const lowerCaseUrl = normalizedUrl.toLowerCase();
 
-    // 检查是否存在对应的模块
+    // Check whether a matching module exists
     if (modules?.[lowerCaseUrl]) {
       const Element = modules[lowerCaseUrl];
 
@@ -246,7 +246,7 @@ class RouterStore {
         _router.children.unshift({
           index: true,
           element: <Element />,
-          // 继承父级的 name/icon，否则该 index 默认页会生成一个 label 为空的标签
+          // Inherit the parent's name/icon; otherwise this default index page would create a tab with an empty label
           meta: { name: _router.meta?.name, icon: _router.meta?.icon },
         });
       } else {
@@ -255,7 +255,7 @@ class RouterStore {
       return;
     }
 
-    // 检查是否为外部 URL 或内部路由
+    // Check whether it is an external URL or an internal route
     const urlType = this._detectHttpUrlType(normalizedUrl);
 
     if (urlType === "invalid" || urlType === "localhost") {
@@ -287,7 +287,7 @@ class RouterStore {
     menuList?.forEach((item) => {
       let children: RouteType[] = [];
 
-      // 使用统一的路径规范化函数
+      // Use the unified path normalization function
       const path = this._normalizePath(item.path, parentPath);
 
       const _router: RouteType = {
@@ -312,11 +312,11 @@ class RouterStore {
         _router.children = children.length > 0 ? children : undefined;
       }
 
-      // 处理组件 URL
+      // Handle the component URL
       if (item.url) {
         this._setRouteElement(_router, item.url);
       } else if (_router.children) {
-        // 没有 URL 但有子路由，设置为 Outlet
+        // No URL but has child routes; set to Outlet
         _router.element = <Outlet />;
         _router.meta = {
           ..._router.meta,
@@ -332,14 +332,14 @@ class RouterStore {
   };
 
   /**
-   * 判断路径是否存在于路由配置中
-   * @param path - 路由路径，如 "/home" 或 "/platform/user/index"
-   * @param exactMatch - 是否精确匹配，默认 true。false 时会匹配路径前缀
-   * @returns 路径是否存在
+   * Check whether a path exists in the route config
+   * @param path - Route path, e.g. "/home" or "/platform/user/index"
+   * @param exactMatch - Whether to match exactly, default true. When false, matches path prefixes
+   * @returns Whether the path exists
    * @example
    * RouterService.hasPath("/home") // true
    * RouterService.hasPath("/nonexistent") // false
-   * RouterService.hasPath("/platform", false) // true (匹配 /platform/xxx)
+   * RouterService.hasPath("/platform", false) // true (matches /platform/xxx)
    */
   public hasPath = (path: string, exactMatch: boolean = true): boolean => {
     if (!path || typeof path !== "string") {
@@ -350,7 +350,7 @@ class RouterStore {
 
     const searchInRoutes = (routes: RouteType[]): boolean => {
       for (const route of routes) {
-        // 跳过没有 path 的路由（如 index 路由）
+        // Skip routes without a path (e.g. index routes)
         if (!route.path) {
           if (route.children?.length) {
             if (searchInRoutes(route.children)) return true;
@@ -358,14 +358,14 @@ class RouterStore {
           continue;
         }
 
-        // 精确匹配或前缀匹配
+        // Exact match or prefix match
         if (exactMatch) {
           if (route.path === normalizedPath) return true;
         } else {
           if (normalizedPath.startsWith(route.path)) return true;
         }
 
-        // 递归搜索子路由
+        // Recursively search child routes
         if (route.children?.length) {
           if (searchInRoutes(route.children)) return true;
         }
@@ -377,9 +377,9 @@ class RouterStore {
   };
 
   /**
-   * 根据组件URL路径筛选对应的路由
-   * @param componentUrl - 组件文件路径，如 "permit/user/index" 或 "sys/user/index"
-   * @returns 匹配的路由对象或undefined
+   * Find the route matching a component URL path
+   * @param componentUrl - Component file path, e.g. "permit/user/index" or "sys/user/index"
+   * @returns The matching route object or undefined
    */
   public findRouteByComponentUrl = (
     componentUrl: string
@@ -388,15 +388,15 @@ class RouterStore {
       return undefined;
     }
 
-    // 标准化组件URL：移除开头的斜杠，转为小写
+    // Normalize the component URL: strip leading slashes, convert to lowercase
     const normalizedUrl = componentUrl.trim().toLowerCase().replace(/^\/+/, "");
 
-    // 应用菜单路径映射
+    // Apply the menu path mapping
     const mappedUrl = MENU_PATH_MAPPING[normalizedUrl] || normalizedUrl;
 
     const findInRoutes = (routes: RouteType[]): RouteType | undefined => {
       for (const route of routes) {
-        // 获取路由对应的组件URL并进行匹配
+        // Get the route's component URL and match against it
         const routeComponentUrl = this._getRouteComponentUrl(route);
 
         if (
@@ -407,7 +407,7 @@ class RouterStore {
           return route;
         }
 
-        // 递归搜索子路由
+        // Recursively search child routes
         if (route.children?.length) {
           const found = findInRoutes(route.children);
           if (found) return found;
@@ -420,9 +420,9 @@ class RouterStore {
   };
 
   /**
-   * 从路由对象中提取组件URL路径
-   * @param route - 路由对象
-   * @returns 组件URL或undefined
+   * Extract the component URL path from a route object
+   * @param route - Route object
+   * @returns The component URL or undefined
    */
   private _getRouteComponentUrl = (route: RouteType): string | undefined => {
     const findUrlInMenuList = (
@@ -431,15 +431,15 @@ class RouterStore {
       parentPath?: string
     ): string | undefined => {
       for (const item of menuList) {
-        // 使用统一的路径规范化函数
+        // Use the unified path normalization function
         const path = this._normalizePath(item.path, parentPath);
 
-        // 匹配目标路径
+        // Match against the target path
         if (path === targetPath && item.url) {
           return item.url.split("/").filter(Boolean).join("/").toLowerCase();
         }
 
-        // 递归搜索子路由
+        // Recursively search child routes
         if (item.children) {
           const found = findUrlInMenuList(item.children, targetPath, path);
           if (found) return found;
@@ -452,16 +452,16 @@ class RouterStore {
   };
 
   /**
-   * 检测URL类型
-   * @param url - 待检测的URL字符串
-   * @returns URL类型：
-   *  - "localhost": http(s)://localhost 或 http(s)://127.0.0.1
-   *  - "ip": http(s)://IP地址
-   *  - "domain": http(s)://域名
-   *  - "ip-port": IP:端口格式（不带协议）
-   *  - "ip-only": IP地址（不带端口和协议）
-   *  - "route": 固定内部路由路径
-   *  - "invalid": 无效URL
+   * Detect the URL type
+   * @param url - URL string to check
+   * @returns URL type:
+   *  - "localhost": http(s)://localhost or http(s)://127.0.0.1
+   *  - "ip": http(s)://IP address
+   *  - "domain": http(s)://domain name
+   *  - "ip-port": IP:port format (without protocol)
+   *  - "ip-only": IP address (without port or protocol)
+   *  - "route": fixed internal route path
+   *  - "invalid": invalid URL
    */
   private _detectHttpUrlType = (
     url: string
@@ -479,7 +479,7 @@ class RouterStore {
 
     const trimmedUrl = url.trim();
 
-    // URL 匹配规则配置
+    // URL matching rule config
     const URL_PATTERNS = {
       localhost: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/i,
       ip: /^https?:\/\/((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(:\d+)?(\/.*)?$/,
@@ -491,7 +491,7 @@ class RouterStore {
         /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/,
     };
 
-    // 按优先级检测URL类型
+    // Detect the URL type by priority
     if (URL_PATTERNS.localhost.test(trimmedUrl)) {
       return "localhost";
     }
@@ -512,7 +512,7 @@ class RouterStore {
       return "ip-only";
     }
 
-    // 检测是否为固定内部路由
+    // Check whether it is a fixed internal route
     if (Router.some((route) => route.path === `/${trimmedUrl}`)) {
       return "route";
     }

@@ -17,21 +17,22 @@ const config = {
   module: {
     rules: [
       {
-        // @hsu-react/ui 的 es 产物为 ESM(type:module)、相对导入不带扩展名，
-        // 关闭 webpack5 的 fullySpecified 强校验，允许其无扩展名解析。
+        // The es output of @hsu-react/ui is ESM (type:module) and its relative imports omit
+        // extensions; disable webpack5's strict fullySpecified check to allow extensionless resolution.
         test: /\.m?js$/,
         resolve: { fullySpecified: false },
       },
       {
-        // x-data-spreadsheet 的 src/index.js 会 `import './index.less'`，但其样式已由
-        // @hsu-react/ui 引入的 dist/xspreadsheet.css 提供；把该 less 当作字符串模块
-        // （无人消费其导出，编译与运行时均安全），从而无需 less/less-loader
+        // x-data-spreadsheet's src/index.js does `import './index.less'`, but its styles are already
+        // provided by dist/xspreadsheet.css imported through @hsu-react/ui; treat that less file as a
+        // string module (nothing consumes its export, safe at build and runtime), removing the need
+        // for less/less-loader
         test: /node_modules[\\/]x-data-spreadsheet[\\/]src[\\/]index\.less$/,
         type: "asset/source",
       },
       {
         test: /\.(png|jpe?g|gif|webp|svg)$/i,
-        // 排除 node_modules，但放行 @hsu-react/ui 自带的图片资源
+        // Exclude node_modules, but allow the image assets shipped with @hsu-react/ui
         exclude: /node_modules\/(?!@hsu-react\/ui\/)/,
         type: "asset/resource",
       },
@@ -86,7 +87,7 @@ const config = {
       },
       {
         test: /\.scss$/,
-        // 放行 @hsu-react/ui 的 es 产物 scss（组件库发布未编译的 .module.scss，需本项目编译），排除其余 node_modules
+        // Allow the scss in @hsu-react/ui's es output (the library ships uncompiled .module.scss, which this project must compile), exclude the rest of node_modules
         exclude: /node_modules\/(?!@hsu-react\/ui\/)/,
         use: [
           MiniCssExtractPlugin.loader,
@@ -130,7 +131,7 @@ const config = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      //模板路径，注意需要和index.html路径对应
+      // Template path; must match the index.html path
       template: path.resolve(__dirname, "../public/index.html"),
     }),
   ],

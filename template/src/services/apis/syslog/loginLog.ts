@@ -16,19 +16,19 @@ interface ILoginLogData {
 }
 export type LoginLogData = Partial<ILoginLogData>;
 
-// 列表
+// List
 export const getLoginLogList = async (params: LoginLogSearch) => {
   return await get<ListRes<LoginLogData>>("/sys/logLogin/page", { params });
 };
 
-// 详情
+// Detail
 export const getLoginLog = async (id: number | string, query: string) => {
   return await get<LoginLogData>("/sys/logLogin/info/" + id, {
     params: { query },
   });
 };
 
-// 清理日志
+// Clean logs
 export interface CleanLogParams {
   logType: string;
   retentionPeriod: string;

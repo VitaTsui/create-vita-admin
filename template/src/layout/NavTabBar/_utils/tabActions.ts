@@ -1,7 +1,7 @@
 import { TabType } from "..";
 
 /**
- * 关闭指定索引的标签页（保留固定标签页）
+ * Close the tab at the given index (keeping pinned tabs)
  */
 export const closeTab = (
   openKeys: TabType[],
@@ -10,7 +10,7 @@ export const closeTab = (
   affixRouter: string[] = []
 ): TabType[] => {
   const targetItem = openKeys[index];
-  // 如果是固定标签页，则不关闭
+  // Do not close if it is a pinned tab
   if (affixRouter.includes(targetItem.key) || targetItem.affix) {
     return openKeys;
   }
@@ -24,7 +24,7 @@ export const closeTab = (
 };
 
 /**
- * 关闭左侧标签页（保留固定标签页）
+ * Close tabs to the left (keeping pinned tabs)
  */
 export const closeLeftTabs = (
   openKeys: TabType[],
@@ -32,11 +32,11 @@ export const closeLeftTabs = (
   drop: (key: string) => void,
   affixRouter: string[] = []
 ): TabType[] => {
-  // 分离左侧标签页
+  // Split off the tabs on the left
   const leftTabs = openKeys.slice(0, index);
   const rightTabs = openKeys.slice(index);
 
-  // 过滤出左侧非固定的标签页并关闭
+  // Filter out the non-pinned tabs on the left and close them
   const removedTabs = leftTabs.filter(
     (item) => !affixRouter.includes(item.key) && !item.affix
   );
@@ -44,7 +44,7 @@ export const closeLeftTabs = (
     drop(item.key?.split("?")[0] || "");
   });
 
-  // 保留左侧固定的标签页和右侧所有标签页
+  // Keep the pinned tabs on the left and all tabs on the right
   const keptLeftTabs = leftTabs.filter(
     (item) => affixRouter.includes(item.key) || item.affix
   );
@@ -52,7 +52,7 @@ export const closeLeftTabs = (
 };
 
 /**
- * 关闭右侧标签页（保留固定标签页）
+ * Close tabs to the right (keeping pinned tabs)
  */
 export const closeRightTabs = (
   openKeys: TabType[],
@@ -60,11 +60,11 @@ export const closeRightTabs = (
   drop: (key: string) => void,
   affixRouter: string[] = []
 ): TabType[] => {
-  // 分离左侧标签页和右侧标签页
+  // Split into left and right tabs
   const leftTabs = openKeys.slice(0, index + 1);
   const rightTabs = openKeys.slice(index + 1);
 
-  // 过滤出右侧非固定的标签页并关闭
+  // Filter out the non-pinned tabs on the right and close them
   const removedTabs = rightTabs.filter(
     (item) => !affixRouter.includes(item.key) && !item.affix
   );
@@ -72,7 +72,7 @@ export const closeRightTabs = (
     drop(item.key?.split("?")[0] || "");
   });
 
-  // 保留左侧所有标签页和右侧固定的标签页
+  // Keep all tabs on the left and the pinned tabs on the right
   const keptRightTabs = rightTabs.filter(
     (item) => affixRouter.includes(item.key) || item.affix
   );
@@ -80,7 +80,7 @@ export const closeRightTabs = (
 };
 
 /**
- * 关闭其他标签页（保留固定标签页）
+ * Close other tabs (keeping pinned tabs)
  */
 export const closeOtherTabs = (
   openKeys: TabType[],
@@ -88,7 +88,7 @@ export const closeOtherTabs = (
   drop: (key: string) => void,
   affixRouter: string[] = []
 ): TabType[] => {
-  // 过滤出其他非固定的标签页并关闭
+  // Filter out the other non-pinned tabs and close them
   const removedTabs = openKeys.filter(
     (item) =>
       item.key !== currentItem.key &&
@@ -99,7 +99,7 @@ export const closeOtherTabs = (
     drop(item.key?.split("?")[0] || "");
   });
 
-  // 保留当前标签页和所有固定的标签页
+  // Keep the current tab and all pinned tabs
   return openKeys.filter(
     (item) =>
       item.key === currentItem.key ||
@@ -109,14 +109,14 @@ export const closeOtherTabs = (
 };
 
 /**
- * 关闭全部标签页（保留固定标签页）
+ * Close all tabs (keeping pinned tabs)
  */
 export const closeAllTabs = (
   openKeys: TabType[],
   drop: (key: string) => void,
   affixRouter: string[] = []
 ): TabType[] => {
-  // 过滤出非固定的标签页并关闭
+  // Filter out the non-pinned tabs and close them
   const removedTabs = openKeys.filter(
     (item) => !affixRouter.includes(item.key) && !item.affix
   );
@@ -124,7 +124,7 @@ export const closeAllTabs = (
     drop(item.key?.split("?")[0] || "");
   });
 
-  // 返回固定的标签页
+  // Return the pinned tabs
   return openKeys.filter(
     (item) => affixRouter.includes(item.key) || item.affix
   );

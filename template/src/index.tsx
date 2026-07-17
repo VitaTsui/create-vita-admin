@@ -1,7 +1,7 @@
 import "./install-object-has-own-polyfill";
 
 import "./index.scss";
-// hsu-ui 全局样式（antd 观感覆盖），项目特有增量在本地 styles/antd-overload.scss
+// hsu-ui global styles (antd look-and-feel overrides); project-specific additions live in local styles/antd-overload.scss
 import "@hsu-react/ui/es/styles/antd-overload.scss";
 import "./styles/antd-overload.scss";
 

@@ -1,6 +1,6 @@
 import { get } from "../Axios";
 
-// 获取菜单列表
+// Get the menu list
 export interface MenuListData {
   topMenuList: MenuList[];
   menuList: MenuList[];
@@ -26,7 +26,7 @@ export const getMenuList = async (
   return await get<MenuListData>("/sys/menu/getMenuATopATopMenu", { params });
 };
 
-// 获取权限信息
+// Get permission info
 export interface PermissionsInfo {
   stringPermissions: string[];
 }

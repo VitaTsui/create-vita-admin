@@ -24,7 +24,7 @@
     }
 
     &.ant-menu-item-selected {
-      background-color: #17b3a314;
+      background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
 
       color: var(--primary-color) !important;
     }

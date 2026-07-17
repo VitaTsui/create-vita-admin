@@ -3,10 +3,10 @@ import { RouteType } from "@/router/router.config";
 import { TabType } from "..";
 
 /**
- * 格式化路由为标签页项
- * @param routes 路由配置
- * @param parent 父标签页项
- * @returns 标签页项数组
+ * Format routes into tab items
+ * @param routes Route configuration
+ * @param parent Parent tab item
+ * @returns Array of tab items
  */
 export const formatNavTabBar = (
   routes: RouteType[],

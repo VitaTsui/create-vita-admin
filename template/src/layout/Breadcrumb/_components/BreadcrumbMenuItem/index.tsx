@@ -9,7 +9,7 @@ interface BreadcrumbMenuItemProps {
 }
 
 /**
- * 面包屑菜单项组件
+ * Breadcrumb menu item component
  */
 const BreadcrumbMenuItem: React.FC<BreadcrumbMenuItemProps> = ({
   item,

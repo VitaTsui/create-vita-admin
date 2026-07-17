@@ -4,7 +4,7 @@ import { NavTabBarContent } from "@/hooks/useDropTab";
 import { TabType } from "..";
 
 /**
- * 处理通过 dropKey 关闭标签页的 hook
+ * Hook that closes a tab via dropKey
  */
 export const useDropTabKey = (
   setOpenkeys: React.Dispatch<React.SetStateAction<TabType[]>>

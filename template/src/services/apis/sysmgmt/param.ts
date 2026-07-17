@@ -16,27 +16,27 @@ interface IParamData {
 }
 export type ParamData = Partial<IParamData>;
 
-// 列表
+// List
 export const getParamList = async (params: ParamSearch) => {
   return await get<ListRes<ParamData>>("/sys/param/page", { params });
 };
 
-// 详情
+// Detail
 export const getParam = async (id: number | string) => {
   return await get<ParamData>("/sys/param/info/" + id);
 };
 
-// 新增
+// Create
 export const createParam = async (data: ParamData) => {
   return await post("/sys/param/add", data);
 };
 
-// 修改
+// Update
 export const editParam = async (data: ParamData) => {
   return await post("/sys/param/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteParam = async (id: number | string) => {
   return await get("/sys/param/del", { params: { ids: id } });
 };

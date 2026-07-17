@@ -10,7 +10,7 @@ interface UseMenuPathOptions {
 }
 
 /**
- * 处理菜单路径匹配和激活状态的 hook
+ * Hook that handles menu path matching and active state
  */
 export const useMenuPath = ({
   allItems,
@@ -33,14 +33,14 @@ export const useMenuPath = ({
           const isMatch = checkPathMatch(pathname, item.key, item.parent?.path);
 
           if (isMatch) {
-            // 处理参数路由
+            // Handle param routes
             if (item.key.includes(":") && item.parent?.path) {
               setMenuKey(item.parent.path);
             } else {
               setMenuKey(item.key);
             }
 
-            // 设置展开的菜单项
+            // Set the expanded menu items
             if (parents && !collapsed && mode !== "horizontal") {
               const _openKeys = parents?.map((item) => item.key);
               setOpenkeys([..._openKeys]);

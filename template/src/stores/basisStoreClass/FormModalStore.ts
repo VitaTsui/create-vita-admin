@@ -3,7 +3,7 @@ import { message, notification } from "antd";
 import { computed, makeObservable, observable } from "mobx";
 
 /**
- * F: 表单数据类型
+ * F: form data type
  */
 class FormModalStore<F = Record<string, unknown>> {
   constructor() {
@@ -11,7 +11,7 @@ class FormModalStore<F = Record<string, unknown>> {
   }
 
   /**
-   * 表单数据
+   * Form data
    */
   @computed
   get formData(): Partial<F> {
@@ -21,7 +21,7 @@ class FormModalStore<F = Record<string, unknown>> {
   protected accessor _formData: Partial<F> = {};
 
   /**
-   * 表单类型
+   * Form type
    */
   @computed
   get formType(): string {
@@ -34,7 +34,7 @@ class FormModalStore<F = Record<string, unknown>> {
   };
 
   /**
-   * 获取详情
+   * Get the detail
    * @param id
    */
   public getFormData = (id: number | string, data?: Partial<F>) => {
@@ -43,11 +43,11 @@ class FormModalStore<F = Record<string, unknown>> {
     }, 500);
   };
   protected _getFormData = (_id: number | string, _data?: Partial<F>) => {
-    // 由子类实现具体的获取逻辑
+    // Concrete fetch logic is implemented by subclasses
   };
 
   /**
-   * 编辑
+   * Edit
    * @param data
    */
   public editFormData = (
@@ -55,28 +55,28 @@ class FormModalStore<F = Record<string, unknown>> {
     _data: Partial<F>,
     fn?: () => void
   ) => {
-    // 由子类实现具体的编辑逻辑
+    // Concrete edit logic is implemented by subclasses
     fn?.();
   };
 
   /**
-   * 新增
+   * Create
    * @param data
    */
   public addFormData = (_data: Partial<F>, fn?: () => void) => {
-    // 由子类实现具体的新增逻辑
+    // Concrete create logic is implemented by subclasses
     fn?.();
   };
 
   /**
-   * 重置表单数据
+   * Reset the form data
    */
   public resetFormData = () => {
     this._formData = {};
   };
 
   /**
-   * 消息处理
+   * Message handling
    * @param res
    */
   protected _message = (res?: ResType) => {
@@ -96,7 +96,7 @@ class FormModalStore<F = Record<string, unknown>> {
   };
 
   /**
-   * 重置Store
+   * Reset the store
    */
   public resetStore = () => {
     this._formData = {};

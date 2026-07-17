@@ -25,7 +25,7 @@ class ApiLogStore extends ListPanelStore<ApiLogSearchData, ApiLogData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this.getTotal();

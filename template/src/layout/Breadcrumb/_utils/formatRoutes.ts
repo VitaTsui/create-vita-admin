@@ -3,10 +3,10 @@ import { RouteType } from "@/router/router.config";
 import { BreadcrumbType } from "..";
 
 /**
- * 格式化路由为面包屑项
- * @param router 路由配置
- * @param parent 父路由
- * @returns 面包屑项数组
+ * Format routes into breadcrumb items
+ * @param router Route configuration
+ * @param parent Parent route
+ * @returns Array of breadcrumb items
  */
 export const formatRoutes = (
   router: RouteType[],

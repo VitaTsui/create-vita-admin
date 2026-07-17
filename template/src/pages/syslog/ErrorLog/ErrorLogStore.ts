@@ -24,7 +24,7 @@ class ErrorLogStore extends ListPanelStore<ErrorLogSearchData, ErrorLogData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this.getTotal();

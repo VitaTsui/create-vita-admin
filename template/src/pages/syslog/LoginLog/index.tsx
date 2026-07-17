@@ -150,12 +150,12 @@ const LoginLog: React.FC = observer(() => {
       return;
     }
 
-    // 获取选中的记录
+    // Get the selected records
     const selectedRecords = dataSource.filter(
       (item) => item.id && selectedRowKeys.includes(item.id),
     );
 
-    // 设置继承数据
+    // Set the inherited data
     const ids = selectedRecords?.map((record) => record.id);
     const crtTm = searchData.crtTm;
 
@@ -164,13 +164,13 @@ const LoginLog: React.FC = observer(() => {
       ids,
     };
 
-    // 如果有时间范围，设置 startTime 和 endTime
+    // If there is a time range, set startTime and endTime
     if (crtTm && Array.isArray(crtTm) && crtTm.length === 2) {
       inheritedData.startTime = crtTm[0];
       inheritedData.endTime = crtTm[1];
     }
 
-    // 设置继承数据并打开对话框
+    // Set the inherited data and open the dialog
     newChat();
     setInheritedData(inheritedData);
     setChatModalOpen(true);

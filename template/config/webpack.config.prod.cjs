@@ -14,12 +14,12 @@ Object.keys(envConfig).map((key) => {
   definePlugin[`process.env.${key}`] = JSON.stringify(envConfig[key]);
 });
 
-// 路径处理函数
+// Path normalization helper
 const normalizePath = (inputPath) => {
   return path.normalize(inputPath).replace(/\\/g, "/");
 };
 
-// 获取规范化的 cwd
+// Normalized cwd
 const cwd = normalizePath(process.cwd());
 
 const config = {
@@ -48,7 +48,7 @@ const config = {
         }
         return "static/css/[name].[hash:8].chunk.css";
       },
-      // 异步 chunk 无 name，用 [id] 兜底（避免 name 渲染成字面量 undefined）
+      // Async chunks have no name, fall back to [id] (avoids name rendering as the literal undefined)
       chunkFilename: "static/css/[id].[hash:8].chunk.css",
     }),
     new CopyWebpackPlugin({
@@ -63,7 +63,7 @@ const config = {
           },
           noErrorOnMissing: false,
           force: true,
-          context: cwd, // 添加 context 配置
+          context: cwd, // Add context configuration
         },
       ],
     }),
@@ -79,7 +79,7 @@ const config = {
             const packageName = module.context.match(
               /[\\/]node_modules[\\/](.*?)([\\/]|$)/
             )?.[1];
-            // 匹配不到包名时返回 undefined，交给 webpack 用 chunk id 命名（避免出现字面量 "undefined"）
+            // Return undefined when no package name matches, letting webpack name it by chunk id (avoids the literal "undefined")
             return packageName ? packageName.replace("@", "") : undefined;
           },
           minSize: 20 * 1024,

@@ -26,7 +26,7 @@ interface BreadcrumbProps {
 }
 
 /**
- * 面包屑组件
+ * Breadcrumb component
  */
 const Breadcrumb: React.FC<BreadcrumbProps> = (props) => {
   const { router, className } = props;
@@ -39,7 +39,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = (props) => {
   const breadcrumb = useBreadcrumbPath(_routes);
 
   /**
-   * 处理面包屑项点击事件
+   * Handle the breadcrumb item click event
    */
   const handleItemClick = useCallback(
     (path: string) => {
@@ -49,7 +49,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = (props) => {
   );
 
   /**
-   * 格式化面包屑项
+   * Format breadcrumb items
    */
   const formattedItems = useMemo(() => {
     return cloneDeep(breadcrumb)?.map((item, index) => {
@@ -57,7 +57,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = (props) => {
       const children = item.children?.filter((i) => !i.path?.includes(":"));
       const hasChildren = children && children.length > 0;
 
-      // 如果有子菜单，设置菜单项
+      // If there are child menus, set the menu items
       if (hasChildren) {
         item.onClick = (e) => e.preventDefault();
         item.menu = {
@@ -65,17 +65,17 @@ const Breadcrumb: React.FC<BreadcrumbProps> = (props) => {
         };
       }
 
-      // 最后一项不显示路径
+      // The last item does not show a path
       if (isLastItem) {
         item.path = undefined;
       }
 
-      // 如果有图标，包装标题
+      // If there is an icon, wrap the title
       if (item.icon) {
         item.title = <BreadcrumbItemIcon icon={item.icon} title={item.title} />;
       }
 
-      // 如果有路径且没有子菜单，设置点击事件
+      // If there is a path and no child menu, set the click handler
       if (item.path && !hasChildren) {
         item.onClick = (e) => {
           e.preventDefault();

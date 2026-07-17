@@ -11,13 +11,13 @@ import FormModalStore from "@/stores/basisStoreClass/FormModalStore";
 import { ResType } from "@/services/Axios";
 import { TreeData, CheckedKeys } from "@hsu-react/ui";
 
-/** 菜单节点下（含子菜单）功能权限授权数量汇总 */
+/** Summary of granted function permissions under a menu node (including submenus) */
 export interface MenuGrantInfo {
   checked: number;
   total: number;
 }
 
-/** 资源类型：1 菜单，2 功能（与后端 sys_rsco.type 一致） */
+/** Resource type: 1 menu, 2 function (consistent with backend sys_rsco.type) */
 const RSCO_TYPE_MENU = 1;
 const RSCO_TYPE_FUNCTION = 2;
 
@@ -29,7 +29,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
 
   @computed
   get functionTree() {
-    // 根据点击选中的菜单显示功能树，如果没有点击菜单则返回空
+    // Show the function tree based on the clicked menu; return empty if no menu is clicked
     if (!this._selectedMenuKey) {
       return [];
     }
@@ -41,7 +41,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
     return this._selectedMenuKey;
   }
 
-  /** 当前选中菜单的完整路径（如「系统管理 / 角色管理」），用于右侧面板标题 */
+  /** Full path of the currently selected menu (e.g. "System Management / Role Management"), used as the right panel title */
   @computed
   get selectedMenuPath() {
     if (!this._selectedMenuKey) return "";
@@ -69,7 +69,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
     return path ? path.join(" / ") : "";
   }
 
-  /** 已选权限汇总（口径与提交一致：菜单含半选，功能为各菜单暂存的并集） */
+  /** Summary of selected permissions (same basis as submission: menus include half-checked, functions are the union of each menu's staged checks) */
   @computed
   get grantSummary() {
     const menuCount = this._getKeysArray(this._menuCheckedKeys).length;
@@ -83,7 +83,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   @observable
   private accessor _selectedMenuKey: string | null = null;
 
-  // 存储每个菜单对应的已勾选功能（用于暂存）
+  // Store the checked functions of each menu (for staging)
   @observable
   private accessor _menuFunctionCheckedMap: Map<string, CheckedKeys> =
     new Map();
@@ -104,7 +104,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
 
   @computed
   get functionCheckedKeys() {
-    // 如果有选中的菜单，返回该菜单暂存的功能勾选状态
+    // If a menu is selected, return its staged function-check state
     if (this._selectedMenuKey) {
       const savedKeys = this._menuFunctionCheckedMap.get(this._selectedMenuKey);
       return savedKeys || [];
@@ -124,14 +124,14 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   }
 
   /**
-   * 获取类型值（兼容字符串和数字）
+   * Get the type value (compatible with both strings and numbers)
    */
   private _getItemType = (type: string | number | undefined): number => {
     return typeof type === "string" ? Number(type) : type ?? 0;
   };
 
   /**
-   * 将 CheckedKeys 转换为字符串数组
+   * Convert CheckedKeys to a string array
    */
   private _getKeysArray = (checkedKeys: CheckedKeys): string[] => {
     if (Array.isArray(checkedKeys)) {
@@ -145,7 +145,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 获取角色关联菜单
+   * Fetch the menus associated with the role
    */
   public getPermRtRscoTreeNode = (id: number | string) => {
     getPermRtRscoTreeNode({ subId: id }).then((res) => {
@@ -164,7 +164,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
           checkedKeys?.map((i) => i.toString())
         );
 
-        // 打开即自动定位到第一个有功能的菜单，右侧不再空白
+        // On open, auto-locate the first menu that has functions so the right side is never blank
         const firstKey = this._firstMenuKeyWithFunctions(list);
         this._selectedMenuKey = firstKey;
         this._functionCheckedKeys = firstKey
@@ -177,7 +177,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 根据 type 分离菜单和功能树
+   * Split the menu tree and function tree by type
    */
   private _separateTreeByType = (list: MenuListData[]) => {
     const formatMenuTree = (items: MenuListData[]): TreeData[] => {
@@ -239,7 +239,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 设置初始选中状态（支持功能权限多层）
+   * Set the initial checked state (supports multi-level function permissions)
    */
   private _setInitialCheckedKeys = (
     list: MenuListData[],
@@ -284,7 +284,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 第一个直接挂有功能的菜单（深度优先），没有则回退到第一个菜单
+   * The first menu that directly holds functions (depth-first); falls back to the first menu if none
    */
   private _firstMenuKeyWithFunctions = (
     list: MenuListData[]
@@ -317,7 +317,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 递归提取功能节点及其子功能（功能自身的子项里有功能也都要显示）
+   * Recursively extract function nodes and their sub-functions (functions nested inside a function's children are shown too)
    */
   private _extractFunctionWithChildren = (item: MenuListData): TreeData => {
     const children =
@@ -341,7 +341,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 根据选中的菜单过滤功能树（仅取菜单的直接子项，功能自身的子项递归显示）
+   * Filter the function tree by the selected menu (only the menu's direct children; a function's own children are shown recursively)
    */
   private _getFilteredFunctionTreeBySingleMenu = (
     menuKey: string
@@ -358,7 +358,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
           itemId === targetKey &&
           item.children
         ) {
-          // 只取菜单的直接子项中的功能节点，功能自身的子功能递归显示
+          // Only take function nodes among the menu's direct children; a function's own sub-functions are shown recursively
           return (item.children || [])
             .filter(
               (child) =>
@@ -383,7 +383,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 从功能节点递归收集其自身及子功能 id
+   * Recursively collect a function node's own id and its sub-function ids
    */
   private _collectFunctionKeyIdsFromFunctionNode = (
     node: MenuListData
@@ -398,7 +398,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 某菜单直接挂载的全部功能 id（含功能的子功能，不含子菜单下的功能）
+   * All function ids directly mounted on a menu (including a function's sub-functions, excluding functions under submenus)
    */
   private _directFunctionKeysOfMenu = (menuNode: MenuListData): string[] => {
     return (menuNode.children || []).flatMap((child) =>
@@ -409,7 +409,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 某菜单子树下全部功能 id（含子菜单下的功能）
+   * All function ids in a menu's subtree (including functions under submenus)
    */
   private _allFunctionKeysUnderMenu = (menuNode: MenuListData): string[] => {
     return (menuNode.children || []).flatMap((child) => {
@@ -444,7 +444,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
     return null;
   };
 
-  /** 菜单及其子菜单 id（用于合并各菜单下暂存的功能勾选） */
+  /** Ids of a menu and its submenus (used to merge staged function checks under each menu) */
   private _menuIdsInSubtree = (menuNode: MenuListData): string[] => {
     if (!menuNode.id) return [];
     const id = menuNode.id.toString();
@@ -455,7 +455,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 菜单树节点展示用：该菜单子树内功能权限已授权数 / 总数
+   * For menu tree node display: granted / total function permissions within the menu's subtree
    */
   public getMenuGrantInfo = (menuKey: string): MenuGrantInfo => {
     const menuNode = this._findMenuNode(this._allMenuListData, menuKey);
@@ -484,13 +484,13 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 设置菜单选中状态。
-   * 联动：新勾选的菜单自动授权其全部功能，取消勾选的菜单同时清空其功能。
+   * Set the menu checked state.
+   * Linkage: a newly checked menu auto-grants all its functions; an unchecked menu also clears its functions.
    */
   public setMenuCheckedKeys = (checkedKeys: CheckedKeys) => {
     const prevEffective = new Set(this._getKeysArray(this._menuCheckedKeys));
     const nextEffective = new Set(this._getKeysArray(checkedKeys));
-    // 自动授权只针对「完全勾选」的菜单；半选（因子菜单连带）不自动授权功能
+    // Auto-grant only applies to fully-checked menus; half-checked ones (caused by submenus) do not auto-grant functions
     const nextChecked = new Set(
       (Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked)?.map(
         (key) => key.toString()
@@ -514,14 +514,14 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
 
     this._menuCheckedKeys = checkedKeys;
 
-    // 同步当前选中菜单的功能勾选展示
+    // Sync the function-check display of the currently selected menu
     if (this._selectedMenuKey) {
       this._functionCheckedKeys =
         this._menuFunctionCheckedMap.get(this._selectedMenuKey) || [];
     }
   };
 
-  /** 确保菜单在勾选集合中（勾选了功能但菜单未勾选时自动补上） */
+  /** Ensure the menu is in the checked set (auto-added when a function is checked but its menu is not) */
   private _ensureMenuChecked = (menuKey: string) => {
     const effective = this._getKeysArray(this._menuCheckedKeys);
     if (effective.includes(menuKey)) return;
@@ -541,12 +541,12 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 设置功能选中状态。
-   * 联动：勾选了功能时自动勾选所属菜单，避免出现「有功能无菜单」的无效配置。
+   * Set the function checked state.
+   * Linkage: checking a function auto-checks its parent menu, avoiding the invalid "function without menu" configuration.
    */
   public setFunctionCheckedKeys = (checkedKeys: CheckedKeys) => {
     this._functionCheckedKeys = checkedKeys;
-    // 同时更新暂存的状态
+    // Also update the staged state
     if (this._selectedMenuKey) {
       this._menuFunctionCheckedMap.set(this._selectedMenuKey, checkedKeys);
 
@@ -557,10 +557,10 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 设置点击选中的菜单（用于显示功能）
+   * Set the clicked menu (used to display its functions)
    */
   public setSelectedMenuKey = (menuKey: string | null) => {
-    // 保存当前菜单的功能勾选状态
+    // Save the function-check state of the current menu
     if (this._selectedMenuKey) {
       this._menuFunctionCheckedMap.set(
         this._selectedMenuKey,
@@ -574,7 +574,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
       : [];
   };
 
-  /** 一键授权全部菜单与功能 */
+  /** Grant all menus and functions in one click */
   public checkAllPermissions = () => {
     const allMenuKeys: string[] = [];
 
@@ -602,7 +602,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
     }
   };
 
-  /** 一键清空全部已选权限 */
+  /** Clear all selected permissions in one click */
   public clearAllPermissions = () => {
     this._menuCheckedKeys = [];
     this._functionCheckedKeys = [];
@@ -610,7 +610,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 重置选中状态
+   * Reset the checked state
    */
   public resetCheckedKeys = () => {
     this._menuCheckedKeys = [];
@@ -620,10 +620,10 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 获取合并后的选中项列表
+   * Get the merged list of checked items
    */
   public getMergedCheckedKeys = (): string[] => {
-    // 保存当前菜单的功能勾选状态
+    // Save the function-check state of the current menu
     if (this._selectedMenuKey) {
       this._menuFunctionCheckedMap.set(
         this._selectedMenuKey,
@@ -644,7 +644,7 @@ class MenuAssignStore extends FormModalStore<RoleRtRsco> {
   };
 
   /**
-   * 编辑关联菜单
+   * Edit the associated menus
    * @param id
    * @param data
    * @param fn

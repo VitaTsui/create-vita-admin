@@ -7,10 +7,10 @@ import { adminPath } from "@/router/router.config";
 import styles from "./index.module.scss";
 
 /**
- * 概览 / 仪表盘（脚手架默认落地页）
+ * Overview / dashboard (default landing page of the scaffold)
  *
- * 这是一个不依赖任何后端业务接口的静态示例页，用于演示框架的卡片、图表与
- * 快捷入口布局。接入真实项目时，把下面的静态数据替换为接口数据即可。
+ * A static demo page with no dependency on any backend business API, showcasing the framework's cards, charts and
+ * quick-entry layout. When wiring up a real project, just replace the static data below with API data.
  */
 
 type Stat = {

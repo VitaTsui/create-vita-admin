@@ -8,7 +8,7 @@ interface BreadcrumbItemIconProps {
 }
 
 /**
- * 面包屑项图标和标题组件
+ * Breadcrumb item icon and title component
  */
 const BreadcrumbItemIcon: React.FC<BreadcrumbItemIconProps> = ({
   icon,

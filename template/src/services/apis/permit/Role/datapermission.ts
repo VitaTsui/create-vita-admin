@@ -15,8 +15,8 @@ interface IDataPermissionData {
 export type DataPermissionData = Partial<IDataPermissionData>;
 
 /**
- * 获取列表
- * @param params 查询参数
+ * Get the list
+ * @param params query params
  */
 export const getDataPermissionList = async (params: DataPermissionSearch) => {
   return await get<ListRes<DataPermissionData>>(
@@ -26,8 +26,8 @@ export const getDataPermissionList = async (params: DataPermissionSearch) => {
 };
 
 /**
- * 获取详情
- * @param id 记录ID
+ * Get the detail
+ * @param id record ID
  */
 export const getDataPermission = async (roleId: number | string) => {
   return await get<DataPermissionData>("/sys/roleDataLevelScope/infoByRoleId", {
@@ -36,24 +36,24 @@ export const getDataPermission = async (roleId: number | string) => {
 };
 
 /**
- * 新增
- * @param data 数据
+ * Create
+ * @param data data
  */
 export const createDataPermission = async (data: DataPermissionData) => {
   return await post("/sys/roleDataLevelScope/add", data);
 };
 
 /**
- * 修改
- * @param data 数据
+ * Update
+ * @param data data
  */
 export const editDataPermission = async (data: DataPermissionData) => {
   return await post("/sys/roleDataLevelScope/upd", data);
 };
 
 /**
- * 删除
- * @param id 记录ID
+ * Delete
+ * @param id record ID
  */
 export const deleteDataPermission = async (id: number | string) => {
   return await get("/sys/roleDataLevelScope/del", { params: { ids: id } });

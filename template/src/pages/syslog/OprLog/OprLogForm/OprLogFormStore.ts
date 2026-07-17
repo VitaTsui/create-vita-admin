@@ -10,7 +10,7 @@ class OprLogFormStore extends FormModalStore<OprLogData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (id: number | string) => {

@@ -23,7 +23,7 @@ class LogChangeStore extends ListPanelStore<LogChangeSearchData, LogChangeData> 
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this.getTotal();
@@ -58,7 +58,7 @@ class LogChangeStore extends ListPanelStore<LogChangeSearchData, LogChangeData> 
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

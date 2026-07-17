@@ -70,20 +70,20 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
   useDropTabKey(setOpenkeys);
   useTabTitle(setOpenkeys);
 
-  // 当前正在拖拽的标签页 ID
+  // ID of the tab currently being dragged
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // 配置拖拽传感器，设置10px的激活距离以避免误触
+  // Configure the drag sensor with a 10px activation distance to avoid accidental drags
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
 
-  // 处理拖拽开始事件
+  // Handle the drag start event
   const onDragStart = (event: DragStartEvent) => {
     setActiveId(String(event.active.id));
   };
 
-  // 处理拖拽结束事件
+  // Handle the drag end event
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
       setOpenkeys((prev) => {
@@ -95,7 +95,7 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
     setActiveId(null);
   };
 
-  // 处理拖拽取消事件
+  // Handle the drag cancel event
   const onDragCancel = () => {
     setActiveId(null);
   };
@@ -138,13 +138,13 @@ const NavTabBar: React.FC<NavTabBarProps> = (props) => {
       onEdit={(key, action) => {
         if (action === "remove") {
           drop((key as string)?.split("?")[0] || "");
-          // 找到当前要关闭的标签页的索引
+          // Find the index of the tab being closed
           const currentIndex = openKeys.findIndex((item) => item.key === key);
           const newOpenKeys = openKeys.filter((item) => item.key !== key);
           setOpenkeys(newOpenKeys);
           setOpen("");
           if (key === tabKey) {
-            // 如果关闭的是当前标签页，选中前一个标签页，如果没有前一个则选中第一个
+            // If the active tab is closed, select the previous tab; fall back to the first one
             const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
             navigate(newOpenKeys[targetIndex]?.key || basePath);
           }

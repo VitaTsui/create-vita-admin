@@ -16,19 +16,19 @@ interface IErrorLogData {
 }
 export type ErrorLogData = Partial<IErrorLogData>;
 
-// 列表
+// List
 export const getErrorLogList = async (params: ErrorLogSearch) => {
   return await get<ListRes<ErrorLogData>>("/sys/logError/page", { params });
 };
 
-// 详情
+// Detail
 export const getErrorLog = async (id: number | string, query: string) => {
   return await get<ErrorLogData>("/sys/logError/info/" + id, {
     params: { query },
   });
 };
 
-// 清理日志
+// Clean logs
 export interface CleanLogParams {
   logType: string;
   retentionPeriod: string;

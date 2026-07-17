@@ -14,7 +14,7 @@ interface DingtalkSyncModalProps {
   onOk: () => void;
 }
 
-// 钉钉部门树（DeptData）转 antd Tree 节点
+// Convert the DingTalk dept tree (DeptData) into antd Tree nodes
 const toTreeData = (list: DeptData[]): DataNode[] =>
   list.map((item) => ({
     key: String(item.id),

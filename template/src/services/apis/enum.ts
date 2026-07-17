@@ -23,7 +23,7 @@ export const getEnumPageByPcd = async (cd: string, query: string) => {
 };
 
 /**
- * 角色列表
+ * Role list
  */
 interface RoleItem {
   id: string | number;
@@ -49,21 +49,21 @@ export const getRoleList = async () => {
   return await get<RoleList>("/sys/role/list");
 };
 
-// 用户列表
+// User list
 export const getUserList = async () => {
   return await get<ListRes<{ id: string | number; nickname: string }>>(
     "/sys/user/list",
   );
 };
 
-// 短信配置列表
+// SMS config list
 export const getSmsConfigList = async () => {
   return await get<ListRes<{ id: string | number; nm: string }>>(
     "/sys/smsConf/list",
   );
 };
 
-// 短信模板列表
+// SMS template list
 export const getSmsTemplateList = async () => {
   return await get<ListRes<{ cd: string | number; nm: string }>>(
     "/sys/smsTemplate/list",

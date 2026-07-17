@@ -1,11 +1,11 @@
 import { array_is_includes } from "hsu-utils";
 
 /**
- * 检查路径是否匹配（用于面包屑）
- * @param pathname 当前路径
- * @param itemPath 路由路径
- * @param parentPath 父路径
- * @returns 是否匹配
+ * Check whether a path matches (used by the breadcrumb)
+ * @param pathname Current path
+ * @param itemPath Route path
+ * @param parentPath Parent path
+ * @returns Whether it matches
  */
 export const checkBreadcrumbPathMatch = (
   pathname: string,
@@ -27,25 +27,25 @@ export const checkBreadcrumbPathMatch = (
     return false;
   }
 
-  // 处理根路径
+  // Handle the root path
   if (pathname === "/" && itemPath === "/") {
     return true;
   }
 
-  // 处理包含参数的路由（如 /user/:id）
+  // Handle routes containing params (e.g. /user/:id)
   if (itemPath.includes(":")) {
     if (parentPath === "/") {
-      // 如果父路径是根路径，检查是否没有非参数段
+      // If the parent path is the root path, check that there are no non-param segments
       return !keyArr.filter((i: string) => !i.startsWith(":")).length;
     } else {
-      // 过滤掉参数段，只比较非参数部分
+      // Filter out param segments and compare only the non-param parts
       return array_is_includes(
         keyArr.filter((i: string) => !i.startsWith(":")),
         pathArr
       );
     }
   } else {
-    // 普通路径匹配
+    // Plain path matching
     return array_is_includes(keyArr, pathArr);
   }
 };

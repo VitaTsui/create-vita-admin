@@ -9,9 +9,9 @@ const {
 } = require("./utils.cjs");
 
 /**
- * 创建列表面板（不带表单）
- * 用法: node createListPanel.cjs <panelName> [parent] [apiUrl]
- * 示例: node createListPanel.cjs userManagement dataMonitoring /vm/user
+ * Create a list panel (without a form)
+ * Usage: node createListPanel.cjs <panelName> [parent] [apiUrl]
+ * Example: node createListPanel.cjs userManagement dataMonitoring /vm/user
  */
 function main() {
   try {
@@ -37,7 +37,7 @@ function main() {
     console.log(`面板路径: ${panelPath}`);
     console.log(`API 路径: ${apiPathValue}\n`);
 
-    // 读取并处理模板
+    // Read and process the templates
     const panelTemplate = path.resolve(__dirname, "./ListPanel/panel.js");
     const storeTemplate = path.resolve(__dirname, "./ListPanel/store.js");
     const apiTemplate = path.resolve(__dirname, "./ListPanel/api.js");
@@ -61,7 +61,7 @@ function main() {
       "<API_DEL_PATH>": apiUrl ? `${apiUrl}/del` : "",
     });
 
-    // 创建文件
+    // Create the files
     const files = [
       {
         fileName: "index.tsx",

@@ -24,7 +24,7 @@ class LoginLogStore extends ListPanelStore<LoginLogSearchData, LoginLogData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this.getTotal();

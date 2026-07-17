@@ -24,27 +24,27 @@ interface ISmsConfigData extends Record<string, unknown> {
 }
 export type SmsConfigData = Partial<ISmsConfigData>;
 
-// 列表
+// List
 export const getSmsConfigList = async (params: SmsConfigSearch) => {
   return await get<ListRes<SmsConfigData>>("/sys/smsConf/page", { params });
 };
 
-// 详情
+// Detail
 export const getSmsConfig = async (id: number | string) => {
   return await get<SmsConfigData>("/sys/smsConf/info/" + id);
 };
 
-// 新增
+// Create
 export const createSmsConfig = async (data: SmsConfigData) => {
   return await post("/sys/smsConf/add", data);
 };
 
-// 修改
+// Update
 export const editSmsConfig = async (data: SmsConfigData) => {
   return await post("/sys/smsConf/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteSmsConfig = async (id: number | string) => {
   return await get("/sys/smsConf/del", { params: { ids: id } });
 };

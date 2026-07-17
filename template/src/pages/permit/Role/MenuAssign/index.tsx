@@ -27,7 +27,7 @@ const TOOLTIP_CONFIG = {
 };
 
 /**
- * 获取树中所有节点的 key
+ * Get the keys of all nodes in the tree
  */
 const getAllTreeKeys = (nodes: TreeData[]): React.Key[] => {
   const keys: React.Key[] = [];
@@ -41,7 +41,7 @@ const getAllTreeKeys = (nodes: TreeData[]): React.Key[] => {
 };
 
 /**
- * 将 CheckedKeys 转换为字符串数组
+ * Convert CheckedKeys to a string array
  */
 const getCheckedKeysArray = (checkedKeys: CheckedKeys): string[] => {
   if (Array.isArray(checkedKeys)) {
@@ -120,13 +120,13 @@ const MenuAssign: React.FC<MenuAssignProps> = observer((props) => {
     [setFunctionCheckedKeys]
   );
 
-  // 获取所有功能节点的 key
+  // Get the keys of all function nodes
   const allFunctionKeys = useMemo(
     () => getAllTreeKeys(functionTree),
     [functionTree]
   );
 
-  // 计算全选状态
+  // Compute the select-all state
   const { allChecked, indeterminate } = useMemo(() => {
     if (!allFunctionKeys.length) {
       return { allChecked: false, indeterminate: false };
@@ -144,7 +144,7 @@ const MenuAssign: React.FC<MenuAssignProps> = observer((props) => {
     };
   }, [allFunctionKeys, functionCheckedKeys]);
 
-  // 处理全选
+  // Handle select-all
   const handleSelectAll = useCallback(
     (e: { target: { checked: boolean } }) => {
       setFunctionCheckedKeys(e.target.checked ? allFunctionKeys : []);

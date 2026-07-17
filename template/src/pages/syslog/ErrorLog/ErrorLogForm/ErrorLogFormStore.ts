@@ -11,7 +11,7 @@ class ErrorLogFormStore extends FormModalStore<ErrorLogData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (

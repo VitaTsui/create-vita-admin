@@ -26,27 +26,27 @@ interface IMenuData {
 }
 export type MenuData = Partial<IMenuData>;
 
-// 列表
+// List
 export const getMenuList = async (params: MenuSearch) => {
   return await get<ListRes<MenuData>>("/sys/rsco/listTreeNode", { params });
 };
 
-// 详情
+// Detail
 export const getMenu = async (id: number | string) => {
   return await get<MenuData>("/sys/rsco/info/" + id);
 };
 
-// 新增
+// Create
 export const createMenu = async (data: MenuData) => {
   return await post("/sys/rsco/add", data);
 };
 
-// 修改
+// Update
 export const editMenu = async (data: MenuData) => {
   return await post("/sys/rsco/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteMenu = async (id: number | string) => {
   return await get("/sys/rsco/del", { params: { ids: id } });
 };

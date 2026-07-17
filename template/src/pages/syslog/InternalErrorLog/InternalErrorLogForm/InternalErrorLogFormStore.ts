@@ -16,8 +16,8 @@ class InternalErrorLogFormStore extends FormModalStore<InternalErrorLogData> {
   }
 
   /**
-   * 获取详情
-   * @param id 记录ID
+   * Fetch detail
+   * @param id Record ID
    */
   protected _getFormData = (id: number | string) => {
     getInternalErrorLog(id).then((res) => {
@@ -30,9 +30,9 @@ class InternalErrorLogFormStore extends FormModalStore<InternalErrorLogData> {
   };
 
   /**
-   * 新增
-   * @param data 数据
-   * @param fn 成功回调
+   * Create
+   * @param data Data
+   * @param fn Success callback
    */
   public addFormData = (
     data: InternalErrorLogData,
@@ -48,10 +48,10 @@ class InternalErrorLogFormStore extends FormModalStore<InternalErrorLogData> {
   };
 
   /**
-   * 编辑
-   * @param id 记录ID
-   * @param data 数据
-   * @param fn 成功回调
+   * Edit
+   * @param id Record ID
+   * @param data Data
+   * @param fn Success callback
    */
   public editFormData = (
     id: number | string,

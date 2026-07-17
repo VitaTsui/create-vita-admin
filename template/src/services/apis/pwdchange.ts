@@ -6,7 +6,7 @@ interface IPwdChangeData {
 }
 export type PwdChangeData = Partial<IPwdChangeData>;
 
-// 修改
+// Update
 export const editPwdChange = async (data: PwdChangeData) => {
   return await post("/sys/user/updPwd", data);
 };

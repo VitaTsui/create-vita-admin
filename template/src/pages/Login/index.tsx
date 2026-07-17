@@ -44,8 +44,8 @@ const Login: React.FC = observer(() => {
     checkIsNeedLoginCaptcha();
   }, [checkIsNeedLoginCaptcha, getCryptoKey]);
 
-  // 钉钉：探测开关（未配置则隐藏入口）+ 处理扫码回调
-  // 探测请求带 skipAuthRedirect，401 时静默当作未开启，不触发跳登录
+  // DingTalk: probe the toggle (hide the entry if not configured) + handle the QR-scan callback
+  // The probe request carries skipAuthRedirect; a 401 is silently treated as disabled, without redirecting to login
   useEffect(() => {
     checkDingtalkEnabled().then(setDingtalkEnabled);
 
@@ -54,7 +54,7 @@ const Login: React.FC = observer(() => {
     if (!authCode) return;
     const state = params.get("state") ?? undefined;
     const saved = sessionStorage.getItem(DINGTALK_STATE_KEY);
-    // 清掉地址栏的回调参数，避免刷新重复触发
+    // Clear the callback params from the address bar to avoid re-triggering on refresh
     window.history.replaceState({}, "", window.location.pathname);
     if (saved && state && saved !== state) {
       message.error("钉钉登录校验失败，请重试");

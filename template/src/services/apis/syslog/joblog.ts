@@ -5,9 +5,9 @@ import { ListRes } from "@/services/ResType";
 export interface JobLogSearchData {
   crtTm: [string, string];
   status: number;
-  /** 业务开始时间 */
+  /** Business start time */
   execStartTm?: string;
-  /** 业务结束时间 */
+  /** Business end time */
   execEndTm?: string;
 }
 
@@ -18,26 +18,26 @@ interface JobLogSearch {
 interface IJobLogData {
   id: string | number;
   crtTm: string | [string, string];
-  /** 业务开始时间 */
+  /** Business start time */
   execStartTm?: string;
-  /** 业务结束时间 */
+  /** Business end time */
   execEndTm?: string;
 }
 export type JobLogData = Partial<IJobLogData>;
 
-// 列表
+// List
 export const getJobLogList = async (params: JobLogSearch) => {
   return await get<ListRes<JobLogData>>("/sys/jobLog/page", { params });
 };
 
-// 详情
+// Detail
 export const getJobLog = async (id: number | string, query: string) => {
   return await get<JobLogData>("/sys/jobLog/info/" + id, {
     params: { query },
   });
 };
 
-// 清理日志
+// Clean logs
 export interface CleanLogParams {
   logType: string;
   retentionPeriod: string;

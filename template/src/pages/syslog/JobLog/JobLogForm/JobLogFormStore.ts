@@ -10,7 +10,7 @@ class JobLogFormStore extends FormModalStore<JobLogData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (

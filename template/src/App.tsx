@@ -36,7 +36,7 @@ const App: React.FC = observer(() => {
   const { layout, headerTheme, appearance, setAppearance } = ThemeStore;
   const { locale, setLocale } = I18nStore;
 
-  // CF 做法：外观 + 语言放进用户下拉，跟随当前语言显示双语标签
+  // Appearance + language are grouped into the user dropdown; bilingual labels follow the current language
   const isEn = locale === "en-US";
   const appearanceOptions = [
     { label: isEn ? "Light" : "浅色", value: "light" },
@@ -48,7 +48,7 @@ const App: React.FC = observer(() => {
     { label: "English", value: "en-US" },
   ];
 
-  // 导航(顶栏/侧边)明暗：亮色 -> light，暗色/主题色 -> dark
+  // Nav (header/sidebar) light/dark: light -> light, dark/theme-colored -> dark
   const navTheme: "light" | "dark" =
     headerTheme === "light" ? "light" : "dark";
 
@@ -60,8 +60,8 @@ const App: React.FC = observer(() => {
   const { checkPermission } = usePermissions();
 
   useEffect(() => {
-    // 窗口宽度 <=1440 收起菜单、>1440 展开；只在跨越断点时自动切换，
-    // 断点内的 resize 不覆盖用户手动展开/收起的选择
+    // Collapse the menu when window width <=1440, expand when >1440; only auto-switch when crossing the breakpoint,
+    // resizes within the breakpoint do not override the user's manual expand/collapse choice
     const mql = window.matchMedia("(max-width: 1440px)");
     const onBreakpointChange = (e: MediaQueryListEvent | MediaQueryList) => {
       setCollapsed(e.matches);
@@ -100,7 +100,7 @@ const App: React.FC = observer(() => {
       <Layout id="App" className={headerTheme}>
         <Header className={classNames("header", headerTheme)}>
           <div className="header-left">
-            {/* 标题 */}
+            {/* Title */}
             {["left", "mixed"].includes(layout) ? (
               <div
                 className={classNames("title", { titleCollapsed: collapsed })}
@@ -113,7 +113,7 @@ const App: React.FC = observer(() => {
               </div>
             )}
 
-            {/* 折叠按钮 */}
+            {/* Collapse button */}
             {["left", "mixed"].includes(layout) && (
               <Button
                 className="collapsed"
@@ -128,12 +128,12 @@ const App: React.FC = observer(() => {
               />
             )}
 
-            {/* 面包屑 */}
+            {/* Breadcrumb */}
             {["left"].includes(layout) && (
               <Breadcrumb router={router} className={"breadcrumb"} />
             )}
 
-            {/* 顶部菜单 */}
+            {/* Top menu */}
             {["top", "mixed"].includes(layout) && (
               <Menu
                 router={router}
@@ -145,7 +145,7 @@ const App: React.FC = observer(() => {
             )}
           </div>
           <div className="header-right">
-            {/* 用户信息（外观 + 语言 + 账号操作，CF 做法集中在此下拉） */}
+            {/* User info (appearance + language + account actions, all grouped in this dropdown) */}
             <Popover
               overlayClassName="userPopover"
               placement="bottomRight"
@@ -204,7 +204,7 @@ const App: React.FC = observer(() => {
           </div>
         </Header>
         <Layout className="body">
-          {/* 左侧菜单 */}
+          {/* Left sidebar menu */}
           {["left", "mixed"].includes(layout) && (
             <Sider
               trigger={null}
@@ -223,14 +223,14 @@ const App: React.FC = observer(() => {
           )}
 
           <Layout className="content">
-            {/* 内容标签栏 */}
+            {/* Content tab bar */}
             <NavTabBar
               router={router}
               affixRouter={[ADMIN_HOME]}
               basePath={ADMIN_HOME}
             />
 
-            {/* 内容区域 */}
+            {/* Content area */}
             <Content className="content-body">
               <Outlet />
             </Content>
