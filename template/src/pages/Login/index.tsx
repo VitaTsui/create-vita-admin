@@ -1,4 +1,6 @@
-import { Button, Divider, Form, message, Segmented } from "antd";
+// antd's Form is used only as a plain container here (hsu-ui's Form exposes
+// Modal/Drawer/Import/useForm, not a container); Button comes from hsu-ui
+import { Divider, Form, message, Segmented } from "antd";
 import {
   DingtalkOutlined,
   LockOutlined,
@@ -6,7 +8,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 
-import { FormItem } from "@hsu-react/ui";
+import { Button, FormItem } from "@hsu-react/ui";
 import LoginStore from "./LoginStore";
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";

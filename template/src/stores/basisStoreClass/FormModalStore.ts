@@ -34,11 +34,23 @@ class FormModalStore<F = Record<string, unknown>> {
   };
 
   /**
+   * Detail request sequence: invalidates stale delayed callbacks after
+   * resetFormData, preventing a previous form's data from filling the current one.
+   */
+  private _formSeq = 0;
+
+  /**
    * Get the detail
    * @param id
    */
   public getFormData = (id: number | string, data?: Partial<F>) => {
+    const seq = ++this._formSeq;
     setTimeout(() => {
+      // Bail out if the form was reset or reopened during the delay,
+      // otherwise the old callback would overwrite the current form.
+      if (seq !== this._formSeq) {
+        return;
+      }
       this._getFormData(id, data);
     }, 500);
   };
@@ -72,6 +84,8 @@ class FormModalStore<F = Record<string, unknown>> {
    * Reset the form data
    */
   public resetFormData = () => {
+    // Bump the sequence so any in-flight delayed getFormData is discarded
+    this._formSeq++;
     this._formData = {};
   };
 

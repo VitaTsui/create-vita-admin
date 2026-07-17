@@ -22,17 +22,25 @@ class PwdChangeFormStore extends FormModalStore<PwdChangeData> {
     data: PwdChangeData,
     fn?: (res: ResType) => void
   ) => {
-    editPwdChange(data).then((res) => {
-      if (res.code === 0) {
-        fn?.(res);
+    editPwdChange(data)
+      .then((res) => {
+        if (res.code === 0) {
+          fn?.(res);
 
-        notification.success({
-          message: "修改成功，请重新登录",
+          notification.success({
+            message: "修改成功，请重新登录",
+          });
+        } else {
+          this._message(res);
+        }
+      })
+      // Without this, a network failure leaves the modal silently stuck:
+      // no error shown and it never closes.
+      .catch(() => {
+        notification.error({
+          message: "修改密码失败，请检查网络后重试",
         });
-      } else {
-        this._message(res);
-      }
-    });
+      });
   };
 }
 

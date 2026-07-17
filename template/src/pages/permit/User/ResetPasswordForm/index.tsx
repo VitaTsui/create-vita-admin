@@ -1,5 +1,4 @@
 import React from "react";
-import { Form as AntdForm } from "antd";
 import { FormItemProps, Form } from "@hsu-react/ui";
 
 interface ResetPasswordFormProps {
@@ -15,7 +14,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   onCancel,
   onOk,
 }) => {
-  const [form] = AntdForm.useForm();
+  const [form] = Form.useForm();
 
   const handleCancel = () => {
     form.resetFields();
@@ -72,7 +71,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           form &&
           form.getFieldValue("confirmPassword")
         ) {
-          form.validateFields(["confirmPassword"]);
+          // A mismatch makes validateFields reject — which is the whole point of this
+          // cross-field check. antd already renders the error on the field, so swallow
+          // the rejection; leaving it unhandled surfaces as an unhandled rejection.
+          form.validateFields(["confirmPassword"]).catch(() => void 0);
         }
       }}
     />

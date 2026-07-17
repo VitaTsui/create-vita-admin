@@ -4,7 +4,6 @@ import PwdChangeStore from "./PwdChangeStore";
 import React from "react";
 import { observer } from "mobx-react-lite";
 import styles from "./index.module.scss";
-import { Form as AntdForm } from "antd";
 
 interface PwdChangeProps {
   open?: boolean;
@@ -15,7 +14,7 @@ interface PwdChangeProps {
 const PwdChange: React.FC<PwdChangeProps> = observer((props) => {
   const { open, onCancel, onOk } = props;
   const { resetFormData, editFormData, formData } = PwdChangeStore;
-  const [form] = AntdForm.useForm();
+  const [form] = Form.useForm();
 
   const formItems: FormItemProps[] = [
     {
@@ -81,7 +80,10 @@ const PwdChange: React.FC<PwdChangeProps> = observer((props) => {
       form &&
       form.getFieldValue("confirmPassword")
     ) {
-      form.validateFields(["confirmPassword"]);
+      // A mismatch makes validateFields reject — which is the whole point of this
+      // cross-field check. antd already renders the error on the field, so swallow
+      // the rejection; leaving it unhandled surfaces as an unhandled rejection.
+      form.validateFields(["confirmPassword"]).catch(() => void 0);
     }
   };
 
