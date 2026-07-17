@@ -1,4 +1,6 @@
-import { Button, Result } from "antd";
+// Result has no hsu-ui counterpart, so it falls back to antd; Button must come from hsu-ui
+import { Result } from "antd";
+import { Button } from "@hsu-react/ui";
 
 import React from "react";
 import { useNavigate } from "react-router";

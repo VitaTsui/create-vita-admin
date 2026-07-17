@@ -3,7 +3,14 @@ import { observer } from "mobx-react-lite";
 import dayjs from "dayjs";
 import { getDateRange } from "hsu-utils";
 
-import { ColumnsType, FormItemProps, Panel, Operate, ChakraButtonProps } from "@hsu-react/ui";
+import {
+  ColumnsType,
+  Form,
+  FormItemProps,
+  Panel,
+  Operate,
+  ChakraButtonProps,
+} from "@hsu-react/ui";
 import OptionsStore, { Options } from "@/stores/OptionsStore";
 
 import JobLogStore from "./JobLogStore";
@@ -13,7 +20,7 @@ import ChatModal from "../_components/ChatModal";
 import ChatModalStore from "../_components/ChatModal/ChatModalStore";
 import styles from "./index.module.scss";
 import { DeleteOutlined, RobotOutlined } from "@ant-design/icons";
-import { Form, message } from "antd";
+import { message } from "antd";
 import useSearch from "@/hooks/useSearch";
 
 const JobLog: React.FC = observer(() => {

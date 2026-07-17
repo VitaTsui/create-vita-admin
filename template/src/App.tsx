@@ -1,6 +1,7 @@
 import "./App.scss";
 
-import { Avatar, Button, Layout, Popover, Segmented, Space } from "antd";
+// Only components hsu-ui does not provide fall back to antd; Button comes from hsu-ui
+import { Avatar, Layout, Popover, Segmented, Space } from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -11,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import { getUserInfo } from "./utils/auth";
 
 import Breadcrumb from "./layout/Breadcrumb";
-import { Icon } from "@hsu-react/ui";
+import { Button, Icon } from "@hsu-react/ui";
 import Menu, { MenuType } from "./layout/Menu";
 import PwdChange from "./pages/PwdChange";
 import RouterService from "./router/RouterService";

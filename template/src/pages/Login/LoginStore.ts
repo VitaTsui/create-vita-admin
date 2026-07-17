@@ -203,15 +203,26 @@ class LoginStore {
   };
 
   public logout = (fn?: () => void) => {
-    logout().then((res) => {
-      if (res.code === 0) {
-        fn?.();
-      } else {
-        notification.error({
-          message: res.msg,
+    logout()
+      .then((res) => {
+        if (res.code === 0) {
+          fn?.();
+        } else {
+          notification.error({
+            message: res.msg,
+          });
+        }
+      })
+      // Still run fn on a network failure (clear cookies + go to /login): the
+      // server-side session expires anyway, and stranding the user on a page where
+      // "log out" does nothing is worse. The forced re-login after a password
+      // change goes through here too.
+      .catch(() => {
+        notification.warning({
+          message: "退出登录请求失败，已在本地清除登录状态",
         });
-      }
-    });
+        fn?.();
+      });
   };
 }
 

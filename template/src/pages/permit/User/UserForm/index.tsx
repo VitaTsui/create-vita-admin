@@ -5,7 +5,6 @@ import {
   PhoneRule,
 } from "@hsu-react/ui/es/components/FormItem/rules";
 import React, { useEffect } from "react";
-import { Form as AntdForm } from "antd";
 
 import { Form, FormItemProps } from "@hsu-react/ui";
 import UserFormStore from "./UserFormStore";
@@ -33,7 +32,7 @@ const UserForm: React.FC<UserFormProps> = observer((props) => {
     getUserRoleRtRoleNode,
     updateUserRole,
   } = UserFormStore;
-  const [form] = AntdForm.useForm();
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (id && open) {

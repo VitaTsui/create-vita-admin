@@ -33,15 +33,27 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
   /**
    * Fetch list
    */
+  // List request sequence, used to drop out-of-order stale responses
+  private _listSeq = 0;
+
   public getDataSource = () => {
+    // With two searches in a row, a slower earlier response would otherwise
+    // overwrite the later one, leaving the table on the previous keyword's data.
+    // Only accept the response of the most recent request.
+    const seq = ++this._listSeq;
+
     getUserList({ query: this._query.value })
       .then((res) => {
+        if (this._listSeq !== seq) {
+          return;
+        }
         if (res.code === 0) {
-          const { list, page } = res.data;
-          const { total } = page;
+          // data may be incomplete when the backend misbehaves; guard the
+          // destructuring so a malformed payload cannot blank the whole page
+          const { list, page } = res.data ?? {};
 
-          this._dataSource = list;
-          this._total = total;
+          this._dataSource = list ?? [];
+          this._total = page?.total ?? 0;
         } else {
           this._message(res);
         }
@@ -49,6 +61,9 @@ class UserStore extends ListPanelStore<UserSearchData, UserData> {
         this._isLoading = false;
       })
       .catch(() => {
+        if (this._listSeq !== seq) {
+          return;
+        }
         this._isLoading = false;
       });
   };
