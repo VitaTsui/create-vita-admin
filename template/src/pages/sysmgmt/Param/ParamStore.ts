@@ -9,7 +9,7 @@ import ListPanelStore from "@/stores/basisStoreClass/ListPanelStore";
 import { makeObservable } from "mobx";
 
 class ParamStore extends ListPanelStore<ParamSearchData, ParamData> {
-  // sys_param 无 type 列，按编码/值模糊检索即可（不得注入 type 过滤，否则后端 SQL 报错）
+  // sys_param has no type column; fuzzy search by code/value is enough (do not inject a type filter, or the backend SQL errors)
   protected accessor _modeType = {
     cd: "LK",
     val: "LK",
@@ -21,7 +21,7 @@ class ParamStore extends ListPanelStore<ParamSearchData, ParamData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getParamList({ query: this._query.value })
@@ -44,7 +44,7 @@ class ParamStore extends ListPanelStore<ParamSearchData, ParamData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

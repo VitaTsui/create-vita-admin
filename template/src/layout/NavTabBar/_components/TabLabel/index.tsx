@@ -22,7 +22,7 @@ interface TabLabelProps {
 }
 
 /**
- * 标签页标签组件
+ * Tab label component
  */
 const TabLabel: React.FC<TabLabelProps> = ({
   item,

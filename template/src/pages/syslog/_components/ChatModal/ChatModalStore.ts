@@ -13,12 +13,12 @@ const dev = process.env.NODE_ENV === "development";
 const apiBase = process.env.API_BASE;
 
 class ChatModalStore extends ChatStore {
-  // 流式请求接口地址（日志AI分析专用）
+  // Streaming request endpoint (dedicated to log AI analysis)
   protected accessor _streamApiUrl = `${
     dev ? apiBase : ""
   }/ai/dify/sendChatMessageStream/log`;
 
-  // 继承的额外数据
+  // Inherited extra data
   @computed
   get inheritedData() {
     return this._inheritedData;
@@ -35,7 +35,7 @@ class ChatModalStore extends ChatStore {
   }
 
   /**
-   * 重写 chat 方法，格式化请求体为接口文档要求的格式
+   * Override the chat method to format the request body as required by the API docs
    */
   public chat = ({
     apiKey,
@@ -59,27 +59,27 @@ class ChatModalStore extends ChatStore {
     const config = this._getChatConfig(currentChatId, model);
     const messageId = generateRandomStr(16);
 
-    // 获取当前对话
+    // Get the current conversation
     let chat = [...(this._messages.get(currentChatId) || [])];
 
-    // 如果是重新发送，移除最后一条消息
+    // If resending, remove the last message
     if (again && chat.length > 1) {
       chat = chat.slice(0, chat.length - 1);
     }
 
-    // 添加新消息（如果不是重新发送）
+    // Append the new message (if not resending)
     if (!again) {
       chat.push(this._createNewMessage(content, files, messageId));
     }
 
-    // 设置对话和状态
+    // Set the conversation and state
     this._messages.set(currentChatId, chat);
     this._assistanting.set(currentChatId, true);
 
-    // 获取继承的额外数据
+    // Get the inherited extra data
     const inheritedData = this._inheritedData.get(currentChatId) || {};
 
-    // 格式化文件数据
+    // Format the file data
     const formattedFiles = files.length
       ? files?.map((file) => ({
           type: "document",
@@ -88,7 +88,7 @@ class ChatModalStore extends ChatStore {
         }))
       : undefined;
 
-    // 构建 sendRequest 对象
+    // Build the sendRequest object
     const sendRequest = {
       apiKey,
       auto_generate_name: true,
@@ -105,13 +105,13 @@ class ChatModalStore extends ChatStore {
       userId: "",
     };
 
-    // 构建符合接口文档的请求体
+    // Build the request body conforming to the API docs
     const requestData: Record<string, unknown> = {
       sendRequest,
       ...inheritedData,
     };
 
-    // 发起流请求
+    // Initiate the streaming request
     const abortController = streamRequest(this._streamApiUrl, {
       data: requestData,
       onopen: async () => {
@@ -142,7 +142,7 @@ class ChatModalStore extends ChatStore {
   };
 
   /**
-   * 清理指定 chatId 的所有数据（重写以包含 inheritedData）
+   * Clear all data of the given chatId (overridden to include inheritedData)
    */
   protected _clearChatData = (chatId: string) => {
     this._messages.delete(chatId);
@@ -156,14 +156,14 @@ class ChatModalStore extends ChatStore {
   };
 
   /**
-   * 设置继承的额外数据
+   * Set the inherited extra data
    */
   public setInheritedData = (data: Record<string, unknown>) => {
     this._inheritedData.set(this._currentChatId, data);
   };
 
   /**
-   * 停止对话 API（实现基类抽象方法）
+   * Stop-conversation API (implements the base-class abstract method)
    */
   protected _stopChat = (params: { taskId: string; apiKey: string }) => {
     stopChat({

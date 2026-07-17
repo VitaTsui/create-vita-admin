@@ -27,7 +27,7 @@ class RolePermissionsStore extends ListPanelStore<
     makeObservable(this);
   }
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getRolePermissionsList({ query: this._query.value })
@@ -50,7 +50,7 @@ class RolePermissionsStore extends ListPanelStore<
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

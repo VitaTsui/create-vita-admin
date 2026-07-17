@@ -1,5 +1,5 @@
 /**
- * 获取uuid
+ * Generate a UUID
  */
 export const getUUID = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {

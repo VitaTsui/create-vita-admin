@@ -3,24 +3,24 @@ import Login from "@/pages/Login";
 import { ReactNode } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 
-// 详情/子页面（带路由参数，不在后端菜单里）在此显式注册为后管子路由。
-// 示例：const FooDetail = lazy(() => import("@/pages/foo/Detail"));
+// Detail/sub-pages (with route params, not in the backend menu) are explicitly registered here as admin child routes.
+// Example: const FooDetail = lazy(() => import("@/pages/foo/Detail"));
 
 /**
- * MetaType 路由元信息
+ * MetaType route meta info
  *
- * title: 浏览器标签页后缀标题
- * name: 菜单名称
- * menu: 是否显示在菜单中，动态路由始终不显示在菜单中
- * icon: 菜单图标
- * activeIcon: 菜单激活图标
- * disabled: 是否禁用
- * affix: 是否固定在标签页中
- * noTagsView: 是否不显示在标签页中，如果为true，则不显示在标签页中，但会显示在菜单中
- * noCache: 是否不缓存，默认 true，当有 children 时，固定不缓存
- * noLazy: 是否不是懒加载，默认 false
- * noAuth: 是否不进行权限校验，默认 false
- * hasPermi: 是否有权限限制
+ * title: suffix title for the browser tab
+ * name: menu name
+ * menu: whether to show in the menu; dynamic routes are never shown in the menu
+ * icon: menu icon
+ * activeIcon: active menu icon
+ * disabled: whether disabled
+ * affix: whether pinned in the tab bar
+ * noTagsView: whether hidden from the tab bar; if true, not shown in the tab bar but still shown in the menu
+ * noCache: whether to skip caching, default true; always no caching when there are children
+ * noLazy: whether not lazy-loaded, default false
+ * noAuth: whether to skip permission checks, default false
+ * hasPermi: whether restricted by permissions
  */
 export type MetaType = {
   title?: string;
@@ -42,14 +42,14 @@ export type RouteType = {
   meta?: MetaType;
 } & RouteObject;
 
-// 后管（后台管理）统一路由前缀
+// Unified route prefix for the admin (back-office management) area
 export const ADMIN_BASE = "/admin";
-// 后管默认落地页（登录后管理端、关闭全部标签时的兜底）
+// Default admin landing page (fallback after logging into the admin area or closing all tabs)
 export const ADMIN_HOME = `${ADMIN_BASE}/overview`;
 
 /**
- * 拼接后管页面的绝对路径，保证所有跳转都跟随 ADMIN_BASE 变化。
- * 任何指向后管页面的硬编码跳转都应改用此函数，而非手写 "/admin/xxx"。
+ * Build the absolute path of an admin page, ensuring all navigation follows ADMIN_BASE changes.
+ * Any hard-coded navigation to admin pages should use this function instead of hand-written "/admin/xxx".
  * @example adminPath("permit/user/index")   // "/admin/permit/user/index"
  * @example adminPath(`syslog/detail/${id}`) // "/admin/syslog/detail/1"
  * @example adminPath()                      // "/admin"
@@ -61,7 +61,7 @@ export const adminPath = (sub = ""): string => {
 
 const Router: RouteType[] = [
   {
-    // 后管布局：动态菜单（来自后端）会作为本路由的 children 挂载，路径统一带 /admin 前缀
+    // Admin layout: dynamic menus (from the backend) are mounted as children of this route, all paths prefixed with /admin
     path: ADMIN_BASE,
     element: <App />,
     meta: {
@@ -71,10 +71,10 @@ const Router: RouteType[] = [
       {
         index: true,
         element: <Navigate to={ADMIN_HOME} replace />,
-        // 仅作登录后/兜底重定向用，不应作为标签页（否则裸 /admin 会留下一个空白标签）
+        // Only used for post-login/fallback redirects; must not become a tab (otherwise a bare /admin would leave a blank tab)
         meta: { noTabsView: true },
       },
-      // 在此显式注册带路由参数、不在后端菜单中的详情/子页面，例如：
+      // Explicitly register detail/sub-pages with route params that are not in the backend menu here, e.g.:
       // {
       //   path: adminPath("foo/detail/:id"),
       //   element: <FooDetail />,
@@ -91,7 +91,7 @@ const Router: RouteType[] = [
     },
   },
   {
-    // 根路径默认进入后管，由 /admin 的 index 重定向到落地页
+    // Root path defaults to the admin area; the /admin index redirects to the landing page
     path: "/",
     element: <Navigate to={ADMIN_BASE} replace />,
     meta: {

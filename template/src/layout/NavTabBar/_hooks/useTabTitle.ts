@@ -3,7 +3,7 @@ import { NavTabBarTitleContent } from "@/hooks/useSetTabTitle";
 import { TabType } from "..";
 
 /**
- * 处理通过 tabTitles 更新标签页标题的 hook
+ * Hook that updates tab titles via tabTitles
  */
 export const useTabTitle = (
   setOpenkeys: React.Dispatch<React.SetStateAction<TabType[]>>

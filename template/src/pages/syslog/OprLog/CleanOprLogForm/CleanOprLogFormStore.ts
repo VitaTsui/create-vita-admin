@@ -15,7 +15,7 @@ class CleanOprLogFormStore extends FormModalStore<CleanLogData> {
   }
 
   /**
-   * 加载状态
+   * Loading state
    */
   @computed
   get loading() {
@@ -25,9 +25,9 @@ class CleanOprLogFormStore extends FormModalStore<CleanLogData> {
   private accessor _loading: boolean = false;
 
   /**
-   * 清理日志
-   * @param retentionPeriod 保留期限
-   * @param fn 成功回调
+   * Clean logs
+   * @param retentionPeriod Retention period
+   * @param fn Success callback
    */
   public cleanLog = (
     retentionPeriod: string,

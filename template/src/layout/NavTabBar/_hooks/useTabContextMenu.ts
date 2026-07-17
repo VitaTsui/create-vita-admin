@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDebounceEffect } from "ahooks";
 
 /**
- * 处理标签页右键菜单的 hook
+ * Hook that handles the tab context menu
  */
 export const useTabContextMenu = () => {
   const [open, setOpen] = useState<string>("");

@@ -1,9 +1,9 @@
 import { MenuType } from "..";
 
 /**
- * 设置菜单项的激活图标
- * @param items 菜单项数组
- * @param menuKey 当前激活的菜单 key
+ * Set the active icon for menu items
+ * @param items Menu item array
+ * @param menuKey Key of the currently active menu
  */
 export const setActiveIcon = (items: MenuType[], menuKey: string): void => {
   items?.forEach((item) => {

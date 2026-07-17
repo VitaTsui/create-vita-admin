@@ -26,7 +26,7 @@ class SmsConfigStore extends ListPanelStore<
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getSmsConfigList({ query: this._query.value })
@@ -49,7 +49,7 @@ class SmsConfigStore extends ListPanelStore<
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

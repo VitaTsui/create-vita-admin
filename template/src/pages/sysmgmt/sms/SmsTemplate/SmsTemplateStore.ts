@@ -23,7 +23,7 @@ class SmsTemplateStore extends ListPanelStore<
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getSmsTemplateList({ query: this._query.value })
@@ -46,7 +46,7 @@ class SmsTemplateStore extends ListPanelStore<
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

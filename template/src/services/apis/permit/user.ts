@@ -56,32 +56,32 @@ interface IUserData {
 }
 export type UserData = Partial<IUserData>;
 
-// 列表
+// List
 export const getUserList = async (params: UserSearch) => {
   return await get<ListRes<UserData>>("/sys/user/pageUserByOrg", { params });
 };
 
-// 详情
+// Detail
 export const getUser = async (id: number | string) => {
   return await get<UserData>("/sys/user/info/" + id);
 };
 
-// 新增
+// Create
 export const createUser = async (data: UserData) => {
   return await post("/sys/user/add", data);
 };
 
-// 修改
+// Update
 export const editUser = async (data: UserData) => {
   return await post("/sys/user/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteUser = async (id: number | string) => {
   return await get("/sys/user/del", { params: { ids: id } });
 };
 
-// 用户密码重置
+// Reset user password
 export const resetUserPwd = async (data: {
   id: number | string;
   password: string;
@@ -89,7 +89,7 @@ export const resetUserPwd = async (data: {
   return await post("/sys/user/resetPwd", data);
 };
 
-// 用户状态修改
+// Update user status
 export const updateUserStatus = async (id: number | string, status: number) => {
   if (status === 1) {
     return await get("/sys/user/freeze", { params: { ids: id } });
@@ -107,7 +107,7 @@ export interface UserRoleRtRoleNodeRes {
   list: RoleListData[];
 }
 
-// 查询关联角色
+// Query associated roles
 export const getUserRoleRtRoleNode = async (params: {
   userId: number | string;
 }) => {
@@ -122,12 +122,12 @@ interface RoleRtRscoData {
 }
 export type RoleRtRsco = Partial<RoleRtRscoData>;
 
-// 修改用户角色
+// Update user roles
 export const updateUserRole = async (data: RoleRtRsco) => {
   return await post("/sys/user/updUserRole", data);
 };
 
-// 获取部门树
+// Get the department tree
 export interface OrgTreeListData {
   id: string;
   nm: string;

@@ -1,14 +1,15 @@
 import { gcm } from "@noble/ciphers/aes";
 import forge from "node-forge";
 
-// 必须使用「process.env.XXX」这种成员表达式，webpack DefinePlugin 才会在构建时把值内联进来；
-// 写成 const e = process.env; e.CRYPTO_KEY 不会被替换，浏览器里 process 未定义会得到 undefined。
+// The "process.env.XXX" member expression form is required so that webpack DefinePlugin inlines
+// the value at build time; writing `const e = process.env; e.CRYPTO_KEY` is not replaced, and
+// since `process` is undefined in the browser it would evaluate to undefined.
 const DEF_KEY = process.env.CRYPTO_KEY as string;
 const PUB_KEY = process.env.RSA_PUB_KEY as string;
 
 const GCM_IV_LENGTH = 12;
 
-/** 与 `AESUtils.buildKey` 一致：UTF-8 密钥长度须为 16 / 24 / 32 字节 */
+/** Consistent with `AESUtils.buildKey`: the UTF-8 key length must be 16 / 24 / 32 bytes */
 function assertValidAesKeyUtf8(key: string): Uint8Array {
   const keyBytes = new TextEncoder().encode(key);
   const len = keyBytes.length;
@@ -42,7 +43,7 @@ function bytesToBinaryString(bytes: Uint8Array): string {
   return s;
 }
 
-/** 纯 JS（@noble/ciphers），与 Java `AES/GCM/NoPadding` 及包格式一致 */
+/** Pure JS (@noble/ciphers), consistent with Java `AES/GCM/NoPadding` and its packet format */
 function encryptAesJs(word: string, key: string): string {
   const keyBytes = assertValidAesKeyUtf8(key);
   const iv = randomIv12();
@@ -65,7 +66,7 @@ function decryptAesJs(word: string, key: string): string {
   return new TextDecoder().decode(plain);
 }
 
-/** 规范化为 X.509 SPKI PEM（支持 `.env` 里仅 base64、无头尾） */
+/** Normalize to X.509 SPKI PEM (supports base64-only values in `.env` without header/footer) */
 function normalizeSpkiPem(key: string): string {
   const trimmed = key.trim();
   if (trimmed.includes("BEGIN PUBLIC KEY")) {
@@ -77,12 +78,12 @@ function normalizeSpkiPem(key: string): string {
 }
 
 /**
- * 与 Java `Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")` 且在
- * `init()` 时**未**传入 `OAEPParameterSpec` 时的默认一致：
- * OAEP 消息摘要为 SHA-256，MGF1 仍为 **SHA-1**（OpenJDK 常见默认）。
+ * Matches the defaults of Java `Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")`
+ * when **no** `OAEPParameterSpec` is passed to `init()`:
+ * the OAEP message digest is SHA-256 while MGF1 stays **SHA-1** (the common OpenJDK default).
  *
- * Web Crypto 的 RSA-OAEP 在指定 `hash: SHA-256` 时会把 MGF1 也固定为 SHA-256，
- * 与上述 JDK 默认不一致，会导致服务端 `BadPaddingException`。
+ * Web Crypto's RSA-OAEP forces MGF1 to SHA-256 as well when `hash: SHA-256` is specified,
+ * which does not match the JDK default above and causes a server-side `BadPaddingException`.
  */
 async function encodeRSA(data: string, key?: string): Promise<string> {
   if (!key) {
@@ -97,7 +98,7 @@ async function encodeRSA(data: string, key?: string): Promise<string> {
   return forge.util.encode64(encrypted);
 }
 
-// 解密方法（始终纯 JS，与后端 AESUtils 互通）
+// Decryption (always pure JS, interoperable with the backend AESUtils)
 async function decrypt(word: string, key?: string): Promise<string> {
   if (!key) {
     key = DEF_KEY;
@@ -105,7 +106,7 @@ async function decrypt(word: string, key?: string): Promise<string> {
   return decryptAesJs(word, key);
 }
 
-// 加密方法（始终纯 JS，与后端 AESUtils 互通）
+// Encryption (always pure JS, interoperable with the backend AESUtils)
 async function encrypt(word: string, key?: string): Promise<string> {
   if (!key) {
     key = DEF_KEY;
@@ -113,7 +114,7 @@ async function encrypt(word: string, key?: string): Promise<string> {
   return encryptAesJs(word, key);
 }
 
-// 加密dataForm
+// Encrypt dataForm
 async function enf(dataForm: Record<string, string>, sf: string, st: string) {
   const dataForm1: Record<string, string> = {
     ...dataForm,

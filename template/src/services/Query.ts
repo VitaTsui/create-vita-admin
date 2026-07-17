@@ -1,23 +1,23 @@
 import { isNull } from "lodash";
 
 /**
- *@property EQ(" = ", "等于"),
- *@property NE(" <> ", "不等于"),
- *@property LK(" like ", "包含"),
- *@property LLK(" like ", "左包含"),
- *@property RLK(" like ", "右包含"),
- *@property NLK(" not like ", "不包含"),
- *@property IN(" in ", "在..中"),
- *@property NIN(" not in ", "不在..中"),
- *@property LT(" < ", "小于"),
- *@property LE(" <= ", "小于等于"),
- *@property GT(" > ", "大于"),
- *@property GE(" >= ", "大于等于"),
- *@property BT(" between ", "位于..和..之间"),
- *@property IS(" is ", "是"),
- *@property NIS(" is not ", "不是"),
- *@property ASC(" asc ", "升序"),
- *@property DESC(" desc ", "降序"),
+ *@property EQ(" = ", "equal to"),
+ *@property NE(" <> ", "not equal to"),
+ *@property LK(" like ", "contains"),
+ *@property LLK(" like ", "contains on the left"),
+ *@property RLK(" like ", "contains on the right"),
+ *@property NLK(" not like ", "does not contain"),
+ *@property IN(" in ", "in .."),
+ *@property NIN(" not in ", "not in .."),
+ *@property LT(" < ", "less than"),
+ *@property LE(" <= ", "less than or equal to"),
+ *@property GT(" > ", "greater than"),
+ *@property GE(" >= ", "greater than or equal to"),
+ *@property BT(" between ", "between .. and .."),
+ *@property IS(" is ", "is"),
+ *@property NIS(" is not ", "is not"),
+ *@property ASC(" asc ", "ascending"),
+ *@property DESC(" desc ", "descending"),
  *@property AND("and", "and"),
  *@property OR("or", "or"),
  */
@@ -50,15 +50,15 @@ export type RuleNameType = string;
 export type LogicType = "and" | "or" | "not" | string;
 
 /**
- * 过滤条件
- * @property {sting} k 查询键
- * @property {unknown} v 查询值
- * @property {ModeType} m 查询方式 默认值（LK）非必填
- * @property {LogicType} t1 条件间逻辑 默认值（and）非必填
- * @property {number} s 序列 默认值（0）非必填
- * @property {RuleNameType} n 规则名称 默认值（a1）非必填
- * @property {LogicType} t 规则间逻辑 默认值（and）非必填
- * @property {Omit<filterType, 'w' | "t1">[]} w 过滤条件 默认值（[]）非必填
+ * Filter condition
+ * @property {sting} k query key
+ * @property {unknown} v query value
+ * @property {ModeType} m query mode, default (LK), optional
+ * @property {LogicType} t1 logic between conditions, default (and), optional
+ * @property {number} s sequence, default (0), optional
+ * @property {RuleNameType} n rule name, default (a1), optional
+ * @property {LogicType} t logic between rules, default (and), optional
+ * @property {Omit<filterType, 'w' | "t1">[]} w filter conditions, default ([]), optional
  */
 export interface filterType {
   k: string;
@@ -81,7 +81,7 @@ export default class Query {
   }
 
   /**
-   * w 过滤条件
+   * w filter conditions
    *
    * @see {Query#r}
    * @deprecated
@@ -89,22 +89,22 @@ export default class Query {
   private _w: filterType[] = [];
 
   /**
-   * r 过滤条件
+   * r filter conditions
    */
   private _r: Partial<Omit<filterType, "t1">>[] = [];
 
   /**
-   * o 排序
+   * o sorting
    */
   private _o: { k: string; t?: OrderType }[] = [];
 
   /**
-   * j 左连接、右连接 ON 后面过滤条件，主要面向后端开发人员
+   * j filter conditions after the ON of a left/right join, mainly for backend developers
    */
   private _j: filterType[] = [];
 
   /**
-   * p 分页条件
+   * p pagination conditions
    */
   private _p: { n?: number; s?: number; c?: 1 | 0 } | undefined = {
     n: 1,
@@ -112,15 +112,15 @@ export default class Query {
   };
 
   /**
-   * s 过滤字段
+   * s filtered fields
    */
   private _s: { v?: string | string[] } = {};
 
   /**
-   * 过滤条件
-   * @param objKv 表单数据
-   * @param objKm 数据查询方式
-   * @param objRn 规则名称
+   * Filter conditions
+   * @param objKv form data
+   * @param objKm query mode per field
+   * @param objRn rule names
    * @returns
    */
   public toF = <T = Record<string, unknown>>(
@@ -144,15 +144,15 @@ export default class Query {
   };
 
   /**
-   * 过滤条件
-   * @param {sting} k 查询键
-   * @param {unknown} v 查询值
-   * @param {ModeType} m 查询方式 默认值（LK）非必填
-   * @param {LogicType} t1 条件间逻辑 默认值（and）非必填
-   * @param {number} s 序列 默认值（0）非必填
-   * @param {RuleNameType} n 规则名称 默认值（a1）非必填
-   * @param {LogicType} t 规则间逻辑 默认值（and）非必填
-   * @param {boolean} w 允许查询键重复 默认值（false）非必填
+   * Filter condition
+   * @param {sting} k query key
+   * @param {unknown} v query value
+   * @param {ModeType} m query mode, default (LK), optional
+   * @param {LogicType} t1 logic between conditions, default (and), optional
+   * @param {number} s sequence, default (0), optional
+   * @param {RuleNameType} n rule name, default (a1), optional
+   * @param {LogicType} t logic between rules, default (and), optional
+   * @param {boolean} w allow duplicate query keys, default (false), optional
    * @returns
    */
   public toR = (
@@ -208,13 +208,13 @@ export default class Query {
   };
 
   /**
-   * 等于查询
-   * @param {sting} k 查询键
-   * @param {unknown} v 查询值
-   * @param {LogicType} t1 条件间逻辑 默认值（and）非必填
-   * @param {number} s 序列 默认值（0）非必填
-   * @param {RuleNameType} n 规则名称 默认值（a1）非必填
-   * @param {LogicType} t 规则间逻辑 默认值（and）非必填
+   * Equals query
+   * @param {sting} k query key
+   * @param {unknown} v query value
+   * @param {LogicType} t1 logic between conditions, default (and), optional
+   * @param {number} s sequence, default (0), optional
+   * @param {RuleNameType} n rule name, default (a1), optional
+   * @param {LogicType} t logic between rules, default (and), optional
    */
   public toEqual = (
     k: string,
@@ -230,13 +230,13 @@ export default class Query {
   };
 
   /**
-   * 包含查询
-   * @param {sting} k 查询键
-   * @param {unknown} v 查询值
-   * @param {LogicType} t1 条件间逻辑 默认值（and）非必填
-   * @param {number} s 序列 默认值（0）非必填
-   * @param {RuleNameType} n 规则名称 默认值（a1）非必填
-   * @param {LogicType} t 规则间逻辑 默认值（and）非必填
+   * Contains (like) query
+   * @param {sting} k query key
+   * @param {unknown} v query value
+   * @param {LogicType} t1 logic between conditions, default (and), optional
+   * @param {number} s sequence, default (0), optional
+   * @param {RuleNameType} n rule name, default (a1), optional
+   * @param {LogicType} t logic between rules, default (and), optional
    */
   public toLike = (
     k: string,
@@ -252,9 +252,9 @@ export default class Query {
   };
 
   /**
-   * 排序
-   * @param {key} k 排序字段
-   * @param {OrderType} t 升序还是降序
+   * Sorting
+   * @param {key} k sort field
+   * @param {OrderType} t ascending or descending
    */
   public toO = (k: string, t: OrderType = "desc") => {
     this._o = [];
@@ -276,10 +276,10 @@ export default class Query {
   };
 
   /**
-   * 分页条件
-   * @param {number} n 第几页
-   * @param {number} s 每页条数
-   * @param {1 | 0} c 是否查询总数，非必填，如果设置为1，则不会查询总数
+   * Pagination conditions
+   * @param {number} n page number
+   * @param {number} s page size
+   * @param {1 | 0} c whether to query the total count, optional; if set to 1, the total count is not queried
    */
   public toP = (n: number, s: number, c: 1 | 0 = 0) => {
     this._p = {
@@ -290,8 +290,8 @@ export default class Query {
   };
 
   /**
-   * 过滤字段
-   * @param {string} v 过滤字段，支持String类型多个字段(",")逗号隔开，如："username,mob"，或者进行数组赋值，如：["username", "mob"]
+   * Filtered fields
+   * @param {string} v fields to filter; supports a String of multiple comma-separated fields, e.g. "username,mob", or an array, e.g. ["username", "mob"]
    */
   public toS = (v: string) => {
     this._s = {
@@ -300,7 +300,7 @@ export default class Query {
   };
 
   /**
-   * query对象
+   * query object
    */
   public toQuery = () => {
     return {
@@ -314,7 +314,7 @@ export default class Query {
   };
 
   /**
-   * query对象转string
+   * Convert the query object to a string
    */
   public toJsonStr = () => {
     return JSON.stringify({
@@ -328,14 +328,14 @@ export default class Query {
   };
 
   /**
-   * 查询条件url编码
+   * URL-encode the query conditions
    */
   public toEncode = () => {
     return encodeURIComponent(this.toJsonStr());
   };
 
   /**
-   * 清空查询条件
+   * Clear the query conditions
    */
   public clear = () => {
     this._w = [];

@@ -11,7 +11,7 @@ class LoginLogFormStore extends FormModalStore<LoginLogData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (

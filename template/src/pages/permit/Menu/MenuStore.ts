@@ -34,7 +34,7 @@ class MenuStore extends ListPanelStore<MenuSearchData, MenuData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     this._query.toR("type", "1,2", "IN");
@@ -53,7 +53,7 @@ class MenuStore extends ListPanelStore<MenuSearchData, MenuData> {
       this._isLoading = false;
     });
   };
-  // 格式化菜单列表
+  // Format the menu list
   private _formatTree = (list: Required<MenuData>[]) => {
     const node: TreeData[] = [];
 
@@ -76,7 +76,7 @@ class MenuStore extends ListPanelStore<MenuSearchData, MenuData> {
 
     return node;
   };
-  // 获取展开Id
+  // Get expanded ids
   private _getExpandedIds = (list: Required<MenuData>[]) => {
     const ids: string[] = [];
 
@@ -91,7 +91,7 @@ class MenuStore extends ListPanelStore<MenuSearchData, MenuData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

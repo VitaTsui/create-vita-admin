@@ -23,32 +23,32 @@ interface ILogChangeData {
 }
 export type LogChangeData = Partial<ILogChangeData>;
 
-// 列表
+// List
 export const getLogChangeList = async (params: LogChangeSearch) => {
   return await get<ListRes<LogChangeData>>("/sys/logChange/page", { params });
 };
 
-// 详情
+// Detail
 export const getLogChange = async (id: number | string) => {
   return await get<LogChangeData>("/sys/logChange/info/" + id);
 };
 
-// 当前最新发布版本（用于顶栏展示）
+// Current latest released version (shown in the top bar)
 export const getLatestLogChange = async () => {
   return await get<LogChangeData>("/sys/logChange/getLatest");
 };
 
-// 新增
+// Create
 export const createLogChange = async (data: LogChangeData) => {
   return await post("/sys/logChange/add", data);
 };
 
-// 修改
+// Update
 export const editLogChange = async (data: LogChangeData) => {
   return await post("/sys/logChange/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteLogChange = async (id: number | string) => {
   return await get("/sys/logChange/del", { params: { ids: id } });
 };

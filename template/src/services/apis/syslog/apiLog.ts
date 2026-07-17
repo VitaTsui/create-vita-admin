@@ -18,17 +18,17 @@ interface IApiLogData {
 }
 export type ApiLogData = Partial<IApiLogData>;
 
-// 列表
+// List
 export const getApiLogList = async (params: ApiLogSearch) => {
   return await get<ListRes<ApiLogData>>("/sys/log/page", { params });
 };
 
-// 详情
+// Detail
 export const getApiLog = async (id: number | string, query: string) => {
   return await get<ApiLogData>("/sys/log/info/" + id, { params: { query } });
 };
 
-// 清理日志
+// Clean logs
 export interface CleanLogParams {
   logType: string;
   retentionPeriod: string;

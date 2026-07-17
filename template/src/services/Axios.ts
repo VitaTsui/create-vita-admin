@@ -17,12 +17,12 @@ import wsCache from "@/utils/wsCache";
 import { getFileNameFromHeader } from "hsu-utils/lib/DownloadFile";
 
 /**
- * 获取 CSRF Token
- * 优先从 cookie 中获取，如果没有则从 meta 标签获取
- * @returns CSRF Token 字符串
+ * Get the CSRF Token
+ * Prefer reading it from cookies; fall back to the meta tag if not found
+ * @returns CSRF Token string
  */
 function getCsrfToken(): string {
-  // 方法1: 从 cookie 中获取 CSRF token（常见名称）
+  // Method 1: read the CSRF token from cookies (common names)
   const csrfCookieNames = ["XSRF-TOKEN", "X-CSRF-TOKEN", "CSRF-TOKEN", "_csrf"];
   for (const name of csrfCookieNames) {
     const cookies = document.cookie.split(";");
@@ -34,7 +34,7 @@ function getCsrfToken(): string {
     }
   }
 
-  // 方法2: 从 meta 标签获取
+  // Method 2: read from the meta tag
   const metaToken = document.querySelector<HTMLMetaElement>(
     'meta[name="csrf-token"]'
   );
@@ -42,7 +42,7 @@ function getCsrfToken(): string {
     return metaToken.content;
   }
 
-  // 方法3: 从 data 属性获取
+  // Method 3: read from the data attribute
   const dataToken = document.querySelector<HTMLElement>("[data-csrf-token]");
   if (dataToken?.dataset?.csrfToken) {
     return dataToken.dataset.csrfToken;
@@ -52,16 +52,16 @@ function getCsrfToken(): string {
 }
 
 /**
- * 验证请求是否为同源请求
- * @param url 请求 URL
- * @returns 是否为同源请求
+ * Check whether a request is same-origin
+ * @param url request URL
+ * @returns whether the request is same-origin
  */
 function isSameOrigin(url: string): boolean {
   try {
     const urlObj = new URL(url, window.location.origin);
     return urlObj.origin === window.location.origin;
   } catch {
-    // 如果是相对路径，认为是同源
+    // Treat relative paths as same-origin
     return url.startsWith("/") || !url.includes("://");
   }
 }
@@ -84,7 +84,7 @@ const codeMessage: Record<number, string> = {
   504: "网关超时。",
 };
 
-//清除所有cookie函数
+// Clear all cookies
 export function clearAllCookie() {
   const keys = document.cookie.match(/[^ =;]+(?==)/g);
 
@@ -94,32 +94,32 @@ export function clearAllCookie() {
 }
 
 /**
- * 安全的重定向函数，防止 Open Redirect 漏洞
- * @param path 重定向路径，必须是相对路径（以 / 开头）
+ * Safe redirect function to prevent Open Redirect vulnerabilities
+ * @param path redirect path, must be a relative path (starting with /)
  */
 function safeRedirect(path: string): void {
-  // 验证路径必须是相对路径（以 / 开头）
+  // Validate that the path is a relative path (starting with /)
   if (!path || typeof path !== "string" || !path.startsWith("/")) {
-    path = "/login"; // 默认重定向到登录页
+    path = "/login"; // Redirect to the login page by default
   }
 
-  // 移除可能的查询参数和哈希，防止注入
+  // Strip any query params and hash to prevent injection
   const cleanPath = path.split("?")[0].split("#")[0];
 
-  // 确保路径不包含协议、域名等，只允许相对路径
+  // Ensure the path contains no protocol/domain, allow relative paths only
   if (cleanPath.includes("://") || cleanPath.includes("//")) {
-    // 使用当前 origin 构建完整 URL，确保只重定向到当前域名
+    // Build the full URL with the current origin so we only redirect within the current domain
     const currentOrigin = window.location.origin;
     window.location.href = `${currentOrigin}/login`;
     return;
   }
 
-  // 使用当前 origin 构建完整 URL，确保只重定向到当前域名
+  // Build the full URL with the current origin so we only redirect within the current domain
   const currentOrigin = window.location.origin;
   window.location.href = `${currentOrigin}${cleanPath}`;
 }
 
-// 重新登录
+// Re-login
 const reLogin = debounce(() => {
   notification.error({
     message: "登录已过期，请重新登录",
@@ -140,7 +140,7 @@ const errMsg = debounce((status: number, url: string, errorText: string) => {
 });
 
 /**
- * fetch 响应拦截
+ * fetch response interceptor
  */
 const { fetch: originalFetch } = window;
 window.fetch = async (...args) => {
@@ -152,7 +152,7 @@ window.fetch = async (...args) => {
       ? resource.url
       : resource.toString();
 
-  // CSRF 防护：为同源请求添加 CSRF token 和自定义 header
+  // CSRF protection: add a CSRF token and custom header to same-origin requests
   if (requestUrl && isSameOrigin(requestUrl)) {
     const csrfToken = getCsrfToken();
     const headers = new Headers(config.headers);
@@ -162,7 +162,7 @@ window.fetch = async (...args) => {
       headers.set("X-XSRF-TOKEN", csrfToken);
     }
 
-    // 添加自定义 header 标识 AJAX 请求
+    // Add a custom header to mark the request as AJAX
     headers.set("X-Requested-With", "XMLHttpRequest");
 
     config.headers = headers;
@@ -204,7 +204,7 @@ window.fetch = async (...args) => {
 };
 
 /**
- * axios 请求拦截
+ * axios request interceptor
  */
 axios.interceptors.request.use((config) => {
   const { url } = config;
@@ -214,17 +214,17 @@ axios.interceptors.request.use((config) => {
     config.url = `${apiBase}${config.url}`;
   }
 
-  // CSRF 防护：添加 CSRF token 和自定义 header
+  // CSRF protection: add a CSRF token and custom header
   if (url && isSameOrigin(url)) {
     const csrfToken = getCsrfToken();
     if (csrfToken) {
-      // 添加 CSRF token 到请求头（常见的 header 名称）
+      // Add the CSRF token to request headers (common header names)
       config.headers = config.headers || {};
       config.headers["X-CSRF-TOKEN"] = csrfToken;
       config.headers["X-XSRF-TOKEN"] = csrfToken;
     }
 
-    // 添加自定义 header 标识 AJAX 请求，防止 CSRF 攻击
+    // Add a custom header to mark the request as AJAX, preventing CSRF attacks
     config.headers = config.headers || {};
     config.headers["X-Requested-With"] = "XMLHttpRequest";
   }
@@ -233,7 +233,7 @@ axios.interceptors.request.use((config) => {
 });
 
 /**
- * axios 响应拦截
+ * axios response interceptor
  */
 axios.interceptors.response.use(
   (res) => {
@@ -252,7 +252,7 @@ axios.interceptors.response.use(
     const { status, config, statusText } = err.response;
 
     if (status === 401) {
-      // 标记为静默的请求（如登录页探测钉钉开关）401 时不跳登录，仅向上抛错
+      // Requests marked as silent (e.g. login-page probe for the DingTalk toggle) do not redirect to login on 401; the error is only rethrown
       if (!skipAuthRedirect(err.config)) {
         reLogin();
       }
@@ -267,14 +267,14 @@ axios.interceptors.response.use(
   }
 );
 
-/** 读取请求配置上的「跳过 401 重定向」标记 */
+/** Read the "skip 401 redirect" flag from the request config */
 function skipAuthRedirect(config?: unknown): boolean {
   return !!(config as { skipAuthRedirect?: boolean } | undefined)
     ?.skipAuthRedirect;
 }
 
 /**
- * axios 响应数据预处理
+ * axios response data preprocessing
  */
 export interface ResType<T = unknown> {
   header?: Record<string, string>;
@@ -313,10 +313,9 @@ const response = <T>(res: AxiosResponse<ResType<T>>): ResType<T> => {
   return data;
 };
 
-// 读取 Token
+// Read the token (the backend validates the bare token directly, no Bearer prefix needed)
 const getToken = () => {
   const token = getAccessToken();
-  // return token ? "Bearer " + token : "";
   return token ?? "";
 };
 
@@ -342,7 +341,7 @@ export const get = async <T, P = object>(
     params?: Params | P;
     responseType?: ResponseType;
     headers?: AxiosHeaders;
-    /** 为 true 时该请求 401 不触发全局跳登录（用于未登录态的探测请求） */
+    /** When true, a 401 on this request does not trigger the global login redirect (for probe requests in a logged-out state) */
     skipAuthRedirect?: boolean;
   }
 ): Promise<ResType<T>> => {
@@ -459,7 +458,7 @@ export const put = async <T = undefined>(
 };
 
 /**
- * 流式请求
+ * Streaming request
  */
 interface streamRequestOptions<T = Record<string, unknown>>
   extends FetchEventSourceInit {
@@ -480,7 +479,7 @@ export function streamRequest<T>(
     Authorization: token,
   };
 
-  // CSRF 防护：为同源请求添加 CSRF token 和自定义 header
+  // CSRF protection: add a CSRF token and custom header to same-origin requests
   if (isSameOrigin(url)) {
     const csrfToken = getCsrfToken();
     if (csrfToken) {

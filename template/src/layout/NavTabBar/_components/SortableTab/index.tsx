@@ -7,7 +7,7 @@ interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * 可拖拽的标签页节点组件
+ * Draggable tab node component
  */
 const DraggableTabNode: React.FC<Readonly<DraggableTabPaneProps>> = (props) => {
   const {

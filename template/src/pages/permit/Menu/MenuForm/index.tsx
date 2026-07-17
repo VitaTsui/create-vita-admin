@@ -42,7 +42,7 @@ const MenuForm: React.FC<MenuFormProps> = observer((props) => {
     }
   }, [formData]);
 
-  // 类型派生：1 菜单，2 功能（与后端 sys_rsco.type 一致）
+  // Type derivation: 1 menu, 2 function (consistent with backend sys_rsco.type)
   const isMenu = formType === 1;
   const isFunction = formType === 2;
 

@@ -5,7 +5,7 @@ import { checkBreadcrumbPathMatch } from "../_utils/pathMatch";
 import { NavTabBarTitleContent } from "@/hooks/useSetTabTitle";
 
 /**
- * 处理面包屑路径匹配的 hook
+ * Hook that handles breadcrumb path matching
  */
 export const useBreadcrumbPath = (_routes: BreadcrumbType[]) => {
   const location = useLocation();
@@ -31,7 +31,7 @@ export const useBreadcrumbPath = (_routes: BreadcrumbType[]) => {
           );
 
           if (isMatch) {
-            // 如果 tabTitles 中有当前路径的标题，则应用自定义标题
+            // If tabTitles has a title for the current path, apply the custom title
             const finalItem =
               tabTitles && tabTitles[pathname] !== undefined
                 ? { ...item, title: tabTitles[pathname] }
@@ -75,7 +75,7 @@ export const useBreadcrumbPath = (_routes: BreadcrumbType[]) => {
     _setBreadcrumb(_routes);
   }, [_routes, pathname, tabTitles]);
 
-  // 当 tabTitles 变化时，更新最后一个面包屑项的标题
+  // When tabTitles changes, update the title of the last breadcrumb item
   useEffect(() => {
     if (!pathname) return;
 
@@ -85,7 +85,7 @@ export const useBreadcrumbPath = (_routes: BreadcrumbType[]) => {
       const newBreadcrumb = [...prev];
       const lastItem = newBreadcrumb[newBreadcrumb.length - 1];
 
-      // 检查当前路径是否匹配最后一个面包屑项
+      // Check whether the current path matches the last breadcrumb item
       const isPathMatch =
         lastItem.path === pathname ||
         (lastItem.path &&
@@ -96,7 +96,7 @@ export const useBreadcrumbPath = (_routes: BreadcrumbType[]) => {
           ));
 
       if (isPathMatch && tabTitles && tabTitles[pathname] !== undefined) {
-        // 如果 tabTitles 中有当前路径的标题，则更新
+        // If tabTitles has a title for the current path, update it
         newBreadcrumb[newBreadcrumb.length - 1] = {
           ...lastItem,
           title: tabTitles[pathname],

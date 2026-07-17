@@ -1,6 +1,6 @@
 import { get, post } from "../Axios";
 
-// 登录
+// Login
 export type LoginData = {
   username: string;
   password: string;
@@ -17,7 +17,7 @@ export const login = async (data: LoginData) => {
   return await post<LoginResData>("/auth/access/login", data);
 };
 
-// 注册
+// Register
 export type RegisterData = {
   username: string;
   password: string;
@@ -30,32 +30,32 @@ export const register = async (data: RegisterData) => {
   return await post<LoginResData>("/auth/access/register", data);
 };
 
-// 加密 Key
+// Crypto key
 export const getCryptoKey = async () => {
   return await get<string>("/auth/access/getCryptoKey");
 };
 
-// 退出
+// Logout
 export const logout = async () => {
   return await get("/auth/access/logout");
 };
 
-// 是否需要验证码
+// Whether a captcha is required
 export const isNeedLoginCaptcha = async () => {
   return await get<boolean>("/auth/access/isNeedLoginCaptcha");
 };
 
-// 钉钉扫码授权地址
+// DingTalk QR-code authorization URL
 export type DingtalkUrlRes = { enabled: boolean; url: string };
 export const getDingtalkUrl = async (state: string) => {
   return await get<DingtalkUrlRes>("/auth/access/dingtalk/url", {
     params: { state },
-    // 登录页未登录态探测：401 时静默隐藏入口，不触发跳登录
+    // Logged-out probe on the login page: on 401, silently hide the entry without triggering the login redirect
     skipAuthRedirect: true,
   });
 };
 
-// 钉钉扫码登录（用回调授权码换登录态）
+// DingTalk QR-code login (exchange the callback auth code for a login session)
 export const dingtalkLogin = async (data: {
   authCode: string;
   state?: string;

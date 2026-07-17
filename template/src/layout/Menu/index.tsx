@@ -79,8 +79,8 @@ const Menu: React.FC<MenuProps> = (props) => {
     setMenuKey,
   });
 
-  // Cloudflare 风格：侧边栏（inline）把一级目录渲染为不可折叠的「分组」，
-  // 一级=灰色分区标题，二级=平铺项；展开模式下不再用可折叠子菜单。
+  // Cloudflare style: the sidebar (inline) renders top-level directories as non-collapsible "groups";
+  // level 1 = gray section title, level 2 = flat items; collapsible submenus are no longer used in expanded mode.
   const cfGroupItems = useMemo<ItemType[]>(() => {
     return _items.map((it) =>
       it.children?.length && !collapsed

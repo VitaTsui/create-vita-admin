@@ -56,7 +56,7 @@ const Routes: React.FC = observer(() => {
   }, [tabTitles, setTabTitle]);
 
   return (
-    // 注入 @hsu-react/ui 的权限与请求实现，供库内组件（Button hasPermi、ImportForm 等）使用
+    // Inject the permission and request implementations for @hsu-react/ui, used by library components (Button hasPermi, ImportForm, etc.)
     <HsuConfigProvider permissions={permissions} request={{ get, post, del, put }}>
       <ReloadContent.Provider value={value}>
         <NavTabBarContent.Provider value={dropTabValue}>

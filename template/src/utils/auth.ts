@@ -4,22 +4,22 @@ import wsCache from "@/utils/wsCache";
 
 const AccessTokenKey = "FZXVM_ACCESS_TOKEN";
 
-// 获取token
+// Get token
 export const getAccessToken = () => {
   return wsCache.get(AccessTokenKey);
 };
 
-// 设置token
+// Set token
 export const setToken = (token: string) => {
   wsCache.set(AccessTokenKey, token);
 };
 
-// 删除token
+// Remove token
 export const removeToken = () => {
   wsCache.delete(AccessTokenKey);
 };
 
-// ========== 账号相关 ==========
+// ========== Account ==========
 
 const UserInfoKey = "FZXVM_USER_INFO";
 

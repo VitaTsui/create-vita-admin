@@ -11,7 +11,7 @@ interface UseOnlyLvOneMenuOptions {
 }
 
 /**
- * 处理仅一级菜单的逻辑
+ * Handle the top-level-only menu logic
  */
 export const useOnlyLvOneMenu = ({
   items,

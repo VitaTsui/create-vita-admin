@@ -18,14 +18,14 @@ export type searchRNType<T> = { [K in keyof T]?: RuleNameType };
 export type searchKTType<T> = { [K in keyof T]?: LogicType };
 
 /**
- * S: 查询条件类型
- * D：列表数据类型
+ * S: search condition type
+ * D: list data type
  */
 export default class ListPanelStore<
   S = Record<string, unknown>,
   D = Record<string, unknown>
 > extends FormModalStore<D> {
-  // 请求
+  // Request
   protected accessor _query: Query = new Query();
 
   constructor() {
@@ -34,7 +34,7 @@ export default class ListPanelStore<
   }
 
   /**
-   * 正在加载
+   * Loading
    */
   @computed
   get isLoading() {
@@ -44,7 +44,7 @@ export default class ListPanelStore<
   protected accessor _isLoading: boolean = true;
 
   /**
-   * 排序
+   * Sorting
    */
   @computed
   get order() {
@@ -66,14 +66,14 @@ export default class ListPanelStore<
     this._query.toOArr(this._order ? [this._order] : []);
 
     this._isLoading = true;
-    // 请求前置空旧列表，避免新数据返回前展示过期行
+    // Clear the old list before the request to avoid showing stale rows until new data returns
     this._dataSource = [];
 
     this.getDataSource();
   };
 
   /**
-   * 查询
+   * Search
    */
   @computed
   get searchData() {
@@ -104,7 +104,7 @@ export default class ListPanelStore<
       this._logicType
     );
 
-    // 条数仅在查询时获取，翻页/排序不重复请求
+    // The total count is fetched only on search; paging/sorting does not re-request it
     this.getTotal();
 
     this.changePage({ num: 1 });
@@ -127,7 +127,7 @@ export default class ListPanelStore<
   };
 
   /**
-   * 分页
+   * Pagination
    */
   @computed
   get page() {
@@ -150,7 +150,7 @@ export default class ListPanelStore<
     }
 
     this._isLoading = true;
-    // 请求前置空旧列表，避免新数据返回前展示过期行
+    // Clear the old list before the request to avoid showing stale rows until new data returns
     this._dataSource = [];
 
     this._page = { ...this._page, ...page };
@@ -172,7 +172,7 @@ export default class ListPanelStore<
   };
 
   /**
-   * 列表
+   * List
    */
   @computed
   get total() {
@@ -182,8 +182,8 @@ export default class ListPanelStore<
   protected accessor _total: number = 0;
 
   /**
-   * 条数加载中
-   * 独立条数请求（getTotal）进行时为 true，由有独立条数请求的子类维护
+   * Total count loading
+   * true while an independent total-count request (getTotal) is in flight; maintained by subclasses that have an independent total-count request
    */
   @computed
   get totalLoading() {
@@ -198,14 +198,14 @@ export default class ListPanelStore<
   @observable
   protected accessor _dataSource: Array<D> = [];
   public getDataSource = () => {
-    // 由子类实现具体的数据获取逻辑
+    // Concrete data fetch logic is implemented by subclasses
   };
 
   /**
-   * 局部更新单行数据（按主键就地合并），不触发整表刷新
-   * @param id 主键值
-   * @param row 要合并的字段
-   * @param key 主键字段名，默认 "id"
+   * Partially update a single row (merge in place by primary key) without triggering a full table refresh
+   * @param id primary key value
+   * @param row fields to merge
+   * @param key primary key field name, default "id"
    */
   protected _patchRow = (
     id: number | string,
@@ -221,15 +221,15 @@ export default class ListPanelStore<
     }
   };
 
-  // 单行刷新请求序号，用于丢弃乱序返回的过期响应
+  // Sequence number for single-row refresh requests, used to discard stale out-of-order responses
   private accessor _rowRefreshSeq: Map<string, number> = new Map();
 
   /**
-   * 按主键重新拉取单行数据并就地合并，不触发整表刷新
-   * 走列表接口保证行结构与列表一致；未查到该行时回退整表刷新
-   * @param id 主键
-   * @param fetchList 列表接口（与 getDataSource 用同一个）
-   * @param key 主键字段名，默认 "id"
+   * Re-fetch a single row by primary key and merge it in place, without triggering a full table refresh
+   * Uses the list API so the row structure matches the list; falls back to a full table refresh if the row is not found
+   * @param id primary key
+   * @param fetchList list API (the same one used by getDataSource)
+   * @param key primary key field name, default "id"
    */
   protected _refreshRowData = (
     id: number | string,
@@ -261,32 +261,32 @@ export default class ListPanelStore<
   };
 
   /**
-   * 获取条数
-   * 仅在查询（setSearchData）时调用，翻页/排序不触发
-   * 由有独立条数请求的子类实现；无独立条数请求的列表无需重写
+   * Get the total count
+   * Called only on search (setSearchData); paging/sorting does not trigger it
+   * Implemented by subclasses that have an independent total-count request; lists without one need not override it
    */
   public getTotal = () => {
-    // 由子类实现具体的条数获取逻辑
+    // Concrete total-count fetch logic is implemented by subclasses
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (_id: number | string) => {
-    // 由子类实现具体的删除逻辑
+    // Concrete delete logic is implemented by subclasses
   };
 
   /**
-   * 导入文件
+   * Import a file
    * @param file
    */
   public uploadList = (_file: FormData) => {
-    // 由子类实现具体的导入逻辑
+    // Concrete import logic is implemented by subclasses
   };
 
   /**
-   * 消息处理
+   * Message handling
    * @param res
    */
   protected _message = (res?: ResType) => {
@@ -306,7 +306,7 @@ export default class ListPanelStore<
   };
 
   /**
-   * 重置Store
+   * Reset the store
    */
   public resetStore = () => {
     this._searchData = {};

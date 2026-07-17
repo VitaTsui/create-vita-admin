@@ -5,10 +5,10 @@ import BreadcrumbMenuItem from "../_components/BreadcrumbMenuItem";
 import { cloneDeep } from "lodash";
 
 /**
- * 格式化面包屑子菜单
- * @param children 子面包屑项
- * @param navigate 导航函数
- * @returns 菜单项数组
+ * Format the breadcrumb submenu
+ * @param children Child breadcrumb items
+ * @param navigate Navigation function
+ * @returns Array of menu items
  */
 export const formatBreadcrumbMenu = (
   children: BreadcrumbType[],

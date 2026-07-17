@@ -10,7 +10,7 @@ interface UseTabPathOptions {
 }
 
 /**
- * 处理标签页路径匹配和激活状态的 hook
+ * Hook that handles tab path matching and active state
  */
 export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
   const location = useLocation();
@@ -18,7 +18,7 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
   const [openKeys, setOpenkeys] = useState<TabType[]>([]);
 
   /**
-   * 检查并设置固定路由（affixRouter 和 affix）到 openKeys
+   * Check affixed routes (affixRouter and affix) and add them to openKeys
    */
   const _checkAffix = useCallback(
     (items: TabType[]) => {
@@ -26,7 +26,7 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
         if (item.children) {
           _checkAffix(item.children);
         } else {
-          // 检查是否是固定路由
+          // Check whether it is an affixed route
           const isAffix = affixRouter.includes(item.key) || item.affix;
           if (isAffix) {
             setOpenkeys((prev) => {
@@ -68,7 +68,7 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
                 pathArr
               )
             ) {
-              // 处理参数路由
+              // Handle param routes
               setTabKey(`${pathname}${search}`);
 
               setOpenkeys((prev) => {
@@ -84,7 +84,7 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
                 return [...prev, { ...item, key: `${pathname}${search}` }];
               });
             } else {
-              // 处理普通路由
+              // Handle plain routes
               setTabKey(`${item.key}${search}`);
 
               setOpenkeys((prev) => {
@@ -108,9 +108,9 @@ export const useTabPath = ({ items, affixRouter }: UseTabPathOptions) => {
   );
 
   useEffect(() => {
-    // 先处理固定路由，设置 openKeys
+    // Handle affixed routes first to populate openKeys
     _checkAffix(items);
-    // 然后进行路径匹配
+    // Then run path matching
     _checkPath(items);
   }, [_checkAffix, _checkPath, items]);
 

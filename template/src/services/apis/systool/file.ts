@@ -29,27 +29,27 @@ interface IFileData {
 }
 export type FileData = Partial<IFileData>;
 
-// 列表
+// List
 export const getFileList = async (params: FileSearch) => {
   return await get<ListRes<FileData>>("/sys/fileConf/page", { params });
 };
 
-// 详情
+// Detail
 export const getFile = async (id: number | string) => {
   return await get<FileData>("/sys/fileConf/info/" + id);
 };
 
-// 新增
+// Create
 export const createFile = async (data: FileData) => {
   return await post("/sys/fileConf/add", data);
 };
 
-// 修改
+// Update
 export const editFile = async (data: FileData) => {
   return await post("/sys/fileConf/upd", data);
 };
 
-// 删除
+// Delete
 export const deleteFile = async (id: number | string) => {
   return await get("/sys/fileConf/del", { params: { ids: id } });
 };

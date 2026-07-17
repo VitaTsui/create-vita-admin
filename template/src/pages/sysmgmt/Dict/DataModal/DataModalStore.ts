@@ -23,7 +23,7 @@ class DataModalStore extends ListPanelStore<DictSearchData, DictData> {
   };
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     if (!this._id) return;
@@ -48,7 +48,7 @@ class DataModalStore extends ListPanelStore<DictSearchData, DictData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

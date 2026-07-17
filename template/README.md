@@ -1,5 +1,7 @@
 # Vita Admin Starter
 
+[![license](https://img.shields.io/github/license/VitaTsui/vita-admin-starter.svg)](./LICENSE)
+
 一套开箱即用的**中后台管理脚手架**。
 UI 主要基于 [`@hsu-react/ui`](https://www.npmjs.com/package/@hsu-react/ui) 组件库构建，
 配合 React 18 + TypeScript + MobX，使用 webpack 5 打包。
@@ -140,3 +142,13 @@ vita-admin-starter/
 - 后台统一前缀 `/admin`，菜单由后端动态返回并挂载为子路由（见 `src/router/RouterService.tsx`）。
 - 带路由参数、不在菜单中的详情页，在 `src/router/router.config.tsx` 中显式注册。
 - 用 `adminPath("xxx/yyy")` 拼接后台路径，避免硬编码 `/admin` 前缀。
+
+## 贡献
+
+日常开发在 `develop` 分支进行（feature 分支合入 `develop`），`main` 只接受来自 `develop` 的 PR。PR 标题遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+
+> 想直接用本模板创建新项目？推荐 [`create-vita-admin`](https://github.com/VitaTsui/create-vita-admin)：`npm create vita-admin@latest my-app`。
+
+## License
+
+[MIT](./LICENSE) © VitaHsu

@@ -1,7 +1,7 @@
 import { get, post } from "../Axios";
 import { ListRes } from "../ResType";
 
-// 告警信息和任务调度失败信息
+// Alert info and task scheduling failure info
 export interface AlertInfoData {
   alertCount: number;
   taskFailCount: number;
@@ -18,7 +18,7 @@ export const getAlertInfo = async () => {
   return await get<AlertInfoData>("/data/home/screen/alert/info");
 };
 
-// 首页API配置信息
+// Home page API config info
 export interface MaintainedInfo {
   apiUnmaintainedCount: number;
   apiMaintainedCount: number;
@@ -58,7 +58,7 @@ export const getApiConfig = async () => {
   return await get<ApiConfigData>("/data/home/screen/api/config");
 };
 
-// 首页mq配置信息
+// Home page MQ config info
 export interface MqConfig {
   mqNodeCount: number;
   mqQueueCount: number;
@@ -74,7 +74,7 @@ export const getMqConfig = async () => {
   return await get<MqConfigData>("/data/home/screen/mq/config");
 };
 
-// API调用趋势
+// API call trend
 export interface ApiTrendParams {
   apiId?: number;
   indicatorsType?: number;
@@ -96,7 +96,7 @@ export const getApiTrend = async (data: ApiTrendParams = {}) => {
   return await post<ListRes<ApiTrendData>>("/data/home/screen/api/trend", data);
 };
 
-// MQ消息趋势
+// MQ message trend
 export interface MqTrendParams {
   indicatorsType?: number;
   msgType?: string;
@@ -118,12 +118,12 @@ export const getMqTrend = async (data: MqTrendParams = {}) => {
   return await post<ListRes<MqTrendData>>("/data/home/screen/mq/trend", data);
 };
 
-// MQ 消息类型列表
+// MQ message type list
 export const getMqMsgTypeList = async () => {
   return await post<ListRes<string>>("/data/home/screen/mq/msgType/list");
 };
 
-// MQ 消息来源列表
+// MQ message source list
 export const getMqSourceList = async () => {
   return await post<ListRes<string>>("/data/home/screen/mq/source/list");
 };

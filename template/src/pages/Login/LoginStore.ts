@@ -48,7 +48,7 @@ class LoginStore {
     }
   };
 
-  // 检查是否需要登录验证码
+  // Check whether a login captcha is required
   public checkIsNeedLoginCaptcha = async () => {
     try {
       const res = await isNeedLoginCaptcha();
@@ -150,7 +150,7 @@ class LoginStore {
     }
   };
 
-  // 取钉钉扫码授权地址并跳转；未开启时返回 false 由页面隐藏入口
+  // Fetch the DingTalk QR authorization URL and redirect; returns false when disabled so the page hides the entry
   public gotoDingtalk = async (state: string): Promise<boolean> => {
     const res = await getDingtalkUrl(state);
     if (res.code === 0 && res.data?.enabled && res.data.url) {
@@ -160,7 +160,7 @@ class LoginStore {
     return false;
   };
 
-  // 检测钉钉是否开启（控制登录页入口显隐）
+  // Detect whether DingTalk is enabled (controls visibility of the login page entry)
   public checkDingtalkEnabled = async (): Promise<boolean> => {
     try {
       const res = await getDingtalkUrl("");
@@ -170,7 +170,7 @@ class LoginStore {
     }
   };
 
-  // 钉钉回调授权码换登录态
+  // Exchange the DingTalk callback auth code for a login session
   public dingtalkLogin = async (
     authCode: string,
     state: string | undefined,

@@ -23,7 +23,7 @@ class DictStore extends ListPanelStore<DictSearchData, DictData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getDictList({ query: this._query.value })
@@ -46,7 +46,7 @@ class DictStore extends ListPanelStore<DictSearchData, DictData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

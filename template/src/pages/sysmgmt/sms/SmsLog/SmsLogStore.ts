@@ -23,7 +23,7 @@ class SmsLogStore extends ListPanelStore<SmsLogSearchData, SmsLogData> {
   }
 
   /**
-   * 获取列表
+   * Fetch list
    */
   public getDataSource = () => {
     getSmsLogList({ query: this._query.value })
@@ -46,7 +46,7 @@ class SmsLogStore extends ListPanelStore<SmsLogSearchData, SmsLogData> {
   };
 
   /**
-   * 删除
+   * Delete
    * @param id
    */
   public delData = (id: number | string) => {

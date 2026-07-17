@@ -16,7 +16,7 @@ class RoleFormStore extends FormModalStore<RolePermissionsData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (id: number | string) => {
@@ -30,7 +30,7 @@ class RoleFormStore extends FormModalStore<RolePermissionsData> {
   };
 
   /**
-   * 新增
+   * Create
    * @param data
    * @param fn
    */
@@ -48,7 +48,7 @@ class RoleFormStore extends FormModalStore<RolePermissionsData> {
   };
 
   /**
-   * 编辑
+   * Edit
    * @param id
    * @param data
    * @param fn

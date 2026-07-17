@@ -23,13 +23,13 @@ const mutationObserver = new MutationObserver(() => {
 export interface ApiLogChatModalProps extends Omit<ModalProps, "children"> {
   apiKey: string;
   onCancel: () => void;
-  /** 外部列表标题 */
+  /** Title of the outer list */
   listTitle?: string;
-  /** 与外部列表相同的列配置 */
+  /** Same column config as the outer list */
   tableColumns?: ColumnsType<AnyObject>;
-  /** 勾选行数据 */
+  /** Checked row data */
   selectedRowsData?: AnyObject[];
-  /** 与列表 rowKey 一致，默认 id */
+  /** Consistent with the list rowKey, defaults to id */
   tableRowKey?: string;
 }
 

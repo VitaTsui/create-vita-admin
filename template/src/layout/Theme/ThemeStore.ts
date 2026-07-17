@@ -7,41 +7,41 @@ export type Theme = "light" | "dark";
 
 export type HeaderTheme = "light" | "dark" | "theme";
 
-// CF 做法：外观三档（亮 / 暗 / 跟随系统）
+// Three appearance modes (light / dark / follow system)
 export type Appearance = "light" | "dark" | "system";
 
 class ThemeStore {
-  // 用户选择的外观档位
+  // Appearance mode selected by the user
   get appearance() {
     return this._appearance;
   }
   private _appearance: Appearance = "system";
 
-  // 系统当前是否暗色（外观=system 时生效）
+  // Whether the system is currently dark (takes effect when appearance=system)
   private _systemDark = false;
 
-  // 解析后的实际暗色状态
+  // Resolved actual dark-mode state
   get isDark(): boolean {
     if (this._appearance === "system") return this._systemDark;
     return this._appearance === "dark";
   }
 
-  // CF 风格：固定左侧布局，不再提供切换
+  // Fixed left layout; switching is no longer offered
   get layout(): Layout {
     return "left";
   }
 
-  // 导航明暗跟随外观
+  // Nav light/dark follows the appearance
   get headerTheme(): HeaderTheme {
     return this.isDark ? "dark" : "light";
   }
 
-  // 内容主题跟随外观
+  // Content theme follows the appearance
   get theme(): Theme {
     return this.isDark ? "dark" : "light";
   }
 
-  // 固定水青主色
+  // Fixed teal primary color
   get primaryColor() {
     return "#13C2C2";
   }
@@ -54,7 +54,7 @@ class ThemeStore {
       this._appearance = cached;
     }
 
-    // 监听系统配色，外观=system 时实时跟随
+    // Listen for system color-scheme changes, following in real time when appearance=system
     if (typeof window !== "undefined" && window.matchMedia) {
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       this._systemDark = mq.matches;

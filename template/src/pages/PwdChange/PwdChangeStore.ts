@@ -12,7 +12,7 @@ class PwdChangeFormStore extends FormModalStore<PwdChangeData> {
   }
 
   /**
-   * 编辑
+   * Edit
    * @param id
    * @param data
    * @param fn

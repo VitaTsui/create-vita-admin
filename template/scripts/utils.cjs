@@ -2,22 +2,22 @@ const path = require("path");
 const fs = require("fs");
 
 /**
- * 读取模板文件并替换占位符
- * @param {string} templatePath - 模板文件路径
- * @param {Object} replacements - 替换映射对象
- * @returns {string} 替换后的内容
+ * Read a template file and replace its placeholders
+ * @param {string} templatePath - Template file path
+ * @param {Object} replacements - Replacement mapping object
+ * @returns {string} The content after replacement
  */
 function readAndReplaceTemplate(templatePath, replacements) {
   try {
     let content = fs.readFileSync(templatePath, "utf8");
 
-    // 移除模板字符串的标记
+    // Remove the template string markers
     content = content
       .replace(/^`\s*/, "")
       .replace(/\s*`;\s*$/, "")
       .trim();
 
-    // 执行替换
+    // Perform the replacements
     Object.keys(replacements).forEach((key) => {
       const regex = new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
       content = content.replace(regex, replacements[key]);
@@ -31,8 +31,8 @@ function readAndReplaceTemplate(templatePath, replacements) {
 }
 
 /**
- * 确保目录存在
- * @param {string} dirPath - 目录路径
+ * Ensure a directory exists
+ * @param {string} dirPath - Directory path
  */
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
@@ -41,9 +41,9 @@ function ensureDirectoryExists(dirPath) {
 }
 
 /**
- * 写入文件
- * @param {string} filePath - 文件路径
- * @param {string} content - 文件内容
+ * Write a file
+ * @param {string} filePath - File path
+ * @param {string} content - File content
  */
 function writeFile(filePath, content) {
   try {
@@ -58,8 +58,8 @@ function writeFile(filePath, content) {
 }
 
 /**
- * 验证必需参数
- * @param {string} panelName - 面板名称
+ * Validate required arguments
+ * @param {string} panelName - Panel name
  */
 function validatePanelName(panelName) {
   if (!panelName) {
@@ -67,7 +67,7 @@ function validatePanelName(panelName) {
     process.exit(1);
   }
 
-  // 验证名称格式（只允许字母、数字、下划线和连字符）
+  // Validate the name format (only letters, digits, underscores and hyphens are allowed)
   if (!/^[a-zA-Z0-9_-]+$/.test(panelName)) {
     console.error("错误: 面板名称只能包含字母、数字、下划线和连字符");
     process.exit(1);
@@ -75,19 +75,19 @@ function validatePanelName(panelName) {
 }
 
 /**
- * 构建 API 路径
- * @param {string} parent - 父级路径
- * @param {string} apiName - API 名称
- * @returns {string} API 路径
+ * Build the API path
+ * @param {string} parent - Parent path
+ * @param {string} apiName - API name
+ * @returns {string} The API path
  */
 function buildApiPath(parent, apiName) {
   return parent ? `${parent}/${apiName}` : apiName;
 }
 
 /**
- * 构建权限前缀
+ * Build the permission prefix
  * @param {string} apiUrl - API URL
- * @returns {string} 权限前缀
+ * @returns {string} The permission prefix
  */
 function buildPermiPrefix(apiUrl) {
   if (!apiUrl) return "";

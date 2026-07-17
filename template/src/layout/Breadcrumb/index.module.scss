@@ -1,7 +1,7 @@
 .Breadcrumb {
   cursor: default;
 
-  // 窄屏下长路径不换行、不挤压顶栏，超出部分隐藏
+  // On narrow screens, keep long paths on one line so they do not squeeze the top bar; hide the overflow
   overflow: hidden;
 
   :global(ol) {

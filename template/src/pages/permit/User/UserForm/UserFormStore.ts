@@ -27,7 +27,7 @@ class UserFormStore extends FormModalStore<UserData> {
   }
 
   /**
-   * 获取详情
+   * Fetch detail
    * @param id
    */
   protected _getFormData = (id: number | string) => {
@@ -41,7 +41,7 @@ class UserFormStore extends FormModalStore<UserData> {
   };
 
   /**
-   * 新增
+   * Create
    * @param data
    * @param fn
    */
@@ -56,7 +56,7 @@ class UserFormStore extends FormModalStore<UserData> {
   };
 
   /**
-   * 编辑
+   * Edit
    * @param id
    * @param data
    * @param fn
@@ -76,8 +76,8 @@ class UserFormStore extends FormModalStore<UserData> {
   };
 
   /**
-   * 获取角色列表
-   * 获取用户角色
+   * Fetch the role list
+   * Fetch the user's roles
    * @param id
    */
   public getUserRoleRtRoleNode = (id: number | string) => {
@@ -94,7 +94,7 @@ class UserFormStore extends FormModalStore<UserData> {
   };
 
   /**
-   * 分配用户角色
+   * Assign roles to the user
    * @param id
    * @param data
    * @param fn

@@ -17,12 +17,12 @@ export default function usePermissions(hasPermi?: string[]): {
 
   const checkPermission = useCallback(
     (hasPermi: string[] | undefined) => {
-      // 如果hasPermi或permissions为空，则认为有权限
+      // If hasPermi or permissions is empty, treat as permitted
       if (!hasPermi || !permissions) {
         return true;
       }
 
-      // 如果hasPermi或permissions为空数组，则认为没有权限
+      // If hasPermi or permissions is an empty array, treat as not permitted
       if (
         (Array.isArray(hasPermi) && !hasPermi.length) ||
         (Array.isArray(permissions) && !permissions.length)
@@ -30,7 +30,7 @@ export default function usePermissions(hasPermi?: string[]): {
         return false;
       }
 
-      // 如果hasPermi和permissions都不为空数组，则判断hasPermi是否在permissions中
+      // If neither hasPermi nor permissions is an empty array, check whether hasPermi is included in permissions
       return array_is_includes(permissions, hasPermi);
     },
     [permissions]

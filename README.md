@@ -1,5 +1,8 @@
 # create-vita-admin
 
+[![npm version](https://img.shields.io/npm/v/create-vita-admin.svg)](https://www.npmjs.com/package/create-vita-admin)
+[![license](https://img.shields.io/npm/l/create-vita-admin.svg)](./LICENSE)
+
 一键创建基于 [`@hsu-react/ui`](https://www.npmjs.com/package/@hsu-react/ui) 的中后台管理项目脚手架——
 无需 `git clone`，模板内嵌在包里，离线可用。
 
@@ -59,6 +62,10 @@ git push --follow-tags             # 推送代码与版本标签
 把 `.gitignore` 重命名为 `_gitignore`（规避 npm 对点 gitignore 的特殊处理）、
 并同步 `.claude/skills/` 项目级规范。
 
+## 贡献
+
+日常开发在 `develop` 分支进行（feature 分支合入 `develop`），`main` 只接受来自 `develop` 的 PR；合入 `main` 后按 `package.json` 版本自动打 tag 并发布 npm。PR 标题遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+
 ## License
 
-MIT
+[MIT](./LICENSE) © VitaHsu

@@ -9,9 +9,9 @@ const {
 } = require("./utils.cjs");
 
 /**
- * 创建列表面板（带表单）
- * 用法: node createListAForm.cjs <panelName> [parent] [apiUrl]
- * 示例: node createListAForm.cjs userManagement dataMonitoring /vm/user
+ * Create a list panel (with a form)
+ * Usage: node createListAForm.cjs <panelName> [parent] [apiUrl]
+ * Example: node createListAForm.cjs userManagement dataMonitoring /vm/user
  */
 function main() {
   try {
@@ -38,7 +38,7 @@ function main() {
     console.log(`API 路径: ${apiPathValue}`);
     console.log(`权限前缀: ${permiPrefix || "无"}\n`);
 
-    // ========== 创建列表部分 ==========
+    // ========== Create the list part ==========
     const listPanelTemplate = path.resolve(
       __dirname,
       "./ListPanel/listAform.js"
@@ -68,7 +68,7 @@ function main() {
       "<API_DEL_PATH>": apiUrl ? `${apiUrl}/del` : "",
     });
 
-    // 创建列表文件
+    // Create the list files
     const listFiles = [
       {
         fileName: "index.tsx",
@@ -96,7 +96,7 @@ function main() {
       writeFile(path.join(file.path, file.fileName), file.content);
     });
 
-    // ========== 创建表单部分 ==========
+    // ========== Create the form part ==========
     const formPanelPath = path.resolve(
       __dirname,
       "../src/pages",
@@ -117,7 +117,7 @@ function main() {
       "<API_PATH>": apiPathValue,
     });
 
-    // 创建表单文件
+    // Create the form files
     const formFiles = [
       {
         fileName: "index.tsx",

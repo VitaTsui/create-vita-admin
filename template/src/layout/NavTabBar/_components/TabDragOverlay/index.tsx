@@ -19,7 +19,7 @@ interface TabDragOverlayProps {
 }
 
 /**
- * 拖拽覆盖层组件，显示正在被拖拽的标签页
+ * Drag overlay component that renders the tab currently being dragged
  */
 const TabDragOverlay: React.FC<TabDragOverlayProps> = ({
   activeId,
