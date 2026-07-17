@@ -32,7 +32,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VitaTsui/vita-admin-starter.git"
+    "url": "git+https://github.com/VitaTsui/create-vita-admin.git"
   },
-  "homepage": "https://github.com/VitaTsui/vita-admin-starter"
+  "homepage": "https://github.com/VitaTsui/create-vita-admin#readme"
 }

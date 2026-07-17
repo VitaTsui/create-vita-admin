@@ -15,7 +15,7 @@ function fail(msg) {
   process.exit(1);
 }
 
-// 解析项目名：`npm create vita-admin my-app` / `npx create-vita-admin my-app`
+// Parse the project name: `npm create vita-admin my-app` / `npx create-vita-admin my-app`
 const args = process.argv.slice(2).filter((a) => !a.startsWith("-"));
 const projectName = args[0];
 
@@ -40,6 +40,7 @@ if (!fs.existsSync(templateDir)) {
   fail("模板目录缺失，包可能损坏，请重新安装。");
 }
 
+// Copy a directory recursively (dest is created if missing)
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
@@ -53,13 +54,13 @@ function copyDir(src, dest) {
 console.log(`\n${DIM}正在创建项目 ${projectName} ...${RESET}`);
 copyDir(templateDir, targetDir);
 
-// _gitignore → .gitignore（npm 发布时点 gitignore 会被特殊处理，模板里用 _gitignore 占位）
+// _gitignore → .gitignore (npm treats dot-gitignore files specially at publish time, so the template ships a _gitignore placeholder)
 const ignoreSrc = path.join(targetDir, "_gitignore");
 if (fs.existsSync(ignoreSrc)) {
   fs.renameSync(ignoreSrc, path.join(targetDir, ".gitignore"));
 }
 
-// 改写 package.json 的 name / version
+// Rewrite package.json: set the new project's name / version and drop the template author
 const pkgPath = path.join(targetDir, "package.json");
 try {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
@@ -67,8 +68,8 @@ try {
   pkg.version = "0.0.0";
   delete pkg.author;
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-} catch (e) {
-  // 忽略：package.json 改写失败不致命
+} catch {
+  // Ignore: failing to rewrite package.json is not fatal
 }
 
 console.log(`

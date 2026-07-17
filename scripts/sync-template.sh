@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# 从 vita-admin-starter 源仓库同步内嵌模板 + 项目级 skills。
-# 用法：
-#   bash scripts/sync-template.sh [vita-admin-starter 路径]
-# 默认取兄弟目录 ../vita-admin-starter，可传参覆盖。
+# Sync the embedded template + project-level skills from the vita-admin-starter source repo.
+# Usage:
+#   bash scripts/sync-template.sh [path-to-vita-admin-starter]
+# Defaults to the sibling directory ../vita-admin-starter; pass a path to override.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -17,7 +17,7 @@ if [ ! -d "$SRC/src" ]; then
 fi
 
 echo "→ 同步模板：$SRC  →  $DST"
-# 模板主体：排除产物/git/本地配置（.claude 单独处理，只取 skills）
+# Template body: exclude build artifacts / git / local config (.claude is handled separately — only skills are taken)
 rsync -a --delete \
   --exclude='node_modules' \
   --exclude='dist' \
@@ -30,12 +30,12 @@ rsync -a --delete \
   --exclude='.DS_Store' \
   "$SRC/" "$DST/"
 
-# .gitignore → _gitignore（npm 发布会特殊处理点 gitignore，故重命名占位）
+# .gitignore → _gitignore (npm treats dot-gitignore files specially at publish time, so rename it as a placeholder)
 if [ -f "$DST/.gitignore" ]; then
   mv -f "$DST/.gitignore" "$DST/_gitignore"
 fi
 
-# 项目级 skills：只取 .claude/skills（不含本地 settings 等配置）
+# Project-level skills: copy only .claude/skills (excluding local settings and other config)
 if [ -d "$SRC/.claude/skills" ]; then
   mkdir -p "$DST/.claude/skills"
   rsync -a --delete "$SRC/.claude/skills/" "$DST/.claude/skills/"
