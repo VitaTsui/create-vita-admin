@@ -1,0 +1,114 @@
+.MenuAssign {
+  .container {
+    display: flex;
+    gap: 16px;
+    height: 100%;
+
+    .left,
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--vita-border);
+      border-radius: 4px;
+      overflow: hidden;
+
+      .title {
+        height: 45px;
+        min-height: 45px;
+        padding: 0px 16px;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: 500;
+        border-bottom: 1px solid var(--vita-border);
+        background-color: var(--vita-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .helpIcon {
+          cursor: default;
+        }
+
+        .summary {
+          margin-left: auto;
+          font-size: 12px;
+          font-weight: 400;
+          color: var(--vita-muted-foreground);
+          white-space: nowrap;
+        }
+
+        .menuPath {
+          font-size: 13px;
+          font-weight: 400;
+          color: var(--vita-muted-foreground);
+        }
+
+        .selectAllCheckbox {
+          margin-left: auto;
+        }
+      }
+
+      .menuTree {
+        padding: 12px;
+
+        .menuTreeNodeRow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          min-width: 0;
+        }
+
+        .menuTreeNodeTitleText {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .grantBadge {
+          flex-shrink: 0;
+          font-size: 12px;
+          line-height: 18px;
+          padding: 0 6px;
+          border-radius: 4px;
+          font-weight: 400;
+        }
+
+        .grantAll {
+          color: var(--vita-success);
+          background: color-mix(in srgb, var(--vita-success) 8%, transparent);
+          border: 1px solid color-mix(in srgb, var(--vita-success) 35%, transparent);
+        }
+
+        .grantPartial {
+          color: var(--vita-warning);
+          background: color-mix(in srgb, var(--vita-warning) 8%, transparent);
+          border: 1px solid color-mix(in srgb, var(--vita-warning) 35%, transparent);
+        }
+
+        .grantNone {
+          color: var(--vita-muted-foreground);
+          background: var(--vita-muted);
+          border: 1px solid var(--vita-border);
+        }
+      }
+
+      .functionTree {
+        padding: 12px;
+        overflow: auto;
+        flex: 1;
+      }
+
+      .emptyHint {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: var(--vita-muted-foreground);
+        font-size: 14px;
+      }
+    }
+  }
+}

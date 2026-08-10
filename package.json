@@ -6,11 +6,12 @@
     "create-vita-admin": "index.js"
   },
   "scripts": {
-    "sync": "bash scripts/sync-template.sh"
+    "sync": "bash scripts/sync-template.sh",
+    "dedupe": "node scripts/dedupe-templates.cjs"
   },
   "files": [
     "index.js",
-    "template"
+    "templates"
   ],
   "engines": {
     "node": ">=16"
