@@ -1,16 +1,17 @@
 {
   "name": "create-vita-admin",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "脚手架：一键创建基于 @hsu-react/ui 的 React + MobX + webpack 中后台管理项目",
   "bin": {
     "create-vita-admin": "index.js"
   },
   "scripts": {
-    "sync": "bash scripts/sync-template.sh"
+    "sync": "bash scripts/sync-template.sh",
+    "dedupe": "node scripts/dedupe-templates.cjs"
   },
   "files": [
     "index.js",
-    "template"
+    "templates"
   ],
   "engines": {
     "node": ">=16"

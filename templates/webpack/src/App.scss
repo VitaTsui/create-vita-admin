@@ -1,0 +1,57 @@
+// 应用外壳的布局。
+//
+// 顶栏（.header / .title / .user / .userPopover 这一整套）与页签栏的样式**已经跟着组件
+// 库走了** —— 它们随 `@hsu-react/ui/es/layout` 的 Header 一起发布，且收成了 CSS Module，
+// 不再需要（也不该）在这里用裸类名重写一份：这边的 `.header` 是全局类名，会和库里的
+// module 类名各画各的，改这边不生效、改库那边这边又盖回去。
+//
+// 留在这里的只有真正属于「应用外壳」的部分：整页的纵向排布、侧栏与内容区。
+#App {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+
+  .body {
+    flex: 1;
+    width: 100%;
+    min-height: 0px;
+
+    .ant-layout-sider {
+      // 细边框分隔，不用投影
+      border-right: 1px solid var(--vita-border);
+      box-shadow: none;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+
+      flex: 1;
+      min-width: 0px;
+      height: 100%;
+
+      // 冷调浅灰画布，衬托带边框的白色卡片（跟随明暗切换）
+      background: var(--vita-background);
+
+      .content-body {
+        flex: 1;
+        width: 100%;
+        min-height: 0px;
+      }
+    }
+  }
+
+  // 深色导航：侧栏铺同一条中性黑渐变。两端色由 Layout.Theme 的 navDarkColors 写入，
+  // 顶栏用的是同两个变量，这样侧栏和顶栏的渐变是接得上的。
+  &.dark .body .ant-layout-sider {
+    background: linear-gradient(
+      180deg,
+      var(--nav-dark-top, #1f1f1f) 0%,
+      var(--nav-dark-bottom, #141414) 100%
+    );
+
+    border-right-color: rgb(255 255 255 / 8%);
+  }
+}

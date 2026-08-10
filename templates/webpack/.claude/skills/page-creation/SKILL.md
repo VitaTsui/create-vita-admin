@@ -1,0 +1,1645 @@
+---
+name: page-creation
+description: Use this skill when creating, modifying, reviewing, auditing, or scaffolding any page/module under `src/pages/` in a React + MobX + Ant Design project that uses the project-local `Panel`/`Form.Modal`/`FormItem`/`Operate` component suite and the `ListPanelStore`/`FormModalStore` base classes (located under `src/stores/basisStoreClass/`). Covers five page shapes — CRUD lists (`Panel.List`), form modals (`Form.Modal`), list+form bundles, static/dashboard content pages (`Panel.Default`), and nested list-in-modal pages (`Panel.List.Modal`) with parent-ID scoping — plus the private sub-folders they spawn (`_components/`、`_contComps/`、`_hooks/`、`_utils/`、`<Module>Form/`). Also triggers when editing or adding to existing pages: 加/改/删列（含操作列、开关列、`fixedWidth`、`orderKey`）、加/改/删搜索项、加/改/删表单项、加/改按钮（含 `hasPermi` 权限码）、加/改弹窗、切换 Dsr 字段渲染、调整列宽档位、拆 `_contComps/`、在列表 store 里覆写 `_modeType`/`_staticSearchData`、把表单 store 的 `_getFormData` 接上、或为已有列表追加嵌套子列表。以及对已有页面做合规 review（会连带调起 api-creation 检查 `src/services/apis/` 配套文件）。Typical trigger phrases: "新增一个页面"、"创建一个 XXX 管理页面"、"add a CRUD page"、"在 pages 下新增模块"、"新建一个增删改查界面"、"新建一个仪表盘/内容页/静态面板"、"在 XXX 里弹一个子列表/嵌套列表"、"给 XXX 页面加列/加搜索项/加表单项/加按钮/加弹窗"、"改下 XXX 页面的列宽/权限码/操作列"、"把 XXX 列表的状态列换成 Dsr"、"检查这个页面是否符合规范"、"review / 审计 pages 下 XXX". The skill adapts to the current project's own directory/component conventions rather than assuming a fixed category list.
+---
+
+# 页面创建规范 (src/pages)
+
+<!-- 维护须知：正文里不要出现「美元符号 + 数字」形式的占位符。skill 被调用时会把调用方传的
+     参数按位置替换掉它们，示例会被改写成一段无关文本（真踩过：SQL 例子里的两个位置绑定被换成了
+     调用参数的片段，读到的人看到的是一句语法不通的 SQL）。SQL 示例一律用 ? 表示绑定参数。 -->
+
+本 skill 规范 `src/pages/` 下 CRUD 业务页面的目录结构、Store 约定和组件装配方式。目标是产出与既有模块一致的代码，而不是自由发挥。
+
+## 先决条件 — 先读这些
+
+创建页面前必须确认以下基础设施（若缺失，此 skill 不适用）：
+
+- `src/stores/basisStoreClass/ListPanelStore.ts` —— 列表页基类，暴露 `searchData`/`page`/`dataSource`/`total`/`isLoading`/`order` 等 observable，以及 `setSearchData`/`initSearchData`/`changePage`/`onOrderChange`/`getDataSource`/`delData`/`resetStore` 等方法。基类在排序/翻页/查询路径会先置空列表再调 `getDataSource`（避免展示旧数据）；另有 `getTotal`（条数独立请求，仅查询触发）与 `_patchRow`/`_refreshRowData`（按主键行级更新，不触发整表刷新）。
+- `src/stores/basisStoreClass/FormModalStore.ts` —— 表单弹窗基类，暴露 `formData`、`getFormData`、`addFormData`、`editFormData`、`resetFormData`、`_message`。
+- 配对好的服务层：`src/services/apis/<category>/<module>.ts`（必须镜像页面路径，详见 api-creation skill）。
+- 组件套件（多数在 `src/components/` 下）：`Panel.List` / `Panel.Default`、`Form.Modal`、`FormItem`（含 `FormItemProps`）、`Table`（含 `ColumnsType`）、`Operate`、`Button`（含 `ChakraButtonProps`）、`Switch`。
+- 可选：`src/stores/OptionsStore` 提供 `Options("KEY")` 选项工厂与按需加载方法（`getRole`、`getXxxType` 等）。**仅承载下拉/枚举选项**——非选项类的数据（系统参数、单值字符串、健康状态等）不进这里，详见后文「列表页 Store 模板」的要点。
+
+## 与 api-creation skill 的联动（必须遵守）
+
+本 skill 和 `api-creation` skill 是一对配套规范：页面和 API 在路径/文件名上必须镜像一致（详见 api-creation skill 的「目录和文件名」一节）。
+
+**两类触发场景必须**通过 `Skill` 工具调起 `api-creation`：
+
+1. **创建页面时**：若本次页面创建涉及新增或修改 `src/services/apis/` 下的任何文件（无论是全新模块还是在已有文件里加一两个函数），**在动 API 文件之前**先调用 `api-creation` skill 确认路径镜像、文件名、类型/函数命名与写法。不要凭记忆自己对着模板硬写 API 文件。
+2. **审计/Review 既有页面时**：检查页面合规性时，**必须**连带对页面配套的 `src/services/apis/` 文件做一次 api-creation 合规检查——调起 `api-creation` skill 获取最新规则后再给结论。页面规范本身不能覆盖 API 层的问题。
+
+如果能一次就确定既要创建页面又要创建 API，**并行**调起两个 skill（本 skill + api-creation）；不要先只按页面规范落笔再回头补 API 规范，那样会反复修改。
+
+## 目录骨架
+
+一个标准 CRUD 模块的目录：
+
+```
+src/pages/<category>/<ModuleName>/
+├── index.tsx                    # 列表页入口（observer）
+├── index.module.scss            # 模块级样式（通常只占位，.ModuleName {}）
+├── <ModuleName>Store.ts         # 列表页 store，extends ListPanelStore
+└── <ModuleName>Form/            # 新增/编辑弹窗（如需表单）
+    ├── index.tsx
+    ├── index.module.scss
+    └── <ModuleName>FormStore.ts # 表单 store，extends FormModalStore
+```
+
+若模块还需要额外的子弹窗/子页面（如"数据"、"批量操作"、"详情"），与 `<ModuleName>Form/` 平级再开一个 PascalCase 文件夹（例如 `DataModal/`、`BatchRoleManagement/`、`FieldDetailList/`），结构同上。
+
+### 大类目录（category）
+
+大类目录由**当前项目**实际存在的子目录决定。创建前先用 Glob 列出 `src/pages/` 的子目录，择一归入；都不匹配再新建。独立入口（登录、首页、改密等）直接放在 `src/pages/` 根下。
+
+### 页面私有资源用下划线前缀
+
+页面内部不对外共享的构件用下划线前缀目录承载，表示"仅本页使用"：
+
+- `_components/`：页面私有的展示组件
+- `_contComps/`：页面内容区（content components）拆分
+- `_hooks/`：页面私有 hooks
+- `_utils/`：页面私有工具函数
+- `_constants/`：页面私有常量
+- `_styles/`、`_context/`、`_modals/` 等按需
+
+不要把页面私有代码抽到 `src/components/`——那是全项目共享级别。
+
+## 命名
+
+- **文件夹/模块名**：PascalCase，与业务名一一对应，例如 `ApiBlacklistManagement`、`MqQueueManagement`、`Dict`。
+- **Store 文件**：`<ModuleName>Store.ts`、`<ModuleName>FormStore.ts`。
+- **样式文件**：固定 `index.module.scss`，外层类名用 PascalCase 与文件夹同名（`.ApiBlacklistManagement { }`），内部类名 camelCase。
+- **样式类命名**：`styles.ApiBlacklistManagement`（外层）、`styles.content`、`styles.formItemGroupTitle`（内层 camelCase）。
+- **props 类型**：`<ModuleName>FormProps`，放在组件文件顶部，不单独抽文件。
+
+## 组件选用：@hsu-react/ui 优先（硬性规则）
+
+页面里用到的 UI 组件**一律优先从 `@hsu-react/ui` 导入**，antd 只兜底 hsu-ui 没有的能力——不要凭习惯从 antd 拿：
+
+- **hsu-ui 已覆盖，必须用 hsu-ui 版**：`Button`、`Icon`、`Table`、`FormItem`、`Form`（含 `Form.Modal`）、`Panel`、`Search`、`Operate`、`Switch`、`Select`、`Input`、`Checkbox`、`DatePicker`、`Tree`、`Tags`、`Modal`、`Descriptions`、`TextEllipsis`、`Copy`、`Upload`、`TabBar`、`Slider`、`FlexFill`、`Chart`、`Markdown`、`CodeMirror`、`Editor`、`FilePreview`、`Spreadsheet`、`ChainGraph`、`Chat`、`SecondConf`、`FileCol`。
+- **antd 兜底（hsu-ui 无对应）**：`message`、`notification`、`Popover`、`Tooltip`、`Divider`、`Segmented`、`Spin`、`Empty`、`Row/Col` 栅格、`Space` 等。
+- 拿不准某组件 hsu-ui 有没有：先查 `node_modules/@hsu-react/ui/es/index.d.ts` 的导出（或文档站 <https://vitatsui.github.io/hsu-ui>），再决定 import 来源。
+
+**同名不等于同物——`Form` 是唯一的例外，别「顺手改正」**：hsu-ui 的 `Form` 只导出 `Modal` / `Drawer` / `Import` / `useForm` 四个成员（见 `Form/index.d.ts` 的 `FormType`），**它本身不是表单容器**。需要一个裸的 `<Form>` 包住若干 `FormItem`（登录页就是）时，容器只能从 antd 拿：
+
+```tsx
+// ✅ 正确：容器走 antd，FormItem / Button 仍走 hsu-ui
+import { Form } from "antd";
+import { Button, FormItem } from "@hsu-react/ui";
+```
+
+这类「看着违规、实则正确」的写法，在文件顶部留一行注释说明原因，免得下一轮审计又被当成违规改回去。
+
+反例：
+
+```tsx
+// ❌ hsu-ui 已有同名组件却从 antd 导入 —— 观感与行为都会偏离项目规范
+import { Table, Modal, Switch, Button } from "antd";
+```
+
+```tsx
+// ✅ 同名组件一律走 hsu-ui，antd 只补缺
+import { Table, Modal, Switch, Button } from "@hsu-react/ui";
+import { message, Tooltip } from "antd";
+```
+
+## 列表页 `index.tsx` 模板
+
+```tsx
+import React, { useEffect, useState } from "react";
+
+import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@hsu-react/ui";
+import { PlusOutlined } from "@ant-design/icons";
+import { observer } from "mobx-react-lite";
+
+import XxxStore from "./XxxStore";
+import XxxForm from "./XxxForm";
+import XxxFormStore from "./XxxForm/XxxFormStore";
+import styles from "./index.module.scss";
+
+const Xxx: React.FC = observer(() => {
+  const {
+    setSearchData,
+    initSearchData,
+    dataSource,
+    isLoading,
+    total,
+    changePage,
+    page,
+    getDataSource,
+    delData,
+    order,
+    onOrderChange,
+  } = XxxStore;
+  const [id, setId] = useState<number | string>();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    initSearchData();
+  }, [initSearchData]);
+
+  const searchItems: FormItemProps[] = [
+    { type: "INPUT", name: "nm", label: "名称" },
+  ];
+
+  const beforeButtonGroup: ChakraButtonProps[] = [
+    {
+      title: "新增",
+      colorPalette: "blue",
+      icon: <PlusOutlined />,
+      onClick: () => {
+        setTitle("新增");
+        setId("");
+        setOpen(true);
+      },
+      hasPermi: ["<module>:<sub>:add"],
+    },
+  ];
+
+  const columns: ColumnsType = [
+    { title: "名称", dataIndex: "nm", width: 200 },
+    {
+      title: "操作",
+      width: 140,
+      ellipsis: false,
+      align: "center",
+      fixed: "right",
+      fixedWidth: true,
+      render: (record) => (
+        <Operate
+          menu={[
+            {
+              title: "编辑",
+              onClick: () => {
+                setTitle("修改");
+                setOpen(true);
+                setId(record.id);
+              },
+              hasPermi: ["<module>:<sub>:upd"],
+            },
+            {
+              title: "删除",
+              delete: true,
+              onConfirm: () => {
+                delData(record.id);
+              },
+              hasPermi: ["<module>:<sub>:del"],
+            },
+          ]}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Panel.List
+        className={styles.Xxx}
+        searchProps={{
+          searchItems,
+          onSearch: setSearchData,
+          onReset: initSearchData,
+          beforeButtonGroup,
+          hasPermi: ["<module>:<sub>:query"],
+        }}
+        tableProps={{
+          columns,
+          dataSource,
+          rowKey: "id",
+          loading: isLoading,
+          pagination: {
+            total,
+            onChange: (num, size) => changePage({ num, size }),
+            current: page?.num,
+            pageSize: page?.size,
+          },
+          order,
+          onOrderChange,
+        }}
+      />
+      <XxxForm
+        open={open}
+        title={title}
+        id={id}
+        onCancel={() => {
+          setId("");
+          setOpen(false);
+        }}
+        onOk={() => {
+          getDataSource();
+        }}
+      />
+    </>
+  );
+});
+
+export default Xxx;
+```
+
+要点：
+- 默认导出 `observer(() => {...})` 包裹的组件。
+- 从 store 解构所需 observable 与 action，变量名不要改。
+- 用 `useState` 维护弹窗本地 UI 状态（`id`、`open`、`title`）——**不要**把这类短命 UI 态塞进 MobX store。
+- `useEffect(initSearchData, [initSearchData])` 是入口触发数据加载的标准写法。
+- 枚举选项在组件挂载时通过 `OptionsStore` 的对应方法加载（`useEffect(() => getXxxType(), [getXxxType])`）。
+- 所有按钮/列/操作项都要带 `hasPermi: [<权限码>]` 做权限门控，权限码格式由后端决定（如 `vm:monitApiBlcak:add`）。
+
+## 列表页 Store 模板
+
+```ts
+import {
+  XxxData,
+  XxxSearchData,
+  deleteXxx,
+  getXxxList,
+} from "@/services/apis/<category>/<module>";
+
+import ListPanelStore from "@/stores/basisStoreClass/ListPanelStore";
+import { makeObservable } from "mobx";
+
+class XxxStore extends ListPanelStore<XxxSearchData, XxxData> {
+  protected accessor _modeType = {};
+
+  constructor() {
+    super();
+    makeObservable(this);
+  }
+
+  public getDataSource = () => {
+    getXxxList({ query: this._query.value })
+      .then((res) => {
+        if (res.code === 0) {
+          const { list, page } = res.data;
+          const { total } = page;
+
+          this._dataSource = list;
+          this._total = total;
+        } else {
+          this._message(res);
+        }
+
+        this._isLoading = false;
+      })
+      .catch(() => {
+        this._isLoading = false;
+      });
+  };
+
+  public delData = (id: number | string) => {
+    deleteXxx(id).then((res) => {
+      if (res.code === 0) {
+        this.getDataSource();
+      }
+
+      this._message(res);
+    });
+  };
+}
+
+export default new XxxStore();
+```
+
+要点：
+- **导出单例**：`export default new XxxStore();`，页面直接 `import XxxStore from "./XxxStore"` 拿到同一个实例。
+- 列表获取覆写 `public getDataSource`；排序/翻页/查询路径由基类先置空列表再调用（防旧数据闪现），`delData` 成功后的刷新不置空（无闪烁）。状态开关等单行变更优先用 `_refreshRowData(id, 列表接口)` 行级刷新（内部防乱序、未查到自动回退整表），不要整表重拉。
+- `_isLoading = false` 必须在 `.then` 和 `.catch` 两条路径都设置，避免卡 loading。
+- 成功分支只在 `res.code === 0` 下处理数据；失败分支统一走 `this._message(res)`。
+- **`_modeType` 始终声明**（即便是 `{}`）——脚手架和现有模块都显式挂了 `protected accessor _modeType = {};`，子类保持一致，便于后面按需加模式而不改签名。
+- 若有"固定不变的查询条件"（如 `tid: 0`），覆写 `_staticSearchData`；字段需要特殊比较模式（如 `IS`、`EQ`）时在 `_modeType` 里登记，例如嵌套列表按父级 ID 精确过滤：`protected accessor _modeType = { excepStratId: "EQ" };`。
+- `delData` 成功后再次调用 `getDataSource()` 刷新；不要自行 splice `_dataSource`。
+- **一次刷新只发一发请求**。别为了「顺带算个统计」在同一个方法里对同一个接口发第二发——素材库的 `loadItems` 曾经既拉当前条目、又拉一次全库供角标计数，而未选中条目时**两发的 URL 完全一样**，每次增删改要发 3 个请求。统计能从已有数据里算就用 `get` 派生，算不出来再单独开一个方法、由页面按需调。
+- **角标/计数与列表过滤必须同源**。同一页上的「待办 12」和点进去的结果集要来自同一份数据：素材库的角标数的是全库、列表过滤的是当前条目，点「待写用法 12」只出 2 行，用户没法理解。写计数的 getter 时问一句「它和 `items` 是不是同一个来源」。
+- **失败分支不要静默**。`if (res.code === 0) { ... }` 后面没有 `else` 是最常见的漏，接口挂了页面只是空着；`.catch` 同理（至少要复位 loading）。
+- **系统参数（`/sys/param/getValByKey`）等非选项类数据放页面自己的 Store，不要塞进 `OptionsStore`**：`OptionsStore` 只承载下拉/枚举选项（`Options("XXX")` 工厂消费的那种 `SelectOption[]`）。需要从 `/sys/param/getValByKey` 取的 system param、健康检查值、单值字符串等，挂在使用该值的页面 Store 上，按 `@computed get xxx() / @observable accessor _xxx / public getXxx = () => apiCall().then(...)` 的三段式落地（参考 `DataViewSearchStore` 的 `defaultColumnCount`/`getDefaultColumnCount`）。多个页面需要同一个系统参数也照此办理：每个页面 Store 各放一份，让数据归属和加载时机跟着页面走，而不是堆到全局 store。判断标准：如果这个值不会通过 `Options("KEY")` 当成下拉项渲染，就不属于 `OptionsStore`。
+
+## 表单弹窗 `XxxForm/index.tsx` 模板
+
+```tsx
+import React, { useEffect } from "react";
+
+import { Form, FormItemProps } from "@hsu-react/ui";
+import { observer } from "mobx-react-lite";
+
+import XxxFormStore from "./XxxFormStore";
+import styles from "./index.module.scss";
+
+interface XxxFormProps {
+  open?: boolean;
+  title?: string;
+  id?: string | number;
+  onCancel?: () => void;
+  onOk?: () => void;
+}
+
+const XxxForm: React.FC<XxxFormProps> = observer((props) => {
+  const { open, title, id, onCancel, onOk } = props;
+  const { resetFormData, addFormData, editFormData, formData, getFormData } =
+    XxxFormStore;
+
+  useEffect(() => {
+    if (id && open) {
+      getFormData(id);
+    }
+  }, [getFormData, id, open]);
+
+  const formItems: FormItemProps[] = [
+    { type: "INPUT", name: "nm", label: "名称", required: true },
+    // ...
+  ];
+
+  const onClose = () => {
+    resetFormData();
+    onCancel?.();
+  };
+
+  const handleOk = (data: Record<string, unknown>) => {
+    if (id) {
+      editFormData(id, data, () => {
+        onClose();
+        onOk?.();
+      });
+    } else {
+      addFormData(data, () => {
+        onClose();
+        onOk?.();
+      });
+    }
+  };
+
+  return (
+    <Form.Modal
+      className={styles.XxxForm}
+      title={title}
+      open={open}
+      onCancel={onClose}
+      onOk={handleOk}
+      formItems={formItems}
+      value={formData}
+    />
+  );
+});
+
+export default XxxForm;
+```
+
+要点：
+- Props 固定四件套：`open`、`title`、`id`、`onCancel`、`onOk`（可加父级 ID 等业务补充字段）。**回填数据靠 `getFormData(id)`，不要用 props 把整行传进来**——见「组件抽取与弹窗组织 · 缺详情接口时不要用 props 传整行」。
+- `useEffect` 中 `if (id && open)` 双重条件，避免弹窗未打开时空请求。
+- 依赖 `OptionsStore` 的字段，放到**另一个** `useEffect(() => getXxxType(), [getXxxType, open])`——按需拉一次。
+- **把 `onClose` 和 `handleOk` 提成命名常量**，不要在 JSX 里写多层内联箭头函数；`Form.Modal` 的 `onOk={handleOk}`、`onCancel={onClose}` 只接引用。`handleOk` 的 `data` 形参统一标 `Record<string, unknown>`。
+- 提交入口在 `handleOk` 里分支：有 `id` 走 `editFormData`，否则 `addFormData`；成功回调里 `onClose()` 再调 `onOk?.()` 通知父组件刷新。
+- `onCancel` 关闭前一定调用 `resetFormData()`，否则下次打开新增时会带脏数据。
+- `formItems` 字段多时可分组：`Record<string, FormItemProps[]>`，`Form.Modal` 会按分组渲染。
+- 复杂嵌套表（动态行/子表）使用 `antd` 的 `Form.List` + 自定义 `Table` 渲染，详见 `ApiMetadataManagement/ApiMetadataManagementForm` 的实现。
+- **父级 ID 注入**：当表单由外层父列表弹出（见下文"嵌套列表弹窗"一节）、需要把父记录 ID 一并写入提交数据时，props 里加 `<parentIdProp>?: number | string;`，解构出来后在 `handleOk` 开头写 `data.<parentIdProp> = <parentIdProp>;` 再走 `addFormData/editFormData`。
+
+## 条件字段：基于其他字段值动态显示/必填
+
+某些字段需要根据另一个字段的当前值决定**是否显示**、**是否必填**（例如"规则类型"决定要不要填"用户/系统类型/接口URL"）。实现按以下规则做：
+
+1. **本地 `useState` 持有触发字段的当前值**（不要塞进 store）。`useEffect` 监听 `formData.<触发字段>` 同步给 state，覆盖编辑回填场景。
+
+2. **用触发字段自身的 `componentProps.onChange` 更新 state**——**不要**在 `Form.Modal` 上挂 `onValuesChange` 监听全表单。`onValuesChange` 是"全局监听器"，要在回调里 if-else 挑字段，写法冗余、依赖排查难；字段自己的 `onChange` 只关心自己的值，本地 state 立即收敛。
+
+3. **条件字段同步设 `visible` 和 `required`**，二者都基于派生 boolean。`visible: false` 会让 FormItem 直接 `return null`，不渲染；`required: false` 自动放过校验。隐藏后 antd Form 字段的缓存值仍会随提交一起发出（`preserve: true` 是默认），如果业务上不能多带这些值，要在 `componentProps.onChange` 切换触发字段时显式 `form.setFieldsValue({ <隐藏字段>: undefined })`。
+
+4. **DATEPICKER 自身已经按 `showTime` 序列化好字符串**（`"YYYY-MM-DD"` 或 `"YYYY-MM-DD HH:mm:ss"`），`handleOk` 里**不要再额外格式化**。
+
+```tsx
+const [ruleType, setRuleType] = useState<string | undefined>();
+
+useEffect(() => {
+  if (formData.ruleType) setRuleType(formData.ruleType as string);
+}, [formData.ruleType]);
+
+const needUser = ruleType === "USER_TOTAL" || ruleType === "USER_SYSTEM_TOTAL";
+const needUrl = ruleType === "API_USER_TOTAL";
+
+const formItems: FormItemProps[] = [
+  {
+    type: "SELECT",
+    name: "ruleType",
+    label: "规则类型",
+    required: true,
+    componentProps: {
+      options: Options("RULE_TYPE"),
+      onChange: (value: string) => setRuleType(value),   // ← 字段自身 onChange
+    },
+  },
+  {
+    type: "SELECT",
+    name: "userId",
+    label: "用户",
+    required: needUser,
+    visible: needUser,    // ← 隐藏即 return null
+    componentProps: { options: Options("USER") },
+  },
+  {
+    type: "SELECT",
+    name: "url",
+    label: "接口URL",
+    required: needUrl,
+    visible: needUrl,
+    componentProps: { options: Options("API_METADATA") },
+  },
+];
+```
+
+反例：
+
+```tsx
+// ❌ 用 Form.Modal 的 onValuesChange 来监听单个字段 —— 维度错了
+<Form.Modal
+  onValuesChange={(value) => {
+    if ('ruleType' in value) setRuleType(value.ruleType);  // 一堆 if-else
+    if ('xxx' in value) ...
+  }}
+  ...
+/>
+
+// ❌ 提交前手动把隐藏字段抹 undefined —— 用 visible + onChange 时清就够了
+const handleOk = (data) => {
+  if (!needUser) data.userId = undefined;
+  if (!needUrl) data.url = undefined;
+  ...
+};
+
+// ❌ 自己 dayjs 再 format 一遍 DatePicker 的输出 —— 组件早格式化好了
+const submitData = {
+  ...data,
+  rangeStartTm: dayjs(data.rangeStartTm).format("YYYY-MM-DD HH:mm:ss"),
+};
+```
+
+## 表单 Store 模板
+
+```ts
+import {
+  XxxData,
+  createXxx,
+  editXxx,
+  getXxx,
+} from "@/services/apis/<category>/<module>";
+
+import FormModalStore from "@/stores/basisStoreClass/FormModalStore";
+import { ResType } from "@/services/Axios";
+import { makeObservable } from "mobx";
+
+class XxxFormStore extends FormModalStore<XxxData> {
+  constructor() {
+    super();
+    makeObservable(this);
+  }
+
+  protected _getFormData = (id: number | string) => {
+    getXxx(id).then((res) => {
+      if (res.code === 0) {
+        this._formData = res.data;
+      } else {
+        this._message(res);
+      }
+    });
+  };
+
+  public addFormData = (data: XxxData, fn?: (res: ResType) => void) => {
+    createXxx(data).then((res) => {
+      if (res.code === 0) {
+        fn?.(res);
+      }
+
+      this._message(res);
+    });
+  };
+
+  public editFormData = (
+    id: number | string,
+    data: XxxData,
+    fn?: (res: ResType) => void
+  ) => {
+    data.id = id;
+
+    editXxx(data).then((res) => {
+      fn?.(res);
+
+      this._message(res);
+    });
+  };
+}
+
+export default new XxxFormStore();
+```
+
+要点：
+- 详情方法**必须**用 `_getFormData`（protected 覆写），不要自己另开 `getFormData`——基类 `getFormData` 做了 `setTimeout(500)` 防抖。
+- `addFormData`/`editFormData` 成功后调用传入的 `fn?.(res)`，再 `_message(res)`。
+- 编辑提交前把 `id` 合并到 `data` 里（`data.id = id`）再 POST，和后端约定一致。
+
+## Store 状态暴露：按是否继承基类分两种写法
+
+不同继承情况下 store 的写法规则不同——这是 MobX 本身的限制：
+
+- **继承 `ListPanelStore` / `FormModalStore` 的 store**：**必须** `makeObservable(this)` + 显式 `@observable accessor` + `@computed get`。`makeAutoObservable` 在继承链下会报错，基类本身用的也是 `makeObservable`。
+- **没有任何继承的独立 store**：**必须** `makeAutoObservable(this)` + 裸私有字段 + 裸 getter，**不要写装饰器**。`makeAutoObservable` 会自动把成员推断成 observable/computed/action。
+
+### 模式 A · 继承基类（`ListPanelStore` / `FormModalStore`）
+
+基类里每一个公开字段都走「私有 observable accessor + computed getter」模式，子类新增字段**必须**沿用，不得裸字段赋值。
+
+```ts
+import { computed, makeObservable, observable } from "mobx";
+
+class XxxStore extends FormModalStore<never> {
+  constructor() {
+    super();
+    makeObservable(this);
+  }
+
+  // 1) 公开读取 —— @computed get
+  @computed
+  get roles() {
+    return this._roles;
+  }
+
+  // 2) 私有可变状态 —— @observable protected/private accessor
+  @observable
+  private accessor _roles: RoleItem[] = [];
+
+  // 3) 修改动作 —— 箭头函数字段（makeObservable 会自动识别为 action）
+  public loadRoles = () => {
+    getRoleList().then((res) => {
+      if (res.code === 0) {
+        this._roles = res.data?.list || [];
+      } else {
+        this._message(res);
+      }
+    });
+  };
+}
+
+export default new XxxStore();
+```
+
+关键点：
+- 必须 `makeObservable(this)`；继承链下 `makeAutoObservable` 会抛错。
+- 私有字段一律 `@observable accessor`（`private`/`protected` 皆可，禁用裸字段）。
+- 公开读取一律 `@computed get`，不要直接把私有字段 `public` 出去。
+- 类型上有初始值就别标 `undefined`；必要时用 `| undefined` 并配 `= undefined`。
+
+### 模式 B · 独立 store（无继承）
+
+`Panel.Default` 仪表盘页、或任何不继承 `ListPanelStore`/`FormModalStore` 的独立 store。直接 `makeAutoObservable` + 裸私有字段 + 裸 getter，**不写任何装饰器**：
+
+```ts
+import { makeAutoObservable } from "mobx";
+
+interface SearchData {
+  timeType: number;
+  date: string;
+}
+
+class XxxStore {
+  private _searchData: SearchData = { timeType: 3, date: "" };
+  private _list: RowItem[] = [];
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  get searchData() {
+    return this._searchData;
+  }
+
+  get list() {
+    return this._list;
+  }
+
+  public init = () => {
+    this.fetchList();
+  };
+
+  public fetchList = async () => {
+    const res = await getXxxList(this._searchData);
+    if (res.code === 0) {
+      this._list = res.data?.list ?? [];
+    } else {
+      showResError(res);
+    }
+  };
+}
+
+export default new XxxStore();
+```
+
+关键点：
+- 只调用 `makeAutoObservable(this)`，不要 import `observable` / `computed` / `action`，也不要写 `@observable` / `@computed` / `accessor`。
+- 私有字段保持 `_` 前缀 + 公开 getter 的只读边界，命名与模式 A 一致；只是少了装饰器。
+- 业务 `code !== 0` 的错误提示：若项目有统一 helper（如 `showResError(res)`）就用它；**本项目没有该 helper**，无继承的独立 store 直接 `notification.error({ message: res.msg ?? "…" })` 即可，但不要写在 tsx 里——提示归 store。
+- 一旦将来把这个 store 加到继承链上（例如改挂 `FormModalStore`），必须切回模式 A（`makeObservable` + 显式装饰器）。
+
+### 命名约定（两种模式通用）
+
+- 私有字段：`_` 开头，外部不访问（`_roles`、`_menuTree`、`_selectedKeys`）。
+- 公开读取：去掉 `_`（`roles`、`menuTree`、`selectedKeys`）。
+- 修改动作：语义动词前缀（`loadRoles`、`setSelectedKeys`、`toggleCollapsed`）。
+
+### 反例
+
+```ts
+// ❌ 继承链下用 makeAutoObservable —— 运行时报错
+class BadStore extends FormModalStore<never> {
+  constructor() {
+    super();
+    makeAutoObservable(this); // 禁止
+  }
+}
+
+// ❌ 继承链下仍然用裸字段 —— 不会被 observe
+class BadStore extends FormModalStore<never> {
+  public roles: RoleItem[] = []; // 应改成 @observable private accessor _roles + @computed get roles
+}
+
+// ❌ 独立 store 里写装饰器 —— 多此一举，makeAutoObservable 已经处理了
+class BadStore {
+  @observable private accessor _roles: RoleItem[] = []; // 应去掉装饰器，改成 private _roles
+  constructor() {
+    makeAutoObservable(this);
+  }
+}
+
+// ❌ 独立 store 把私有字段直接 public —— 失去只读边界
+class BadStore {
+  public roles: RoleItem[] = []; // 应改成 private _roles + 公开 getter
+  constructor() {
+    makeAutoObservable(this);
+  }
+}
+```
+
+## 页签缓存与 store 实例化（单例 vs 每挂载一份）
+
+多页签系统里路由 meta 的 `noCache: false` 表示页面组件被**缓存复用**（keep-alive）：同一路由的多个页签（不同路由参数，如 /library/table/:id 的两张条目表）会**同时存活**。这直接决定 store 的实例化方式：
+
+### 判定规则
+
+- **`noCache: true`（不缓存）或全局唯一页面**（设置页、单例列表页）→ 模块单例：`export default new XStore();`
+- **`noCache: false` 且路由带动态参数**（同路由可多页签并存）→ **禁止单例**。单例会被多个缓存页签共写：后打开的页签把前一个页签的数据/元数据整个覆盖（表现为切页签后数据串了、列错位、显示不对）。
+
+### 每挂载一份的写法（参考 DataViewSearchStore 模式）
+
+```ts
+// XStore.ts —— 导出类，不导出实例
+class EntryStore extends ListPanelStore<EntrySearchData, EntryData> { ... }
+export default EntryStore;
+```
+
+```tsx
+// index.tsx —— 挂载时实例化（mobx-react-lite v4 已移除 useLocalStore，用 useState 惰性初始化）
+const Entry: React.FC = observer(() => {
+  const [entryStore] = useState(() => new EntryStore());
+  const { dataSource, getDataSource, ... } = entryStore;
+  ...
+});
+```
+
+### 配套纪律（缓存页签必守）
+
+1. **子组件不得 import 该 store 单例**——共享数据一律走 props 注入（如表单弹窗需要字段定义，由页面把 `fields` 传下去），否则子组件仍指向旧实例/别的页签。
+2. **请求前置空旧列表**：`getDataSource` 开头 `this._dataSource = []`，避免新数据返回前展示过期行。
+3. **路由参数变化先清元数据**：加载新实体的元信息（字段定义/表头）时先把旧值置空，防止旧列集渗透进新首帧（会引发固定列偏移错算与 React 跨异构列打补丁的 removeChild 白屏）。
+4. **异构列集切换强制重挂载**：同一路由组件在不同列集间切换时给 `Panel.List` 传 `key={实体id}`（hsu-ui ListPanel 的 tableInstanceKey 机制）。
+5. 表头排序如仅需当前页本地排序，覆写 `onOrderChange` 本地排，不重新请求（DataViewSearchStore 的 `_sortLocal` 模式）。
+
+### 反例
+
+```ts
+// ❌ noCache:false 的动态参数路由用单例 —— 多页签共写，必串数据
+export default new EntryStore();
+
+// ❌ 子组件绕过 props 直接 import 单例
+import EntryStore from "../EntryStore";
+const { fields } = EntryStore;
+```
+
+## 页面是懒加载的：不要把页面拖进入口图
+
+`RouterService` 用 `require.context(..., "lazy")` 把 `pages/**/index.tsx` 切成按需加载的 chunk，`RouterContainer` 已经备好 `<Suspense>`。这套机制很容易被无意破坏，破坏后**不会报错、不会变慢一点点，而是首屏直接翻几倍**。
+
+### 规则一：入口图里不要静态 import 任何页面组件
+
+入口图 = `src/index.tsx` → `Routes` → `router.config.tsx` → `App` → `layout/**`。这些文件里 `import SomePage from "@/pages/..."` 会把那个页面连同它的全部依赖拉进首屏。
+
+真实代价：`App.tsx` 里静态 import 了改密弹窗 `PwdChange`，它用 `FormItem`，而 hsu-ui 的 `FormItem` 会**静态引入全部字段渲染器**——`FormEditor→wangeditor`、`FormCodeMirror→codemirror`、`FilePreview→pdfjs`、`Spreadsheet→xlsx`。一个改密弹窗把约 2.5 MB 未压缩的三方库钉在首屏。
+
+需要在 layout/入口里挂页面级组件时（改密、登录）：
+
+```tsx
+const PwdChange = lazy(() => import("./pages/PwdChange"));
+
+// 而且只在真正打开时才挂载，关着的时候连 chunk 请求都不发
+{pwdOpen && (
+  <Suspense fallback={null}>
+    <PwdChange open={pwdOpen} onCancel={...} onOk={...} />
+  </Suspense>
+)}
+```
+
+#### 推论：layout 组件要用 pages 里的东西时，倒过来注入，别 import
+
+顶栏是 `layout/Header/`，`App.tsx` 只剩壳、Sider、Content、改密弹窗。抽的时候有个绕不开的点：用户弹层里的「修改密码 / 退出登录」要用 `LoginStore`（在 `pages/Login/` 下）和懒加载的 `PwdChange` 页面，而 **`layout/` 不允许反向 import `@/pages/…`**（见反例清单）。
+
+解法是倒过来——**`Header` 不认识这两样东西，只收一个 `menu: AccountAction[]`**；`quit` / `pwdOpen` / `<PwdChange>` 全留在 `App.tsx`：
+
+```tsx
+// layout/Header/index.tsx —— 只描述形状，不碰来源
+export interface AccountAction {
+  title: string; icon: string; onclick: () => void;
+}
+
+// App.tsx —— 组装动作，并继续持有懒加载的 PwdChange
+<Header router={router} collapsed={collapsed} menu={menu} … />
+```
+
+**这一带最容易被「顺手整理」整出问题**：改密弹窗看着就该跟用户菜单待在一起，一旦有人把 `PwdChange` 搬进 `Header`，同时踩两条——反向依赖成立，且只要顺手把 `lazy()` 写成静态 import，规则一里那几个库就又回到首屏了。**`layout/` 下出现 `@/pages/` 的 import 一律先当违规看**，需要页面侧的能力就走 props 注入。
+
+### 规则二：入口图里也别静态 import 重组件
+
+同理，`Panel` → `Search` → `FormItem` → 全部字段渲染器，`Chart` → echarts。`RouterService` 只在「外链菜单」这条极少走到的分支用 `Panel.Iframe`，为此专门包了一层 `router/_components/IframePanel` 懒加载它。**加/删这层包装的实测差异：85 个 script / 965 KB(gzip) ↔ 126 个 / 2913 KB。**
+
+懒加载重组件时用**深路径**，别 `import("@hsu-react/ui").then(m => m.Panel.Iframe)`——后者会把整个 barrel 拉进这个异步块，等于没省：
+
+```ts
+const LazyIframePanel = lazy(
+  () => import("@hsu-react/ui/es/components/Panel/IframePanel")
+);
+```
+
+> 页面文件里照常 `import { Panel } from "@hsu-react/ui"`。深路径只用于**入口图**中不得不引用重组件的地方，别推广到页面侧。
+
+### 规则三：懒加载 ＋ 同步更新 = 白屏，别在 store 里同步换路由表
+
+React 18 里，**同步更新中挂起的组件会让 React 丢掉整棵树**并抛 `A component suspended while responding to synchronous input`。而 `observer` 的重渲染走 `useSyncExternalStore`，是同步更新。
+
+菜单拉回后 `RouterService` 整体换掉路由表 → `Routes`（observer）同步重渲染 → 渲染懒加载页面 → 挂起 → **登录后整页白屏**。项目里已经做了两道防护，改这一带时不要拆掉：
+
+```tsx
+// src/index.tsx —— 覆盖点菜单/按钮触发的同步导航
+<BrowserRouter future={{ v7_startTransition: true }}>
+
+// src/router/Routes.tsx —— 覆盖 MobX 换路由表这条路径（白屏的直接原因）
+const deferredRouter = useDeferredValue(router);
+useRoutes(deferredRouter)
+```
+
+**这类问题 `tsc` / `eslint` / `webpack build` 全绿也照样发生**——只能在浏览器里发现。凡是动了懒加载、路由装配、`splitChunks` 的改动，按 playwright-mcp-strategy 的要求必须跑一次登录→导航回归。
+
+### 追首屏体积时：第一跳往往不是根因
+
+用 webpack stats 沿 `reasons` 向上回溯到 `./src/` 边界，**每改一次都要重新量**，别假设上一次的结论还成立。真实案例：pdfjs 进首屏，第一次追到组件库的 `PdfPreview`，改完还在；第二次追到 `hsu-utils` 的 barrel，改完**还在**；第三次才发现是本项目 `Axios.ts` 深引了 `hsu-utils/lib/DownloadFile`（**CJS 产物**，而 CJS 里动态 import 被编译成同步 require）。
+
+两条推论：
+
+- **别深引三方包的 `lib/`**（CJS）。要深引也走 `es/`；能从 barrel 拿就从 barrel 拿。
+- 若根因确实落在 hsu-ui / hsu-utils / single-router 里，**不要在本项目内绕过或覆写**，按 CLAUDE.md 回库改，流程见 `upstream-lib-change` skill。那里还记了一个必踩的 semver 陷阱：`^0.0.x` 等价于精确锁定，会让库的修复被嵌套副本挡住，表现为「库改了也发版了、升级后却毫无变化」。
+
+## tsx 消费 store：解构 + getter，不要回调
+
+**数据的所有权在 store；tsx 只订阅读取，不负责把数据塞回去。** store 的 fetch 方法不应接收「把结果回传给调用方」的回调；要暴露的值都走私有字段 + getter，tsx 用 `observer` 订阅即可。
+
+### 正例
+
+```tsx
+const BindRoleModal: React.FC<Props> = observer(({ open, persId }) => {
+  const { roles, checkedRoleIds, loadRoles, loadPersRoleIds } =
+    BindRoleModalStore;
+
+  useEffect(() => {
+    if (!open) return;
+    loadRoles();
+  }, [open, loadRoles]);
+
+  useEffect(() => {
+    if (!open || !persId) return;
+    loadPersRoleIds(persId);
+  }, [open, persId, loadPersRoleIds]);
+
+  return (
+    <Checkbox.Group
+      value={checkedRoleIds}
+      options={roles.map((r) => ({ label: r.nm, value: r.id }))}
+    />
+  );
+});
+```
+
+对应的 store：
+
+```ts
+@computed get roles() { return this._roles; }
+@observable private accessor _roles: RoleItem[] = [];
+
+@computed get checkedRoleIds() { return this._checkedRoleIds; }
+@observable private accessor _checkedRoleIds: (number | string)[] = [];
+
+public loadRoles = () => {
+  getRoleList().then((res) => {
+    if (res.code === 0) this._roles = res.data?.list || [];
+    else this._message(res);
+  });
+};
+
+public loadPersRoleIds = (persId: number | string) => {
+  getPersRoleIds(persId).then((res) => {
+    if (res.code === 0) this._checkedRoleIds = res.data?.list || [];
+    else this._message(res);
+  });
+};
+```
+
+### 反例
+
+```tsx
+// ❌ fetch 回调把结果塞回 useState —— 数据源双份，永远会漂移
+const [roles, setRoles] = useState<RoleItem[]>([]);
+useEffect(() => {
+  loadRoles((list) => setRoles(list));
+}, [open, loadRoles]);
+```
+
+```ts
+// ❌ store 方法接受结果回调透传
+public loadRoles = (fn?: (list: RoleItem[]) => void) => {
+  getRoleList().then((res) => fn?.(res.data?.list || []));
+};
+```
+
+### 什么情况下仍然用回调？
+
+回调只用在「调用方决定下一步 UI 动作」——这类回调不是传数据，而是通知时机。典型场景：
+
+- `editFormData(id, data, () => { closeModal(); onOk?.(); })`——成功后由调用方决定关不关弹窗
+- `delData(id, () => setSelectedKeys([]))`——删除后让调用方清理选中集
+
+**判断标准：回调参数列表里有没有业务数据？** 有就是反模式（应该改成 store 私有字段 + getter），没有就是合法的"时机通知"回调。
+
+### 两条推论
+
+- tsx 里**不要** `useState` 保存从 store 读来的数据副本。
+- 短命 UI 态（`open`、`title`、`editingId`）仍然用 `useState`——别把「store 数据不要 useState」误推广到「UI 态也不要 useState」。
+
+## 组件抽取与弹窗组织
+
+### 抽取判据：按复用面定归属，不看代码长度
+
+| 情形 | 去处 |
+|---|---|
+| ≥2 个页面用到 | `src/components/<Name>/` |
+| 只有本页用到 | 同级 `_components/<Name>/` |
+| 只被某个弹窗用到 | 该弹窗目录下再开 `_components/` |
+
+**触发抽取的硬条件**（满足任一就必须拆，不要按行数判断）：
+
+1. **同一段渲染逻辑在 ≥2 个页面出现**——哪怕只有类型名不同。写新页面前先搜有没有同构实现：真实案例里「规则页/基础设定/大纲」三页的文档树节点与「新建子页」弹窗曾逐字重复三份；书封网格更隐蔽——一处已有组件、另一处内联复制了一份。
+2. **路由页 `index.tsx` 里内联了 `<Modal>` / `<Form.Modal>`**——弹窗一律独立成目录。
+3. **该 UI 块自带接口调用**——见下条，优先级最高。
+4. **同一个 `index.tsx` 里出现 ≥2 套彼此独立的 `columns`，或 ≥2 个互斥的阶段/视图分支**——拆 `_contComps/`，见「内容区拆分」一节。
+
+#### 抽取要抽到底：只抽零件不抽壳，等于没抽
+
+第 1 条上一轮执行过一次，只抽走了「文档树节点」和「新建子页弹窗」两个零件，三页的 `index.tsx`、Store、`index.module.scss` 原样留着。结果是约 1280 行里 1000 行仍然同构，而且**漂移已经发生**：规则页的 `.ant-tree-node-content-wrapper` 停在旧版本，少了另外两页后来补的「树标题铺满」修复——改了两处、漏了第三处，正是重复代码的典型死法。
+
+抽取完成的判据是**「这三个页面之间还剩多少行是同构的」**，不是「有没有抽出过组件」。三页最终收敛成：
+
+- `stores/basisStoreClass/DocTreeStore.ts` —— 行为全在这里，按配置注入接口（**不用继承**：独立 store 用 `makeAutoObservable`，继承链下会报错；配置注入还能顺带保住 store ↔ API 一一对应）
+- `work/_components/DocTreePage/` —— 页面壳 ＋ 唯一一份 scss，差异走 props（权限码、两句文案、可选的 `before` 插槽）
+- 各页只剩 20 余行：建 store、传配置
+
+**共享组件的落点要看消费者在哪。**`DocTreePage` 没有放 `src/components/`，因为三个消费者都在 `work/` 下、且它要用 `work/_components/ProseEditor`——放全局层会变成"共享组件反向 import 页面私有目录"，把一个违规换成另一个违规。
+
+### 内容区拆分（`_contComps/`）：按职责切，不按行数切
+
+`_components/` 装的是「可复用的零件」，`_contComps/` 装的是「这一页内容区的一大块」——它不打算被别人复用，只是这一页里一个自成职责的区域。
+
+**该拆的信号**（对应上面硬条件第 4 条）：
+
+- 一个 `index.tsx` 里有 **≥2 套彼此独立的 `columns`**
+- 有 **≥2 个互斥的视图/阶段分支**（「列表 ↔ 详情」「卡片视图 ↔ 表格视图」这类）
+- 某个区域**自带只服务于它的局部 state**（例如上传区的几个输入框，只在这次上传用）
+
+三条纪律：
+
+1. **局部 state 跟着区域走。**判据同「弹窗 Store 与页面 Store 的分工」：这份状态在这个区域之外还有人要用吗？没有就跟着走，页面不必再感知。
+2. **搬走 state 时要一并搬走它的复位逻辑。**真实案例：某个「标题草稿」原本靠页面 `useEffect` 在切换目标时 `setDraft(undefined)` 复位；搬进子组件后没有这一步，会把上一个目标的输入串到新目标。解法是调用侧给 `key={当前目标 id}` 让它重挂载。**凡是把本地 state 下沉到子组件，先问一句「原来是谁在什么时候把它清掉的」。**
+3. **scss 跟着组件走，媒体查询也要跟着走。**CSS Module 的类名带 hash，把 `.xxx` 搬进子组件后，留在页面 scss 里的 `@media { .xxx { display:none } }` 会失配、**静默失效**（不报错、只是不生效）。
+
+**纯页面内状态用 `useState`，不要持久化。**面板折叠、卡片/列表视图切换这类只影响「当前这一眼怎么看」的状态，别写 localStorage：页签是 KeepAlive 缓存的，切走再回来本来就还在；而 localStorage 的 key 是全局的，这些状态却几乎都是针对当前对象的——真实案例里某个折叠态被所有对象共享，换个对象还顶着上一个的状态。判据：**这个状态换一个对象/换一个页签还成立吗？**不成立就是页面内状态。真要跨会话记的（登录态/主题/语言/每页条数）走 `wsCache`。
+
+**纯派生逻辑走 `_utils/`，不必包成组件。**「从字段定义 computed 出搜索项与列」这类没有 state / effect 的代码，导出成 `buildSearchItems` / `buildColumns` 之类的纯函数放 `_utils/`，页面只留 `useMemo` 缓存。判据：这段代码有没有自己的 state / effect？没有就是纯派生。
+
+**别为了凑行数把 `columns` 搬进 `_utils/`。**列定义里的 `render` 通常闭包引用了页面的 `setXxx`，硬搬出去要逐个改成参数注入，读一列渲染还要跳两个文件——那是负收益。要么连同 `<Table>` 一起拆成 `_contComps/XxxTable`（行操作走 `onEdit` / `onRemove` 这类具名 props），要么就留在页面里。
+
+#### 审计时别把已合规的弹窗当成违规
+
+用 `grep -l "<Modal" **/index.tsx` 找违规会**误报**：`FieldManage/`、`VolumeManage/`、`LastCommitDiffModal/` 这些本身就是独立弹窗组件（自带 Store、props 四件套、独立目录），它们的 `index.tsx` 里当然有 `<Modal>`，那正是合规的样子。
+
+真正的违规只有一种：**路由页**（在 `router.config.tsx` 或后端菜单里注册过的那个 `index.tsx`）里内联 `<Modal>`。判断方法是先确认这个 `index.tsx` 是不是路由目标，而不是看文件名。
+
+### 弹窗里有接口调用 → 必须独立成组件 ＋ 自带 Store
+
+反模式：弹窗直接 `import { getXxx } from "@/services/apis/…"`、用 `useState` 存服务端数据、失败自己弹 `notification`。
+
+规范结构（对齐 `permit/Role/MenuAssign` 那类既有实现）：
+
+```
+<Modal>/
+├── index.tsx              # observer 包裹，props 四件套
+├── index.module.scss
+└── <Modal>Store.ts        # 接口调用、加载态、错误提示都在这里
+```
+
+- props 固定 `open` / `title` / `id` / `onCancel` / `onOk`；父级 ID 另加具名字段
+- 组件内 `const [store] = useState(() => new XxxStore())`
+- 失败提示走 store（继承基类用 `_message(res)`，独立 store 用 `notification`），**组件里不出现 `notification.error`**
+- **例外**：纯前端校验提示（如「检查定义不是合法 JSON」）留在组件里——规范禁的是「接口失败提示」，不是所有提示
+
+### 弹窗 Store 与页面 Store 的分工
+
+弹窗 store 只管弹窗自己的状态；**页面要展示的数据归页面 store**。
+
+判据：这份数据在弹窗关闭后页面还要不要显示？要 → 放页面 store。
+
+```ts
+// ✅ 关联图书弹窗：可选清单/勾选草稿/保存 在弹窗 store；
+//    「本作已关联哪些图书」页面列表要显示 → 收进 MaterialStore.assocBooks
+// ❌ 若把它放弹窗 store，弹窗就得用回调把业务数据回传给页面——见「tsx 消费 store」一节的反模式
+```
+
+### 缺详情接口时不要用 props 传整行
+
+弹窗回填的正路是 `useEffect(if (id && open)) getFormData(id)`。
+
+后端只有列表接口、没有 `GET /xxx/{id}` 时：**推动后端补详情端点，不要退化成父页面把整行当 props 传下去**。后者绕开基类 `getFormData` 的 500ms 防抖与 `_formSeq` 失效保护，且列表刷新后 props 里的 `version` 是旧快照，提交会撞乐观锁。
+
+配套：**`useState` 只存 `id`，不存整行**（见「tsx 消费 store」的两条推论；真实风险就是过期 `version`）。
+
+### 弹窗产生、关闭后才展示的数据，连同展示弹窗收进同一模块
+
+「弹窗关闭后页面还要不要显示」这条判据有个边界情形：**数据是弹窗动作的产物，但要在该弹窗关闭之后才展示**。典型是新建 MCP 令牌的明文——建完才给，且只给一次。
+
+放页面 store 就得让弹窗用回调把明文回传给页面，那正是上一节点名的反模式。正解是**把展示弹窗也认成这条流程的后半段**，一起收进弹窗模块：
+
+```
+TokenForm/
+├── index.tsx          # 创建表单 Form.Modal ＋ 明文展示 Modal（两个都在这）
+├── index.module.scss  # 连同 .plainBox / .plainText / .plainHint 一起搬过来
+└── TokenFormStore.ts  # plaintext 状态在这里，页面完全不感知
+```
+
+页面只留 `onOk={loadList}` 刷新列表。判据补充为：**这份数据是页面自身的状态，还是某条流程的中间产物？**中间产物跟着流程走，不要为了「归页面」而制造回调。
+
+### 一套 formItems 服务两个弹窗时，合并成一个组件
+
+「新建 own 素材」和「编辑素材」用的是同一组表单项，只是必填规则和附加区块不同。不要开两个目录，**合并成一个组件，用 `id` 有无区分新建/编辑**：
+
+```tsx
+// MaterialForm：id 有值＝编辑，无值＝新建
+required: !id || canonRequired,          // 新建必填；编辑看这条是不是 as_is
+outsideChildren={snapshot ? <快照面板 /> : undefined}   // 只有从图书馆来的才有快照
+```
+
+两个目录会让同一套字段定义分叉，改一处忘另一处。
+
+### 抽完弹窗，回头清页面 store 里的孤儿方法
+
+弹窗独立成目录后，提交逻辑搬进了弹窗 store，**页面 store 里原来的 `addXxx` / `editXxx` 就失去了全部调用点**。它们不会报错，但属于死代码，且下次有人照着它改会改到没人跑的分支上。
+
+抽取的最后一步固定是：
+
+```bash
+# 逐个确认外部调用数为 0，再删方法 + 清掉随之失效的 import
+grep -rn "\.addGroup(\|\.editGroup(" src/pages/ | grep -v XxxStore.ts
+```
+
+本轮抽 8 处弹窗，清出 8 组孤儿方法（`PackStore.addPack/editPack`、`EventStore.add/edit`、`BookTablesStore.create/edit`、`VolumeManageStore.addVolume/editVolumeData`、`TrashStore.addTombstone/editTombstoneData`、`PendingStore.add/edit/decide`、`TokenStore.create/rename/closePlaintext`、`CharacterStore.addCharacter/saveProfile/addStatus/editStatusRow`、`MaterialStore.addGroup/editGroup/addOwn/editItem`）。删完 `tsc` 会直接报出失效 import，照着清即可。
+
+### 跨页 import 私有 store 禁止
+
+`_components/` 与页面目录下的 store 都属页面私有。需要同一份数据时：
+
+- 数据属于父页面 → props 注入
+- 该组件本就该自己有 → 自建 store，API 按「Store 与 API 文件的一一对应」在自己的 API 文件里各留一份（接受 URL 重复）
+
+反例（真实踩过）：章节表单 import 了写作页 `VolumeManage` 的私有 store 取卷列表，单例被两处共写，章节表单里会显示**另一部作品**的卷。
+
+### 二次确认用 `SecondConf` 的触发器模式
+
+删除、回滚、软删这类动作的二次确认，**触发元素原地包一层 `SecondConf`**，不传 `open`——弹窗自持开关状态（需 `@hsu-react/ui` >= 0.0.18）：
+
+```tsx
+<SecondConf
+  contentTitle={`删除《${it.title}》`}
+  contentText="整本书及其条目表将进入软删。"
+  okButtonProps={{ danger: true }}
+  onOk={() => onDelete(it)}
+>
+  <DeleteOutlined />
+</SecondConf>
+```
+
+- 渲染成「确认{contentTitle}吗？」，所以 `contentTitle` 写**动作**（`删除《西游记》`），不是名词
+- 危险动作用 `okButtonProps={{ danger: true }}`；按钮文案不写死，跟 antd 中文默认的「确定/取消」走，除非语义特殊（如 `okText="回滚"`）
+- 触发元素自身的 `onClick` 照常先执行，且组件已 `stopPropagation`，嵌在可点击的卡片/行里不会连带触发整行
+
+**列表里必须用触发器模式**：`map()` 内部无法为每一行单独 `useState`，受控写法只能把「当前待确认的是哪一行」连同文案提到循环外，触发点和弹窗被拆到两个作用域，同页再多一种确认动作就再加一份 state。
+
+仍用受控（传 `open`）的**唯一场景**：触发点不是元素而是配置对象，例如 Dropdown 的 `menu.items`、`Operate` 的操作项——此时无处可包，只能自持 `open` 并在外层渲染 `SecondConf`。
+
+**自己写的触发器组件，`onClick` 必须收下事件对象再往下传。**`SecondConf` 是用 `cloneElement` 把自己的 handler 注到子元素上的，子元素若是自定义组件，那个 handler 就落到它的 `onClick` prop 上：
+
+```tsx
+// ❌ 签名写成无参：SecondConf 注进来的 handler 拿到 undefined，
+//    在它内部的 e.stopPropagation() 处直接抛错，二次确认永远弹不出来
+onClick?: () => void;
+<span onClick={(e) => { e.stopPropagation(); onClick?.(); }}>
+
+// ✅
+onClick?: React.MouseEventHandler<HTMLSpanElement>;
+<span onClick={(e) => { e.stopPropagation(); onClick?.(e); }}>
+```
+
+这条踩过一次：`tsc` 放行（`() => void` 可以赋到 handler 位置），页面看起来也正常，只有真去点删除才发现整条链断了。**凡是要被 `SecondConf` 包住的自定义触发器，写完必须在浏览器里点一次确认弹窗。**
+
+不要在项目内再包一层自己的确认组件。曾经有过一个本地 `ConfirmAction`，正是绕开了 CLAUDE.md「组件能力不满足需求时改动回 hsu-ui 仓库发版」；触发器模式后来并进了 `SecondConf` 本体，本地组件随即删除。
+
+## 多级异步链的 store 必须有序号守卫
+
+**只要一个 store 方法里有两跳以上的异步、而用户可以在它跑完前切换目标，就必须加序号守卫。** 典型是「按 id/seq 加载详情」这类：切目标时两条链并行，先发的完全可能后到，旧响应会盖到新目标身上。
+
+```ts
+/** load 的序号：切目标时自增，异步回调据此丢弃迟到响应 */
+private _loadSeq = 0;
+
+public load = (workId: string, seq: number) => {
+  const seqToken = ++this._loadSeq;
+  const fresh = () => seqToken === this._loadSeq;
+
+  this._chapter = {};
+  getChaptersBySeq(workId, seq).then((res) => {
+    if (res.code !== 0 || !fresh()) return;          // ① 第一跳
+    // …
+    getManuscriptDoc(ch.manuscript_doc_id).then(async (doc) => {
+      if (doc.code !== 0 || !fresh()) return;        // ② 第二跳
+      const local = await idbGet(`draft:${ch.id}`);
+      if (!fresh()) return;                          // ③ 连本地读也算一跳
+      // …落数据
+    });
+  });
+};
+```
+
+要点：
+
+- **每一跳都要检查，不能只在最外层查一次**。本地 IndexedDB 读取、`await` 出来的任何东西都算一跳。
+- 守卫要**覆盖同一条链上的衍生调用**。上例里 `_syncRefLabels(doc)` 自己还会发一个解析请求，它也得在入口处捕获 `this._loadSeq` 并在回调里比对，否则引用名会串到别的目标上。
+- 「乱序只是显示错一下」是低估：真正的代价是**版本凭据被污染**。上例里迟到响应会把 `_bodyVersion` 写成上一章的，之后每一次保存都撞 409，且用户没有任何自救手段。
+
+**判断标准：这个 store 里有没有「先清空再异步填充」的字段？**有就说明存在中间态，就要问「填充回来时目标还是不是它」。
+
+对照：`ListPanelStore._refreshRowData` 早就用 `_rowRefreshSeq` 做了同样的事（按主键记序号、乱序丢弃）；写作台的 `save()` 也有 `stale` 检查。**新写的加载路径要跟上，不要只在保存路径上防。**
+
+## 静态内容页变体（`Panel.Default`）
+
+仪表盘、说明页、图表聚合页等**非列表、非表单**的内容型页面，用 `Panel.Default` 作为外壳，而不是 `Panel.List`。这类页面通常没有搜索/分页/增删改，只需要 Panel 给它一个统一的边距、标题和内容区样式。
+
+```tsx
+import React from "react";
+
+import { Panel } from "@hsu-react/ui";
+import { observer } from "mobx-react-lite";
+import styles from "./index.module.scss";
+
+const Xxx: React.FC = observer(() => {
+  return (
+    <Panel.Default
+      className={styles.Xxx}
+      contentClassName={styles.XxxContent}
+    >
+      {/* 内容在这里；图表、统计卡、子面板等 */}
+    </Panel.Default>
+  );
+});
+
+export default Xxx;
+```
+
+**内容区要撑满时必须显式给高度**：`display:flex; flex-direction:column` 的容器若不写 `height: 100%`，整块只有内容高，子元素的 `flex: 1` 拿不到剩余空间（表现为「下半屏空着、内容挤在顶部」）。需要子区域吃掉剩余高度并独立滚动时：
+
+```scss
+.XxxContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;      // ← 少这行，下面的 flex:1 就不生效
+  min-height: 0;
+}
+
+.XxxScroll {         // 工具条吸顶，滚动交给这一块
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+```
+
+配套的 `index.module.scss` 需要给**两个**选择器占位（外层 + 内容区）：
+
+```scss
+.Xxx {
+}
+
+.XxxContent {
+}
+```
+
+store 可以极简——**未继承任何基类的空 store 用 `makeAutoObservable`**：
+
+```ts
+import { makeAutoObservable } from "mobx";
+
+class XxxStore {
+  constructor() {
+    makeAutoObservable(this);
+  }
+}
+
+export default new XxxStore();
+```
+
+之后如果页面需要拉数据/加状态，按 "Store 状态暴露" 一节的 **模式 B · 独立 store（无继承）** 扩展即可（仍然 `makeAutoObservable` + 裸私有字段 + 裸 getter，不写装饰器）；如果后来发现要接列表/表单/分页，应当切换到 `Panel.List` + `ListPanelStore` 模板，而不是在 `Panel.Default` 里手写这些能力。
+
+API 文件按页面路径镜像落一个同名 `.ts` 即可，哪怕内容暂时为空（由 api-creation skill 驱动），后续添函数时不用再动文件位置。
+
+## 嵌套列表弹窗变体（`Panel.List.Modal`）
+
+当一条"父记录"需要点进去管理一批"子记录"时（例如「异常策略」下管理「适用用户」），把子列表页做成一个 **Modal 里的列表** —— 外层父页面传入 `open` 和父级 ID，Modal 内部自行装一套完整的搜索 + 增删改。对应脚手架：`createListModalPanel.cjs`。
+
+### 组件骨架
+
+```tsx
+import React, { useEffect, useState } from "react";
+
+import { ChakraButtonProps, ColumnsType, FormItemProps, Panel, Operate } from "@hsu-react/ui";
+import { PlusOutlined } from "@ant-design/icons";
+import { observer } from "mobx-react-lite";
+
+import XxxStore from "./XxxStore";
+import XxxForm from "./XxxForm";
+import styles from "./index.module.scss";
+
+interface XxxProps {
+  open?: boolean;
+  onCancel?: () => void;
+  excepStratId?: number | string;  // 父级 ID 字段，按业务命名
+}
+
+const Xxx: React.FC<XxxProps> = observer((props) => {
+  const { open: xxxOpen, onCancel: onXxxCancel, excepStratId } = props;
+  const {
+    setSearchData,
+    initSearchData,
+    dataSource,
+    isLoading,
+    total,
+    changePage,
+    page,
+    getDataSource,
+    delData,
+    order,
+    onOrderChange,
+    resetStore,
+  } = XxxStore;
+  const [id, setId] = useState<number | string>();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    if (xxxOpen && excepStratId) {
+      initSearchData({ excepStratId });
+    }
+  }, [initSearchData, xxxOpen, excepStratId]);
+
+  // searchItems / beforeButtonGroup / columns 同普通列表页
+
+  return (
+    <>
+      <Panel.List.Modal
+        open={xxxOpen}
+        title="用户异常策略"
+        onCancel={() => {
+          resetStore();
+          onXxxCancel?.();
+        }}
+        footer={false}
+        className={styles.Xxx}
+        searchProps={{ /* 同普通列表 */ }}
+        tableProps={{ /* 同普通列表 */ }}
+      />
+      <XxxForm
+        open={open}
+        title={title}
+        id={id}
+        excepStratId={excepStratId}
+        onCancel={() => { setId(""); setOpen(false); }}
+        onOk={() => { getDataSource(); }}
+      />
+    </>
+  );
+});
+
+export default Xxx;
+```
+
+要点（与普通 `Panel.List` 列表页的差异只在下面这几条，其余一致）：
+- **props 命名必须消歧义**：外层父页面传进来的 `open`/`onCancel` 与内层"新增/编辑"表单的 `open`/`onCancel` 同名，`props` 解构时一律 rename：`open: xxxOpen`、`onCancel: onXxxCancel`。**不要**用 `modalOpen` 这类泛名——用模块名前缀，一眼对得上。
+- **初始化条件加门**：`useEffect` 必须 `if (xxxOpen && <parentId>)` 双重判断后才 `initSearchData({ <parentId> })`，把父级 ID 透传进搜索参数；弹窗未打开或父级 ID 缺失时不要发请求。
+- **关闭时 `resetStore()`**：`Panel.List.Modal` 的 `onCancel` 里**必须**先 `resetStore()` 再 `onXxxCancel?.()`，否则下次换个父级 ID 打开会带脏数据。普通列表页不需要这一步。
+- **`footer={false}`** + `title="..."`：Modal 自带标题，底部按钮交给页面内 `Operate` 负责，不要双份。
+- **子表单要接收并注入父级 ID**：`<XxxForm>` 多传一个 `excepStratId={excepStratId}`；表单组件侧按上面"表单弹窗"一节末尾"父级 ID 注入"要点处理。
+
+### 配套 Store
+
+`_modeType` 必须**显式声明**父级 ID 的比较模式（`EQ`），否则 `ListPanelStore` 会默认按模糊匹配拼参数：
+
+```ts
+class XxxStore extends ListPanelStore<XxxSearchData, XxxData> {
+  protected accessor _modeType = {
+    excepStratId: "EQ",
+  };
+
+  constructor() {
+    super();
+    makeObservable(this);
+  }
+
+  // getDataSource / delData 同普通列表页
+}
+```
+
+其它与普通列表 store 一致，`resetStore` 由基类提供无需自己实现。
+
+## 表格列宽规范
+
+全项目的列宽是一个离散档位，不要随手填。新列建议先查下面的表对号入座，档位之间不要自由插值。对齐方式与 `fixedWidth` 也是配套约定（`fixedWidth: true` 要求本项目 `Table` 组件在水平滚动时严格固守该宽度）。
+
+### 基本对齐约定
+
+| 列类别 | `align` | `fixedWidth` | 备注 |
+|---|---|---|---|
+| 时间、枚举/状态、是否 X、数字/计数、ID/编号、手机号 | `"center"` | `true` | 行内内容定长或定值 |
+| 名称/标题、备注/描述、URL/路径 | 不设（默认左） | 不设 | 内容变长自适应 |
+| 操作 | `"center"` | `true` | 见下文专门一节 |
+
+**排序字段翻译规避**：`dataIndex` 是翻译字段（`xxxDsr`、`xxxNm`）时务必加 `orderKey` 指向真正的 code 字段，避免按翻译文本排序。例如 `dataIndex: "typeDsr", orderKey: "type"`。
+
+### 枚举/状态列：优先用后端 Dsr 字段，不要前端映射
+
+列表列渲染字典型字段（状态、类型、是否、级别等）时，**直接用后端返回的 `xxxDsr`** 作为 `dataIndex`，不要在前端写 `render` 做 code→文案映射。项目中 `syslog/ApiLog`、`sysmgmt/sms/SmsLog`、`informationMaintenance/PersonnelManagement` 等绝大多数列表页都是这个写法。
+
+```tsx
+// ✅ 对
+{ title: "状态", dataIndex: "statusDsr", width: 90, align: "center" }
+
+// ❌ 错（硬编码映射，后端加第三态/改文案会失准）
+{
+  title: "状态",
+  dataIndex: "status",
+  render: (r) => (r.status === 0 ? "启用" : "停用"),
+}
+```
+
+理由：
+- 前端映射是脆弱契约——后端加 `status=2/3` 或改文案后 else 分支会错；
+- 多页面/多系统间的文案应由后端统一出口，避免跨页面自行翻译导致分歧；
+- 排序按文本还是按 code 由 `orderKey` 明确（见上条「排序字段翻译规避」），前端映射则两头都不稳。
+
+**接口类型同步**：页面改用 `xxxDsr` 渲染后，对应的 `src/services/apis/<category>/<module>.ts` 里的 Data 接口也要补上 `xxxDsr?: string` 字段；否则 TS 虽然因 `MyData extends Record<string, unknown>` 放过了，但后续 review 看不到真实契约。
+
+**例外**：后端暂时没给 Dsr 字段时，优先推动后端补字段；短期过渡可用 `Options("XXX_KEY")` + `OptionMap` 查表渲染，**绝不要**裸写 `record.x === 0 ? "A" : "B"`——那是最脆、最难维护的写法。
+
+### Table 列 `render` 参数签名（极易踩坑）
+
+本项目 Table 复用 antd 的列 render 签名。**参数含义按列是否设了 `dataIndex` 区分**：
+
+- **有 `dataIndex`** 的列：`render(value, record, index)` —— **第一个参数是这一格的值（即 record[dataIndex]）**，第二个才是 record。
+- **没有 `dataIndex`** 的列（如组合渲染、操作列、Tags 列）：`render(record, _, index)` —— 第一个参数就是 record。
+
+实际项目里两种写法都存在，但**不能搞混**：在带 `dataIndex` 的列里写 `(record) => record.foo` 其实是把 value 当成 record 用，运行时 `value.foo === undefined`，整列会安静地全部渲染成"--"——TS 不会报错，肉眼也只看到列空着，是项目里最常见的"祖传 bug"。
+
+```tsx
+// ✅ 有 dataIndex —— 第一个参数是 value
+{
+  title: "预警百分比",
+  dataIndex: "warnPercent",
+  render: (value: number) =>
+    value !== undefined && value !== null ? `${value}%` : "--",
+}
+
+// ✅ 有 dataIndex 但需要拿整行 —— 第二个参数才是 record（开关列就是这种）
+{
+  title: "是否启用",
+  dataIndex: "status",
+  render: (_, record) => <Switch defaultChecked={!!record.status} ... />,
+}
+
+// ✅ 没有 dataIndex —— 第一个参数就是 record
+{
+  title: "标签",
+  render: (record) => <Tags tags={record?.tags?.map(t => t.nm)} />,
+}
+
+// ❌ 反例：有 dataIndex 却把第一个参数当成 record —— value 是数字，`value.warnPercent` 永远 undefined，整列显示 "--"
+{
+  title: "预警百分比",
+  dataIndex: "warnPercent",
+  render: (record) =>
+    record.warnPercent ? `${record.warnPercent}%` : "--",
+}
+```
+
+判断标准：**写之前问一句"我这列设没设 `dataIndex`？"**。设了就是 `(value) => ...` 或 `(_, record) => ...`；没设就是 `(record) => ...`。
+
+### 时间列要 `dayjs` 格式化，列宽随精度
+
+后端返回的时间字段格式并不统一：
+
+- 框架级时间字段（`crtTm`/`updTm` 等）：很多模块由后端统一格式化成 `"YYYY-MM-DD HH:mm:ss"` 字符串，列里直接用 `dataIndex: "crtTm"` 即可，无需 `render`。
+- 业务级时间字段（`rangeStartTm`/`rangeEndTm`、`xxxTime` 等）：后端经常原样返回 ISO `"2026-05-13T16:46:09"`，如果不处理，列里会带个突兀的 `T`。
+
+业务时间列**必须**用 `dayjs(value).format(...)` 渲染，并根据**字段真实精度**选格式 + 列宽：
+
+| 字段精度 | 表单端 | 渲染格式 | 列宽 |
+|---|---|---|---|
+| 仅日期（不含时分秒）| DATEPICKER 不传 `showTime` | `"YYYY-MM-DD"` | **120**（10 字符 + padding）|
+| 日期 + 时分秒 | DATEPICKER `showTime: true` | `"YYYY-MM-DD HH:mm:ss"` | **160**（19 字符 + padding）|
+
+判断规则：**看表单的 DATEPICKER 是否设 `showTime`**，前后端保持一致——表单里只让选日期的字段，列就不该多出 `00:00:00` 这段无用尾巴；表单选了时分秒的，列宽必须留到 160 才不会断行。
+
+```tsx
+import dayjs from "dayjs";
+
+// 日期型字段（rangeStartTm 业务上只关心"哪一天"）
+{
+  title: "统计开始时间",
+  dataIndex: "rangeStartTm",
+  align: "center",
+  width: 120,
+  fixedWidth: true,
+  render: (value: string) =>
+    value ? dayjs(value).format("YYYY-MM-DD") : "--",
+}
+
+// 含时分秒（精确到秒的业务时间）
+{
+  title: "发生时间",
+  dataIndex: "occurTm",
+  align: "center",
+  width: 160,
+  fixedWidth: true,
+  render: (value: string) =>
+    value ? dayjs(value).format("YYYY-MM-DD HH:mm:ss") : "--",
+}
+```
+
+后端字段是 LocalDateTime 但产品只需要日期粒度时，表单去掉 `showTime`、列用 `"YYYY-MM-DD"` + 120 宽即可，后端返回的尾部 `T00:00:00` 由 dayjs 自动吃掉。
+
+### 非操作列宽度查表
+
+| 列类别 | 标题样例 | 宽度 | 备注 |
+|---|---|---|---|
+| **时间列**（`crtTm`/`updTm`/`sendTm`/`xxxTm`）| 创建时间、修改时间、发送时间 | **160** | 固定 160，`"YYYY-MM-DD HH:mm:ss"` 的标准长度 |
+| **枚举/状态列**（`xxxDsr` + `orderKey`）| 状态（2 字）| **80** | 短枚举 |
+| | 类型、是否恢复、会话类型（3–4 字，值也短）| **90–100** | 按标题字数选 |
+| | 调用状态、异常类型、频率配置（4 字且值较长）| **120–150** | 值更长时取 150 |
+| **开关列**（`Switch` 渲染）| 是否启用 | **100** | `align: "center"`, `fixedWidth: true` |
+| **ID/编号列**（`id`/`cd`/`cfgId`）| 用户ID、角色编码、配置ID | **180–200** | 主键/唯一码统一档位；**避免**把 ID 列设成 300+ |
+| **手机号**（`mob`）| 手机号 | **120** | 固定 |
+| **名称/标题列**（`nm`/`nickname`/`title`）| 名称、角色名称、部门名称、模板名称 | **150–200** | 默认 200；短名称或多列并排时可压到 150 |
+| | 多值名称（角色列表、标签集合）、带链接的资产名 | **200–300** | 有 `render` 组合多个 Tag/Link 时取大档 |
+| **备注/描述列**（`rmks`/`dsc`）| 备注、说明 | **200** | 默认 200；若同页已知普遍很长可给 240 |
+| **长内容列**（`cont`/消息体/SQL）| 内容 | **300–500** | 内容可能溢出，配合 `TextEllipsis` 渲染 |
+| **URL/路径/权限码列** | 调用URL、路由地址、权限标识 | **250–300** | 默认左对齐，不设 `fixedWidth` |
+| **数字/计数列** | 策略数量、最大通知次数、排序值 | **80–140** | 2–3 位数 100，4 位以上 140；非可排序数值加 `sorter: false` |
+
+### 档位选择的经验公式
+
+若无合适档位可套，参考：
+
+- 中心对齐列（时间/枚举/状态/ID/数字）：`width ≈ max(80, 标题字数 × 22 + 内容最长字数 × 16)`，然后就近向上对齐到 **80 / 100 / 120 / 140 / 160 / 180 / 200** 这组档位。
+- 左对齐文本列（名称/备注/URL）：查表即可；实在拿不定默认 **200**。
+
+### 列顺序惯例
+
+列一般按"**标识 → 基本属性 → 枚举/状态 → 备注 → 时间 → 操作**"排列：
+
+```
+[rowSelection?] → 编码/ID → 名称 → 业务属性若干 → 类型/状态 → 备注 → 创建时间 → 修改时间 → 操作(fixed: "right")
+```
+
+首列不要加 `fixed: "left"`，除非该表左右滚动且主键列需常驻可见。操作列固定 `fixed: "right"`。
+
+## 操作列宽度规范
+
+操作列（`title: "操作"`）的宽度按"行内可见按钮的中文字符合计"查表，与全项目既有模块保持一致。基础属性固定：
+
+```ts
+{
+  title: "操作",
+  width: <按下表>,
+  ellipsis: false,
+  align: "center",
+  fixed: "right",
+  fixedWidth: true,
+  render: (record) => (
+    <Operate
+      maxVisible={N}      // 见下方"maxVisible 规则"
+      menu={[ /* 动作列表 */ ]}
+    />
+  ),
+}
+```
+
+### maxVisible 规则
+
+`<Operate>` 会把 `menu` 前 `maxVisible` 个按钮平铺在行内，其余折叠进尾部的 "..." 下拉按钮（称为"溢出"）。
+
+- `menu.length ≤ 3`：可省略 `maxVisible`，全部按钮平铺。
+- `menu.length ≥ 4`：必须显式写 `maxVisible`，通常取 2 或 3；不要让行内摆 4 个以上按钮（Role 的 `maxVisible={4}` 是历史例外，新模块不要模仿）。
+- 有按钮受 `hidden`/`hasPermi` 动态控制时，仍按"设计上的最大可见数"算宽度，不要让宽度随数据抖动。
+
+### 宽度查表
+
+先算"可见字符数" `C` = 行内平铺按钮（前 `maxVisible` 个，未截断就是全部）的 `title` 中文字符合计；再判断是否"有溢出"（`menu.length > maxVisible`，即出现 "..." 下拉按钮，约占 20px）。
+
+| 可见字符 C | 典型组合 | 无溢出 width | 有溢出 width |
+|---|---|---|---|
+| 2 | 1 × 2字（详情）| 80 | — |
+| 4 | 2 × 2字（编辑/删除）| **140** | **160** |
+| 6 | 3 × 2字（编辑/数据/删除）或 2字+4字（编辑/分配角色）| **190** | **190** |
+| 8 | 3 个含 1 个 4 字（编辑/删除/用户策略）| **220** | **220** |
+| 12 | 4 个 2/4 字混合（编辑/角色权限/数据权限/删除）| **300** | **300** |
+
+**落档规则**：按 C 向上对齐到表中最接近的档位，不要在档位之间插值。例如 C=5 用 190，C=7 用 220。
+
+**溢出 +20 只适用于 C=4 档**（140→160）；其它档位自带余量，溢出不再加宽。
+
+### 快速示例
+
+- 2 个 2 字按钮、无溢出 → `width: 140`（Dept / Param / SmsTemplate / TagManagement 等）
+- `maxVisible={2}` + 3～5 个 2 字按钮 → `width: 160`（CodeGen / MqQueueManagement / ApiMetadataManagement）
+- `maxVisible={2}` + 含 4 字按钮（编辑/分配角色，再折叠 2 个）→ `width: 190`（User）
+- 3 个按钮全平铺、全 2 字 → `width: 190`（Dict / Menu / SmsLog）
+- 3 个按钮含 1 个 4 字 → `width: 220`（DataEncryption / DataDesensitization / AppManagement / ApiExceptionStrategyManagement）
+- 4 个按钮、`maxVisible={4}` → `width: 300`（Role，新模块尽量改用 `maxVisible={2~3}` 走 160/190/220）
+
+## 开关/状态列快捷写法
+
+表格中"是否启用/禁用"列不要额外弹窗，直接调用 `FormStore` 的 `editFormData`；
+**成功回调用列表 store 的单行刷新，不要整表 `getDataSource()` 重拉**（整表重拉会置空列表 + loading、丢滚动位置，连续切换多行时反复闪烁）：
+
+```tsx
+{
+  title: "是否启用",
+  dataIndex: "status",
+  render: (_, record) => (
+    <Switch
+      defaultChecked={!!record.status}
+      options={Options("ENABLE_STATUS")}
+      trueValue={1}
+      falseValue={0}
+      onChange={(checked) => {
+        editFormData(
+          record.id,
+          { ...record, status: +checked },
+          () => refreshRow(record.id)
+        );
+      }}
+      key={`${record.id}-${record.status}`}
+    />
+  ),
+  hasPermi: ["<module>:<sub>:upd"],
+}
+```
+
+列表 store 侧公开 `refreshRow`，封装基类的 `_refreshRowData`（按主键经列表接口重拉该行并就地合并；内部自带乱序返回防护，未查到该行时自动回退整表刷新）：
+
+```ts
+public refreshRow = (id: number | string) => {
+  this._refreshRowData(id, getXxxList);
+};
+```
+
+反例：
+
+```tsx
+// ❌ 开关成功后整表重拉 —— 列表置空 + loading，滚动位置丢失，连续切换多行时反复闪烁
+onChange={(checked) => {
+  editFormData(record.id, { ...record, status: +checked }, () => getDataSource());
+}}
+```
+
+## 导入顺序（项目风格）
+
+大致遵循：
+1. React / 第三方 React 生态（`@hsu-react/ui`、antd、antd icons、ahooks 等）
+2. 项目 `@/services/...` / `@/stores/...`
+3. `observer` from `mobx-react-lite`
+4. 同目录相对导入（`./XxxStore`、`./XxxForm`）
+6. `styles from "./index.module.scss"` 放在靠后位置
+
+组内空行区分即可，不必强制分段。现有文件里 import 顺序有轻微差异，以**同目录最近的兄弟文件**为准。
+
+## Store 与 API 文件的一一对应
+
+每个 store 只从**自己配对的**那个 API 文件导入。若多个 store 恰好都要用同一个后端地址，**在每个 store 对应的 API 文件里各自新增一个同名函数**，而不是跨模块去 import 别家 API 文件里的函数。
+
+```ts
+// ✅ XxxStore.ts 只从自己的 apis/<category>/xxx.ts 导入
+import { getXxxList } from "@/services/apis/<category>/xxx";
+
+// ❌ 不要从别的模块的 API 文件借东西
+import { getYyyList } from "@/services/apis/<category>/yyy";
+```
+
+即便 `/some/endpoint` 这个 URL 在 `xxx.ts` 和 `yyy.ts` 里被重复写了两次，也接受这点重复——两份函数各自带着本模块的类型（`XxxData` vs `YyyData`），后续任一模块改字段、改 URL、改传参都不会牵连另一方。把 API 当作 store 的"私有出入口"看待，不要在 store 层做跨模块依赖。
+
+## 编写流程（Claude 应遵循）
+
+创建新 CRUD 页面时：
+
+1. 用 Glob 扫当前项目 `src/pages/` 的子目录，确定归属大类（没有合适大类再新建）。
+2. 读取同大类下 **1 个** 结构最完整的既有模块作为模板（优先挑有 Form 子目录的，如 `ApiBlacklistManagement/`），以其为蓝本复制并改名，这样能捕获本项目特有的组件名/类型名差异。
+3. **确认对应 API**：按 api-creation skill 的路径镜像规则推导出 `src/services/apis/<category>/<modulename>.ts`（全小写连写）。若该 API 文件不存在或需要新增/修改函数，**通过 `Skill` 工具调起 `api-creation` skill**，由它驱动 API 层的落地，再回到页面侧接线。不要先写页面再事后补 API——这样能一次性把路径/命名对齐。
+4. 按骨架产出 4 个文件：`index.tsx`、`index.module.scss`（放一个空的 `.ModuleName {}` 占位即可）、`<ModuleName>Store.ts`、`<ModuleName>Form/` 下的三件套（如本次需要表单）。
+5. `hasPermi` 权限码从后端/产品给的清单里取，**不要**自己拼——若用户没给，显式在代码顶部留一条 `// TODO: 确认权限码` 问回去（这是唯一允许的 TODO 场景）。
+6. 别动路由注册文件——除非用户明确要求把新页面接到菜单/路由里。页面组件自身只负责渲染。
+7. 创建后**不要**运行 build/lint，除非用户要求。
+
+## 审计/Review 流程（Claude 应遵循）
+
+当用户要求"检查这个页面是否合规"、"看看这几个页面是否符合规范"时：
+
+1. 按本 skill 的骨架/命名/Store/反例逐项核对页面侧文件（`index.tsx`、`<Module>Store.ts`、`<Module>Form/` 等）。
+2. **必须**同时通过 `Skill` 工具调起 `api-creation` skill，把页面对应的 `src/services/apis/<category>/<modulename>.ts` 文件纳入检查——路径是否镜像、文件名是否对应、函数命名、类型命名、`ListRes` 用法等。
+3. 汇总两部分违规项一并产出报告；不要只给页面层面的结论而忽略 API 层的硬违规（比如 API 路径没镜像页面、文件名起了泛名）。
+
+### 全项目审计时，这几项 grep 一遍就能查（性价比最高）
+
+逐文件读完 200+ 个文件不现实，下面几条能在几分钟内捞出大部分真问题：
+
+| 查什么 | 怎么查 | 为什么值得 |
+|---|---|---|
+| **权限码对不上后端** | 抓前端所有 `hasPermi` 里的码，与后端下发的权限码全集做差集（本项目后端在哪个文件里维护这张表，第一次查时确认一次） | 前端用了后端不下发的码 → 按钮**永久隐藏**且没有任何报错。真捞到过一个（`work:outline:upd`），整页两个保存按钮不可见 |
+| **首屏体积** | `npm run build` 后数 `dist/index.html` 里的 `<script>` 个数与 gzip 总量 | 代码分割失效是静默的，只体现在体积上 |
+| **反向依赖** | `grep -rn 'from "@/pages/' src/components src/router src/stores src/hooks` | 共享层 import 页面私有目录 |
+| **antd 误用** | `grep -rn 'from "antd"' src` 再比对兜底白名单 | 一眼能判 |
+| **MobX 两种模式混用** | `makeAutoObservable` 的文件列表 ∩ `extends (ListPanelStore\|FormModalStore)` 的文件列表 | 交集非空即运行时报错 |
+| **死代码** | 对每个模块 `grep -rl "<名字>" src \| grep -v 自身` 数引用 | 捞到过 941 行零引用的 store |
+| **重复代码** | 把疑似同构的两个文件用 `sed` 归一化标识符后 `diff` | 比肉眼比对可靠得多，能量化「还剩多少行同构」 |
+| **依赖是否真被用** | 对 `package.json` 每个依赖 `grep -rl` src，再排掉组件库自己的依赖 | 注意区分「没被 src 直接 import」与「真没用」——组件库的依赖会被重复声明 |
+
+**基线要先跑**：`tsc --noEmit` 与 `eslint --max-warnings 0`。它们全绿说明问题都在类型系统之外，值得记在报告里——也提醒你别把时间花在它们能覆盖的地方。
+
+**报告要分严重度并给出证据**（文件:行号、实测数字），把「改了会怎样」写清楚；不要把风格问题和会丢数据的缺陷混在一起排。
+
+## 反例（常见错误，避免）
+
+- ❌ 忘记加 `observer(...)` —— MobX 数据更新不会触发重渲染
+- ❌ 把 `open`/`id` 这类短命 UI 态写进 MobX store —— 页面间切换会脏，用 `useState`
+- ❌ 在 store 的 `.then` 里只设 `_isLoading = false` 不设 `.catch` —— 接口失败会卡 loading
+- ❌ 全局唯一页面（设置页、无动态参数的列表页）用 `export default XxxStore`（导出类）—— 这类页面应 `export default new XxxStore()`。反过来，**缓存页签下可多实例并存的页面（`noCache: false` ＋ 动态参数路由）必须导出类**，详见「页签缓存与 store 实例化」一节
+- ❌ 模块文件夹或 Store 变量用 camelCase（`apiBlacklistManagement/`）—— 与项目约定（PascalCase）不一致
+- ❌ 页面内写 `try/catch` + `notification.error` —— 失败提示由 store 的 `_message(res)` 或 axios 拦截器统一处理
+- ❌ 用 `import XxxStore from "../../stores/XxxStore"` —— store 是页面私有时应放在页面文件夹内，而不是全局 stores
+- ❌ 删除行后手动 splice `_dataSource` —— 直接 `getDataSource()` 重拉更简单也更不易出错
+- ❌ 在 `_components/`/`_contComps/` 之外复用页面私有组件 —— 需要复用就升级到 `src/components/`，不要跨页直接 import 下划线目录的内容
+- ❌ 页面 `index.tsx` 里内联 `<Modal>` —— 弹窗一律独立成目录；带接口调用的还要配自己的 Store
+- ❌ 弹窗/组件里直接 `import { getXxx } from "@/services/apis/…"` —— 接口调用归 store
+- ❌ 同一段渲染逻辑在两个页面各写一遍 —— ≥2 页面复用就升到 `src/components/`
+- ❌ 跨页 import 别的页面 `_components/` 或页面目录下的私有 store —— props 注入或自建
+- ❌ `layout/`、`src/components/`、`src/router/`、`src/stores/` 里 `import ... from "@/pages/..."` —— 方向反了。共享层要用的东西上提到 `src/stores/` 或 `src/components/`；判断落点看消费者都在哪一层
+- ❌ 抽取重复代码只抽零件、留下同构的页面壳与 store —— 判据是「三个页面之间还剩多少行同构」，不是「有没有抽出过组件」
+- ❌ 入口图（`index.tsx`/`Routes`/`router.config`/`App`/`layout/**`）里静态 import 页面组件或 `Panel`/`FormItem`/`Chart` 这类重组件 —— 会把整个组件库的重依赖钉进首屏，见「页面是懒加载的」一节
+- ❌ 在 MobX store 里同步换掉路由表而不加 `useDeferredValue` —— 懒加载页面在同步更新里挂起会让 React 丢掉整棵树，表现为白屏
+- ❌ 多跳异步的加载方法不加序号守卫 —— 切目标时旧响应会盖掉新目标，最坏结果是版本凭据被污染、之后每次保存都 409
+- ❌ 同一次刷新对同一接口发两发请求（顺带算统计）—— 统计从已有数据派生，或单开方法按需调
+- ❌ 角标计数与列表过滤取不同数据源 —— 点进去的结果对不上角标数字
+- ❌ 用 antd `Popconfirm` / `Modal.confirm` 做二次确认 —— 用 hsu-ui 的 `SecondConf`
+- ❌ 列表 `map()` 里用受控 `SecondConf`，把「哪一行待确认」提到循环外 —— 用触发器模式，原地包住触发元素
+- ❌ 在项目内二次封装 hsu-ui 组件补能力 —— 改回 hsu-ui 发版，本项目升依赖
+- ❌ 后端没详情接口就用 props 把整行传给弹窗 —— 推动后端补 `GET /xxx/{id}`，否则会拿旧 `version` 撞乐观锁
+- ❌ 表格文本列裸 `String(value)` —— 截断后看不到全文，包 `TextEllipsis`
+- ❌ flex 列容器不给 `height: 100%` —— 子元素 `flex: 1` 不生效，下半屏空着
+- ❌ 从其它模块的 API 文件里 import 函数复用 —— 即使 URL 相同，也要在本 store 对应的 API 文件里各自新增一份，保持 store ↔ API 一一对应
+- ❌ 弹窗抽成独立目录后不回头删页面 store 里的 `addXxx`/`editXxx` —— 失去调用点即死代码
+- ❌ 把「弹窗产生、关闭后才展示」的数据（如令牌明文）放页面 store —— 会被迫用回调回传，应连同展示弹窗收进弹窗模块
+- ❌ 看到 `import { Form } from "antd"` 就当违规改成 hsu-ui —— hsu-ui 的 `Form` 不是容器，只有 `Modal`/`Drawer`/`Import`/`useForm`
