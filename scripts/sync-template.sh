@@ -18,10 +18,11 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")"
 STARTER_V2="${STARTER_V2:-$REPO_DIR/../vita-admin-starter}"
 STARTER_V1="${STARTER_V1:-$REPO_DIR/../vita-admin-starter}"
 
+# ref 用 remote 分支：本地分支未必存在，也未必是最新的
 TEMPLATES=(
-  "vite|$STARTER_V2|feat/vite"
-  "webpack|$STARTER_V2|feat/hsu-ui-v2"
-  "antd5|$STARTER_V1|develop"
+  "vite|$STARTER_V2|v2/main"
+  "webpack|$STARTER_V2|v2/webpack"
+  "antd5|$STARTER_V1|origin/main"
 )
 
 WANTED="${1:-}"
