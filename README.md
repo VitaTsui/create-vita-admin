@@ -12,8 +12,8 @@
 # npm
 npm create vita-admin@latest my-app
 
-# 或 yarn
-yarn create vita-admin my-app
+# 或 pnpm
+pnpm create vita-admin my-app
 
 # 或 npx
 npx create-vita-admin my-app
@@ -42,8 +42,8 @@ antd 5 与 6 无法共存，选错了迁移成本不低，建新项目前先确�
 
 ```bash
 cd my-app
-yarn          # 安装依赖
-yarn start    # 启动开发服务器（默认 3003，portfinder 自动顺延）
+pnpm install  # 安装依赖
+pnpm start    # 启动开发服务器（默认 3003，portfinder 自动顺延）
 ```
 
 > 启动前在 `.env/.env.dev` 配好 `API_PROXY`（后端代理）与登录加密密钥（`CRYPTO_KEY` / `RSA_PUB_KEY`）。
@@ -54,7 +54,7 @@ yarn start    # 启动开发服务器（默认 3003，portfinder 自动顺延）
 - **UI**：主要基于 `@hsu-react/ui`（Panel / Form / Table / Search / FormItem / Operate / Chart …），底层 Ant Design 6（`antd5` 模板为 5）
 - **能力**：动态路由（后端菜单驱动）、权限控制、多标签页、主题切换、国际化、Axios 服务层、
   MobX store 基类（列表 / 表单 / CRUD）
-- **页面脚手架**：`yarn crt:lp` / `crt:fp` / `crt:lfp` / `crt:lmp` / `crt:dp` 一键生成各类页面
+- **页面脚手架**：`pnpm crt:lp` / `crt:fp` / `crt:lfp` / `crt:lmp` / `crt:dp` 一键生成各类页面
 - **项目级 Claude skills**（`.claude/skills/`）：`page-creation` / `api-creation` /
   `options-management` / `menu-function-management` / `playwright-mcp-strategy` ——
   用 Claude Code 开发时自动遵循本框架的页面 / 接口 / 选项 / 菜单规范
@@ -73,21 +73,21 @@ yarn start    # 启动开发服务器（默认 3003，portfinder 自动顺延）
 ### 维护（同步模板 + 发布新版本）
 
 ```bash
-yarn sync                 # 同步全部模板
-yarn sync vite            # 只同步某一个
-STARTER_V2=/path/to/repo yarn sync    # 源仓库不在同级目录时指定
+pnpm sync                 # 同步全部模板
+pnpm sync vite            # 只同步某一个
+STARTER_V2=/path/to/repo pnpm sync    # 源仓库不在同级目录时指定
 
 npm version patch                  # 升补丁版本
 npm publish --otp=<6位验证码>       # 发布（无构建步骤，上传很快）
 git push --follow-tags             # 推送代码与版本标签
 ```
 
-`yarn sync` 用 `git archive` 从指定 ref 导出到 `templates/<name>/`，**不动你手上的工作区**
+`pnpm sync` 用 `git archive` 从指定 ref 导出到 `templates/<name>/`，**不动你手上的工作区**
 ——三个模板来自同一个 clone 的不同分支，用 rsync 就得来回 checkout，还会把未提交的改动
 卷进模板。同步时会把 `.gitignore` 改名为 `_gitignore`（规避 npm 对点 gitignore 的特殊处理），
 `.claude` 下只保留 `skills/`（settings 是本机的）。
 
-同步末尾会自动跑一次去重（也可单独 `yarn dedupe`）：三个模板同源，字体 / 图片 / pdf worker
+同步末尾会自动跑一次去重（也可单独 `pnpm dedupe:templates`）：三个模板同源，字体 / 图片 / pdf worker
 这类二进制资产逐字节相同（257 个文件里有 217 个），各存一份会让这个**每次 `npm create` 都要
 下载**的包体积乘三。去重把它们抽到 `templates/_shared/`，生成项目时先铺 `_shared` 再铺所选
 模板（同名以模板为准），结果与去重前逐字节一致。实测包体 12.0 MB → 4.5 MB。
