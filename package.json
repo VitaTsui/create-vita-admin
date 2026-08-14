@@ -1,13 +1,13 @@
 {
   "name": "create-vita-admin",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "脚手架：一键创建基于 @hsu-react/ui 的 React + MobX + webpack 中后台管理项目",
   "bin": {
     "create-vita-admin": "index.js"
   },
   "scripts": {
     "sync": "bash scripts/sync-template.sh",
-    "dedupe": "node scripts/dedupe-templates.cjs"
+    "dedupe:templates": "node scripts/dedupe-templates.cjs"
   },
   "files": [
     "index.js",
@@ -35,5 +35,6 @@
     "type": "git",
     "url": "git+https://github.com/VitaTsui/create-vita-admin.git"
   },
-  "homepage": "https://github.com/VitaTsui/create-vita-admin#readme"
+  "homepage": "https://github.com/VitaTsui/create-vita-admin#readme",
+  "packageManager": "pnpm@9.15.9"
 }

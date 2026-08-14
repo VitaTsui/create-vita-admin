@@ -105,10 +105,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",
-    "@iconify/json": "^2.2.385",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
+    "@iconify/json": "^2.2.385",
     "@nuxt/friendly-errors-webpack-plugin": "^2.6.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.13",
     "@types/crypto-js": "^4.2.2",
@@ -152,6 +152,7 @@
     "sass-loader": "^16",
     "sharp": "0.32.6",
     "stream-browserify": "^3.0.0",
+    "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "uppercamelcase": "^3.0.0",
@@ -160,5 +161,6 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.2",
     "webpack-merge": "^5.10.0"
-  }
+  },
+  "packageManager": "pnpm@9.15.9"
 }

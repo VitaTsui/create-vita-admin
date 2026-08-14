@@ -254,8 +254,8 @@ ${GREEN}✓ 项目创建完成：${projectName}${RESET}
 
 下一步:
   ${CYAN}cd ${projectName}${RESET}
-  ${CYAN}yarn${RESET}            ${DIM}# 安装依赖${RESET}
-  ${CYAN}yarn start${RESET}      ${DIM}# 启动开发服务器${RESET}
+  ${CYAN}pnpm install${RESET}    ${DIM}# 安装依赖${RESET}
+  ${CYAN}pnpm start${RESET}      ${DIM}# 启动开发服务器${RESET}
 
 ${DIM}启动前记得在 .env/.env.dev 配好 API_PROXY 与登录加密密钥。${RESET}
 `);
